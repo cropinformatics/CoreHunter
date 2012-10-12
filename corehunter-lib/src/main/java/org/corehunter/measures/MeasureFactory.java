@@ -12,9 +12,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.measures;
+package org.corehunter.measures;
 
-import org.cimmyt.corehunter.UnknownMeasureException;
+import org.corehunter.UnknownMeasureException;
 
 /**
  * <<Class summary>>

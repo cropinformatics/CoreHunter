@@ -12,17 +12,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.search;
+package org.corehunter.search;
 
 import java.util.List;
 import java.util.Random;
-import org.cimmyt.corehunter.Accession;
-import org.cimmyt.corehunter.measures.PseudoMeasure;
+import org.corehunter.Accession;
+import org.corehunter.measures.PseudoMeasure;
 
 /**
  * Implements an abstract neighborhood which defines the neighbors of a given
- * core subset. Depending on the choosen algorithm that uses the neighborhood,
- * one can generate a random neighbor or the entire neighborhood.
+ * core subset. Depending on the chosen algorithm that uses the neighborhood,
+ * one can generate a random neighbor or the one with the highest value.
  *
  * @author hermandebeukelaer
  */

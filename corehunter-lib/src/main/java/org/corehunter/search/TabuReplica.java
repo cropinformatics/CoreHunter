@@ -12,14 +12,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.search;
+package org.corehunter.search;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.cimmyt.corehunter.Accession;
-import org.cimmyt.corehunter.AccessionCollection;
-import org.cimmyt.corehunter.measures.PseudoMeasure;
+import org.corehunter.Accession;
+import org.corehunter.AccessionCollection;
+import org.corehunter.measures.PseudoMeasure;
 
 /**
  *

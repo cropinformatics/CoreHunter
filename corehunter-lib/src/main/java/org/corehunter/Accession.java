@@ -12,7 +12,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter;
+package org.corehunter;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -31,7 +31,6 @@ public /*final*/ class Accession implements Comparable<Accession> {
     protected Integer dartIndex;
     protected Integer ssrIndex;
     
-    protected List<DArTValue> dartValues;
     protected List<List<Double>> ssrValues;
 
     protected Double extDistance;
@@ -40,7 +39,7 @@ public /*final*/ class Accession implements Comparable<Accession> {
      * 
      */
     public Accession(String name) {
-	setName(name);
+	this.name = name;
 	id = nextAccessionId++;	
     }
 
@@ -61,16 +60,9 @@ public /*final*/ class Accession implements Comparable<Accession> {
     }
 	
     public void bindTraitValues(AccessionDataset ds) {
-	if (ds instanceof DArTDataset) {
-	    bindDArTValues((DArTDataset)ds);
-	} else if (ds instanceof SSRDataset) {
+	if (ds instanceof SSRDataset) {
 	    bindSSRValues((SSRDataset)ds);
 	}
-    }
-	
-    public void bindDArTValues(DArTDataset ds) {
-	dartIndex = ds.getAccessionIndex(name);
-	dartValues = ds.getValues(name);
     }
 	
     public void bindSSRValues(SSRDataset ds) {
@@ -111,14 +103,16 @@ public /*final*/ class Accession implements Comparable<Accession> {
     }
 
     public static double[][] getMarkerAlleleTotals(List<Accession> accessions) {
-	if (accessions.size()==0) return null;
+	if (accessions.isEmpty()) {
+            return null;
+        }
 
 	Accession a1 = accessions.get(0);
 	int markerCnt = a1.numSSRMarkers();
 	double markerAlleleTotals[][] = new double[markerCnt][];
 
 	ListIterator<List<Double>> mItr = a1.getSSRValues().listIterator();
-	ListIterator<Double> aItr = null;
+	ListIterator<Double> aItr;
 
 	int i = 0;
 	while (mItr.hasNext()) {
@@ -133,7 +127,6 @@ public /*final*/ class Accession implements Comparable<Accession> {
 	
 	for(Accession a : accessions) {
 	    mItr = a.getSSRValues().listIterator();
-	    aItr = null;
 
 	    i = 0;
 	    while (mItr.hasNext()) {
@@ -155,7 +148,9 @@ public /*final*/ class Accession implements Comparable<Accession> {
     }
 
     public static double[] getAlleleTotals(List<Accession> accessions) {
-	if (accessions.size()==0) return null;
+	if (accessions.isEmpty()){
+            return null;
+        }
 
 	Accession a1 = accessions.get(0);
 	int alleleCnt = a1.numSSRAlleles();
@@ -166,7 +161,7 @@ public /*final*/ class Accession implements Comparable<Accession> {
 		
 	for(Accession a : accessions) {
 	    ListIterator<List<Double>> mItr = a.getSSRValues().listIterator();
-	    ListIterator<Double> aItr = null;
+	    ListIterator<Double> aItr;
 
 	    int i = 0;
 	    while (mItr.hasNext()) {
@@ -186,7 +181,9 @@ public /*final*/ class Accession implements Comparable<Accession> {
     }
 
     public static int[] getAlleleCounts(List<Accession> accessions) {
-	if (accessions.size()==0) return null;
+	if (accessions.isEmpty()){
+            return null;
+        }
 
 	Accession a1 = accessions.get(0);
 	int alleleCnt = a1.numSSRAlleles();
@@ -197,7 +194,7 @@ public /*final*/ class Accession implements Comparable<Accession> {
 		
 	for(Accession a : accessions) {
 	    ListIterator<List<Double>> mItr = a.getSSRValues().listIterator();
-	    ListIterator<Double> aItr = null;
+	    ListIterator<Double> aItr;
 
 	    int i = 0;
 	    while (mItr.hasNext()) {

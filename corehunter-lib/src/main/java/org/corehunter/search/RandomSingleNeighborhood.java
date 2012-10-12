@@ -12,16 +12,16 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.search;
+package org.corehunter.search;
 
 import java.util.Collections;
 import java.util.List;
-import org.cimmyt.corehunter.Accession;
-import org.cimmyt.corehunter.measures.PseudoMeasure;
+import org.corehunter.Accession;
+import org.corehunter.measures.PseudoMeasure;
 
 /**
  * Implements a standard neighborhood which contains all sets that differ in
- * at most one accession from the current core set, meaning one accesion will
+ * at most one accession from the current core set, meaning one accession will
  * be deleted, added or swapped at random.
  *
  * @author hermandebeukelaer

@@ -12,30 +12,24 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.search;
+package org.corehunter.search;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
-
-import org.cimmyt.corehunter.Accession;
-import org.cimmyt.corehunter.AccessionCollection;
-import org.cimmyt.corehunter.measures.GroupAverageClusterDistance;
-import org.cimmyt.corehunter.measures.ModifiedRogersDistance;
-import org.cimmyt.corehunter.measures.PseudoMeasure;
+import org.corehunter.Accession;
+import org.corehunter.AccessionCollection;
+import org.corehunter.measures.PseudoMeasure;
 
 /**
  * <<Class summary>>
@@ -59,126 +53,6 @@ public final class CoreSubsetSearch {
     }
 
     public static AccessionCollection remcSearch(AccessionCollection ac, Neighborhood nh,
-						 PseudoMeasure pm, int sampleMin, int sampleMax,
-						 double runtime, double minProg, double stuckTime,
-                                                 int numReplicas, double minT, double maxT, int mcSteps) {
-	
-	SimpleMonteCarloReplica replicas[] = new SimpleMonteCarloReplica[numReplicas];
-	Random r = new Random();
-	
-	for(int i=0; i<numReplicas; i++) {
-	    double T = minT + i*(maxT - minT)/(numReplicas - 1);
-	    replicas[i] = new SimpleMonteCarloReplica(ac, pm, nh, mcSteps, -1, sampleMin, sampleMax, T);
-            replicas[i].init();
-	}
-	
-	double bestScore = -Double.MAX_VALUE;
-	List<Accession> bestCore = new ArrayList<Accession>();
-
-      	ThreadMXBean tb = ManagementFactory.getThreadMXBean();
-	double sTime = tb.getCurrentThreadCpuTime();
-	double eTime = sTime + runtime * 1000000000;
-	
-	int swapBase = 0;
-        boolean cont = true, impr;
-        double prevBestScore = bestScore, prog;
-        int prevBestSize = ac.size();
-        double lastImprTime = 0.0;
-
-        ProgressWriter pw;
-        if(WRITE_PROGRESS_FILE){
-            pw = new ProgressWriter(PROGRESS_FILE_PATH, PROGRESS_WRITE_PERIOD);
-            pw.start();
-        }
-	while( cont && tb.getCurrentThreadCpuTime() < eTime ) {
-
-	    // run MC search for each replica
-            impr = false;
-	    for(int i=0; i<numReplicas; i++) {
-		replicas[i].doSteps();
-                double bestRepScore = replicas[i].getBestScore();
-		
-		if (bestRepScore > bestScore || 
-		    (bestRepScore == bestScore && replicas[i].getBestCore().size() < bestCore.size())) {
-
-                    
-		    bestScore = bestRepScore;
-		    bestCore.clear();
-		    bestCore.addAll(replicas[i].getBestCore());
-
-                    impr=true;
-                    lastImprTime = (tb.getCurrentThreadCpuTime() - sTime);
-		    System.out.println("best score: " + bestRepScore + "\tsize: " + bestCore.size() +
-				       "\ttime: " + lastImprTime/1000000000);
-                    // update progress writer
-                    if(WRITE_PROGRESS_FILE){
-                        pw.updateScore(bestScore);
-                    }
-		}				
-            }
-
-            // check min progression
-            prog = bestScore - prevBestScore;
-            if(impr && bestCore.size() >= prevBestSize && prog < minProg){
-                cont = false;
-            }
-            // check stuckTime
-            if((tb.getCurrentThreadCpuTime()-sTime-lastImprTime)/1000000000 > stuckTime){
-                cont = false;
-            }
-
-            prevBestScore = bestScore;
-            prevBestSize = bestCore.size();
-
-	    // consider swapping temperatures of adjacent replicas
- 	    for(int i=swapBase; i<numReplicas-1; i+=2) {
-		SimpleMonteCarloReplica m = replicas[i];
-		SimpleMonteCarloReplica n = replicas[i+1];
-	
-		double B_m = 1.0 / (K_b2 * m.getTemperature());
-		double B_n = 1.0 / (K_b2 * n.getTemperature());
-		double B_diff = B_n - B_m;
-		double E_delta = m.getScore() - n.getScore();
-		
-		boolean swap = false;
-
-		if( E_delta <= 0 ) {
-		    swap = true;
-		} else {
-		    double p = r.nextDouble();
-		    
-		    if( Math.exp(B_diff * E_delta) > p ) {
-			swap = true;
-		    }
-		}
-		
-		if (swap) {
-		    m.swapTemperature(n);
-		    SimpleMonteCarloReplica temp = replicas[i];
-		    replicas[i] = replicas[i+1];
-		    replicas[i+1] = temp;
-		}
-	    }
-	    swapBase = 1 - swapBase;
-	}
-        if(WRITE_PROGRESS_FILE){
-            pw.stop();
-        }
-        
-        System.out.println("### End time: " + (tb.getCurrentThreadCpuTime() - sTime)/1000000000);
-
-	AccessionCollection core = new AccessionCollection();
-	core.add(bestCore);
-	
-	// temp
-	// for(int i=0; i<replicas.length; i++) {
-	//    replicas[i].printStats();
-	// }
-	
-	return core;
-    }
-
-    public static AccessionCollection parRemcSearch(AccessionCollection ac, Neighborhood nh,
 						 PseudoMeasure pm, int sampleMin, int sampleMax,
 						 double runtime, double minProg, double stuckTime,
                                                  int numReplicas, double minT, double maxT, int mcSteps) {
@@ -493,8 +367,8 @@ public final class CoreSubsetSearch {
     /**
      * Steepest Descent search.
      *
-     * Always go on with the best of all neighbors, if it is better than the current
-     * core set, and stop search of no improvement can be maded. This is also called
+     * Always continue with the best of all neighbors, if it is better than the current
+     * core set, and stop search if no improvement can be made. This is also called
      * an "iterative improvement" strategy.
      *
      * @param ac
@@ -715,371 +589,13 @@ public final class CoreSubsetSearch {
 
     }
 
-    public static AccessionCollection geneticSearch(AccessionCollection ac, PseudoMeasure pm, int sampleMin,
-                                                    int sampleMax, double runtime, double minProg, double stuckTime,
-                                                    int popSize, int nrOfChildren, int tournamentSize, double mutationRate) {
-
-        double bestScore;
-        List<Accession> bestCore;
-
-        // Create population
-        GeneticPopulation population = new GeneticPopulation(popSize, sampleMin, sampleMax, ac.getAccessions(),
-                                                             pm, nrOfChildren, tournamentSize, mutationRate);
-
-        ThreadMXBean tb = ManagementFactory.getThreadMXBean();
-	double sTime = tb.getCurrentThreadCpuTime();
-	double eTime = sTime + runtime * 1000000000;
-
-        // Init population
-        population.init();
-        bestCore = population.getBestCore();
-        bestScore = population.getBestScore();
-        System.out.println("best score: " + bestScore + "\tsize: " + bestCore.size() +
-                           "\ttime: " + (tb.getCurrentThreadCpuTime() - sTime)/1000000000);
-
-        // Until end time reached, create new generations
-        boolean cont = true;
-        double lastImprTime = 0.0;
-
-        ProgressWriter pw;
-        if(WRITE_PROGRESS_FILE){
-            pw = new ProgressWriter(PROGRESS_FILE_PATH, PROGRESS_WRITE_PERIOD);
-            pw.start();
-            pw.updateScore(bestScore);
-        }
-        while( cont && tb.getCurrentThreadCpuTime() < eTime ){
-            population.nextGen();
-            if(population.getBestScore() > bestScore
-                    || (population.getBestScore() == bestScore && population.getBestCore().size() < bestCore.size())){
-                // check min progression
-                if(population.getBestCore().size() >= bestCore.size() && population.getBestScore() - bestScore < minProg){
-                    cont = false;
-                }
-                // Report new best core was found
-                bestCore = population.getBestCore();
-                bestScore = population.getBestScore();
-
-                lastImprTime = tb.getCurrentThreadCpuTime() - sTime;
-                System.out.println("best score: " + bestScore + "\tsize: " + bestCore.size() +
-                                   "\ttime: " + lastImprTime/1000000000);
-                // update progress writer
-                if(WRITE_PROGRESS_FILE){
-                    pw.updateScore(bestScore);
-                }
-            } else {
-                // check stuckTime
-                if((tb.getCurrentThreadCpuTime()-sTime-lastImprTime)/1000000000 > stuckTime){
-                    cont = false;
-                }
-            }
-        }
-        if(WRITE_PROGRESS_FILE){
-            pw.stop();
-        }
-
-        System.out.println("### End time: " + (tb.getCurrentThreadCpuTime() - sTime)/1000000000);
-
-	AccessionCollection bestCoreCol = new AccessionCollection();
-	bestCoreCol.add(bestCore);
-
-	return bestCoreCol;
-    }
-
-    public static AccessionCollection mergeReplicaSearch(AccessionCollection ac, Neighborhood nh, PseudoMeasure pm,
-                                                    int sampleMin, int sampleMax, double runtime, double minProg, double stuckTime,
-                                                    int minNrOfReplicas, int nrOfLocalSearchSteps, int nrOfChildren, int tournamentSize,
-                                                    boolean stratifiedStart, boolean stratifiedMerge) {
-        final int NR_OF_CLUSTERS = sampleMax;
-        final double STRAT_MERGE_PROB = 0.5;
-
-        double bestScore = -Double.MAX_VALUE;
-        List<Accession> bestCore = new ArrayList<Accession>();
-
-        Random rg = new Random();
-
-        ThreadMXBean tb = ManagementFactory.getThreadMXBean();
-	double sTime = tb.getCurrentThreadCpuTime();
-	double eTime = sTime + runtime * 1000000000;
-
-        Clustering clustering = new Clustering(NR_OF_CLUSTERS, new GroupAverageClusterDistance(new ModifiedRogersDistance(ac.size())));
-
-        if(stratifiedStart){
-            for(Accession a : ac.getAccessions()){
-                clustering.addAccession(a);
-            }
-        }
-
-        // create, init and store genetic replicas
-        List<Replica> replicas = new ArrayList<Replica>(minNrOfReplicas);
-        for (int i=0; i<minNrOfReplicas; i++){
-            LocalSearchReplica rep = new LocalSearchReplica(ac, pm, nh, nrOfLocalSearchSteps, -1, sampleMin, sampleMax);
-            if(stratifiedStart){
-                //if(i%2 == 0) //half random - half stratified start
-                    rep.init(sampleStratifiedStart(clustering.getClusters(), rg));
-                //else
-                //    rep.init();
-            } else {
-                rep.init();
-            }
-            replicas.add(rep);
-        }
-        List<List<Accession>> parents = new ArrayList<List<Accession>>(2*nrOfChildren);
-        List<List<Accession>> children = new ArrayList<List<Accession>>(nrOfChildren);
-
-        boolean cont = true, impr;
-        double prevBestScore = bestScore, prog;
-        int prevBestSize = ac.size();
-        double lastImprTime = 0.0;
-
-        if(!stratifiedStart){
-            // if no clustering at start, timer is started AFTER random initialization,
-            // like with REMC, for fair comparison of runtimes
-            sTime = tb.getCurrentThreadCpuTime();
-            eTime = sTime + runtime * 1000000000;
-        }
-
-        ProgressWriter pw;
-        if(WRITE_PROGRESS_FILE){
-            pw = new ProgressWriter(PROGRESS_FILE_PATH, PROGRESS_WRITE_PERIOD);
-            pw.start();
-        }
-        while ( cont && tb.getCurrentThreadCpuTime() < eTime ){
-            // Perform local search steps for each replica
-            impr=false;
-            for(int i=replicas.size()-1; i>=0; i--){
-
-                Replica rep = replicas.get(i);
-                rep.doSteps();
-
-                // check for better solution
-                if (rep.getBestScore() > bestScore
-                        || (rep.getBestScore() == bestScore && rep.getBestCore().size() < bestCore.size())){
-
-                    // store better core
-                    bestScore = rep.getBestScore();
-                    bestCore.clear();
-                    bestCore.addAll(rep.getBestCore());
-
-                    impr=true;
-                    lastImprTime = tb.getCurrentThreadCpuTime() - sTime;
-                    System.out.println("best score: " + bestScore + "\tsize: " + bestCore.size() +
-                                       "\ttime: " + lastImprTime/1000000000 +
-                                       "\t#rep: " + replicas.size());
-                    // update progress writer
-                    if(WRITE_PROGRESS_FILE){
-                        pw.updateScore(bestScore);
-                    }
-                }
-                // if current replica got stuck and enough replicas left --> remove replica
-                if(rep.stuck() && replicas.size() > minNrOfReplicas){
-                    replicas.remove(i);
-                }
-            }
-
-            // check min progression
-            prog = bestScore - prevBestScore;
-            if(impr && bestCore.size() >= prevBestSize && prog < minProg){
-                cont = false;
-            }
-            // check stuckTime
-            if((tb.getCurrentThreadCpuTime()-sTime-lastImprTime)/1000000000 > stuckTime){
-                cont = false;
-            }
-
-            prevBestScore = bestScore;
-            prevBestSize = bestCore.size();
-
-            // Genetic cross-over to create new replicas
-            selectParents(replicas, parents, 2*nrOfChildren, tournamentSize, rg);
-            if(stratifiedMerge && rg.nextDouble() < STRAT_MERGE_PROB){
-                createNewStratifiedChildren(parents, children, rg, clustering);
-            } else {
-                createNewChildren(parents, children, rg);
-            }
-            for(List<Accession> child : children){
-                LocalSearchReplica rep = new LocalSearchReplica(ac, pm, nh, nrOfLocalSearchSteps, -1, sampleMin, sampleMax);
-                rep.init(child);
-                replicas.add(rep);
-            }
-        }
-        if(WRITE_PROGRESS_FILE){
-            pw.stop();
-        }
-
-        System.out.println("### End time: " + (tb.getCurrentThreadCpuTime() - sTime)/1000000000);
-
-	AccessionCollection bestCoreCol = new AccessionCollection();
-	bestCoreCol.add(bestCore);
-
-	return bestCoreCol;
-
-    }
-
-    public static AccessionCollection parMergeReplicaSearch(AccessionCollection ac, Neighborhood nh, PseudoMeasure pm,
-                                                    int sampleMin, int sampleMax, double runtime, double minProg, double stuckTime,
-                                                    int minNrOfReplicas, int nrOfLocalSearchSteps, int nrOfChildren, int tournamentSize,
-                                                    boolean stratifiedStart, boolean stratifiedMerge) {
-
-        final int NR_OF_CLUSTERS = sampleMax;
-        final double STRAT_MERGE_PROB = 0.5;
-
-        double bestScore = -Double.MAX_VALUE;
-        List<Accession> bestCore = new ArrayList<Accession>();
-
-        Random rg = new Random();
-
-        long sTime = System.currentTimeMillis();
-	long eTime = sTime + (long)(runtime * 1000);
-
-        Clustering clustering = new Clustering(NR_OF_CLUSTERS, new GroupAverageClusterDistance(new ModifiedRogersDistance(ac.size())));
-
-        if(stratifiedStart){
-            for(Accession a : ac.getAccessions()){
-                clustering.addAccession(a);
-            }
-        }
-
-        // create, init and store replicas
-        List<Replica> replicas = new ArrayList<Replica>(minNrOfReplicas);
-        for (int i=0; i<minNrOfReplicas; i++){
-            LocalSearchReplica rep = new LocalSearchReplica(ac, pm, nh.clone(), nrOfLocalSearchSteps, -1, sampleMin, sampleMax);
-            if(stratifiedStart){
-                //if(i%2 == 0) //half random - half stratified start
-                    rep.init(sampleStratifiedStart(clustering.getClusters(), rg));
-                //else
-                //    rep.init();
-            } else {
-                rep.init();
-            }
-            replicas.add(rep);
-        }
-        List<Future> futures = new ArrayList<Future>(minNrOfReplicas);
-        List<List<Accession>> parents = new ArrayList<List<Accession>>(2*nrOfChildren);
-        List<List<Accession>> children = new ArrayList<List<Accession>>(nrOfChildren);
-
-        // create thread pool
-        ExecutorService pool = Executors.newCachedThreadPool();
-
-        boolean cont = true, impr;
-        double prevBestScore = bestScore, prog;
-        int prevBestSize = ac.size();
-        long lastImprTime = 0;
-
-        if(!stratifiedStart){
-            // if no clustering at start, timer is started AFTER random initialization,
-            // like with REMC, for fair comparison of runtimes
-            sTime = System.currentTimeMillis();
-            eTime = sTime + (long)(runtime * 1000);
-        }
-
-        ProgressWriter pw;
-        if(WRITE_PROGRESS_FILE){
-            pw = new ProgressWriter(PROGRESS_FILE_PATH, PROGRESS_WRITE_PERIOD);
-            pw.start();
-        }
-        while ( cont && System.currentTimeMillis() < eTime ){
-
-            // Perform local search steps for each replica (parallel in pool!)
-            futures.clear();
-            for(int i=0; i<replicas.size(); i++){
-                Future fut = pool.submit(replicas.get(i));
-                futures.add(fut);
-            }
-
-            // Wait until all tasks have been completed
-            for(int i=0; i<futures.size(); i++){
-                try {
-                    futures.get(i).get(); // doesn't return a result, but blocks until done
-                } catch (InterruptedException ex) {
-                    System.err.println("Error in thread pool: " + ex);
-                    ex.printStackTrace();
-                    System.exit(1);
-                } catch (ExecutionException ex) {
-                    System.err.println("Error in thread pool: " + ex);
-                    ex.printStackTrace();
-                    System.exit(1);
-                }
-            }
-
-            // All tasks are done, inspect results
-            impr = false;
-            for(int i=replicas.size()-1; i>=0; i--){
-                Replica rep = replicas.get(i);
-                // check for better solution
-                if (rep.getBestScore() > bestScore
-                        || (rep.getBestScore() == bestScore && rep.getBestCore().size() < bestCore.size())){
-
-                    // store better core
-                    bestScore = rep.getBestScore();
-                    bestCore.clear();
-                    bestCore.addAll(rep.getBestCore());
-                    
-                    impr=true;
-                    lastImprTime = System.currentTimeMillis() - sTime;
-                    System.out.println("best score: " + bestScore + "\tsize: " + bestCore.size() +
-                                       "\ttime: " + lastImprTime/1000.0 +
-                                       "\t#rep: " + replicas.size());
-                    // update progress writer
-                    if(WRITE_PROGRESS_FILE){
-                        pw.updateScore(bestScore);
-                    }
-                }
-                // if current replica got stuck and enough replicas left --> remove replica
-                if(rep.stuck() && replicas.size() > minNrOfReplicas){
-                    replicas.remove(i);
-                }
-            }
-
-            // check min progression
-            prog = bestScore - prevBestScore;
-            if(impr && bestCore.size() >= prevBestSize && prog < minProg){
-                cont = false;
-            }
-            // check stuck time
-            if((System.currentTimeMillis()-sTime-lastImprTime)/1000.0 > stuckTime){
-                cont = false;
-            }
-
-            prevBestScore = bestScore;
-            prevBestSize = bestCore.size();
-
-            // Genetic cross-over to create new replicas
-            selectParents(replicas, parents, 2*nrOfChildren, tournamentSize, rg);
-            if(stratifiedMerge && rg.nextDouble() < STRAT_MERGE_PROB){
-                createNewStratifiedChildren(parents, children, rg, clustering);
-            } else {
-                createNewChildren(parents, children, rg);
-            }
-            createNewChildren(parents, children, rg);
-            for(List<Accession> child : children){
-                LocalSearchReplica rep = new LocalSearchReplica(ac, pm, nh.clone(), nrOfLocalSearchSteps, -1, sampleMin, sampleMax);
-                rep.init(child);
-                replicas.add(rep);
-            }
-        }
-        if(WRITE_PROGRESS_FILE){
-            pw.stop();
-        }
-
-        System.out.println("### End time: " + (System.currentTimeMillis() - sTime)/1000.0);
-
-	AccessionCollection bestCoreCol = new AccessionCollection();
-	bestCoreCol.add(bestCore);
-
-	return bestCoreCol;
-
-    }
-
     public static AccessionCollection mixedReplicaSearch(AccessionCollection ac, PseudoMeasure pm, int sampleMin,
                                                          int sampleMax, double runtime, double minProg, double stuckTime,
                                                          int nrOfTabuReplicas, int nrOfNonTabuReplicas, int roundsWithoutTabu,
-                                                         int nrOfTabuSteps, int tournamentSize,int tabuListSize, boolean stratifiedStart,
-                                                         boolean stratifiedMerge, int boostNr, double boostMinProg,
-                                                         int boostTimeFactor, double minBoostTime, double minSimAnTemp,
-                                                         double maxSimAnTemp) {
+                                                         int nrOfTabuSteps, int tournamentSize, int tabuListSize, int boostNr,
+                                                         double boostMinProg, int boostTimeFactor, double minBoostTime,
+                                                         double minMCTemp, double maxMCTemp) {
 
-        final int NR_OF_CLUSTERS = sampleMax;
-        final double STRAT_MERGE_PROB = 0.5;
         double boostTime = 0;
         boolean boostTimeLocked = false;
 
@@ -1093,7 +609,7 @@ public final class CoreSubsetSearch {
 
         // LS can perform more steps than tabu because each step is very fast,
         // only sampling one neighbor instead of Tabu which samples about ac.size()
-        // neighbors in each step to select the (heursistic) best neighbor!
+        // neighbors in each step to select the (heursistic) best neighbor
         final int NR_OF_LS_STEPS = ac.size();
 
         double bestScore = -Double.MAX_VALUE;
@@ -1104,20 +620,9 @@ public final class CoreSubsetSearch {
         Neighborhood randNh = new RandomSingleNeighborhood(sampleMin, sampleMax);
         Neighborhood heurNh = new HeuristicSingleNeighborhood(sampleMin, sampleMax);
 
-        long sTime = System.currentTimeMillis();
-        long eTime = sTime + (long)(runtime * 1000);
-
-        Clustering clustering = new Clustering(NR_OF_CLUSTERS, new GroupAverageClusterDistance(new ModifiedRogersDistance(ac.size())));
-        
-        if(stratifiedStart){
-            for(Accession a : ac.getAccessions()){
-                clustering.addAccession(a);
-            }
-        }
-
         // create, init and store initial replicas (local search)
         List<Replica> replicas = new ArrayList<Replica>(nrOfNonTabuReplicas);
-        // add Local Search Replicas until minimum nr reached
+        // add Local Search Replicas
         for (int i=0; i< nrOfNonTabuReplicas; i++){
             Replica rep;
 
@@ -1125,11 +630,7 @@ public final class CoreSubsetSearch {
             rep = new LocalSearchReplica(ac, pm, randNh.clone(), NR_OF_LS_STEPS, -1, sampleMin, sampleMax);
             
             // Init replica
-            if(stratifiedStart){
-                rep.init(sampleStratifiedStart(clustering.getClusters(), rg));
-            } else {
-                rep.init();
-            }
+            rep.init();
             replicas.add(rep);
         }
         
@@ -1141,7 +642,7 @@ public final class CoreSubsetSearch {
         LRReplica lrrep = new LRReplica(ac, pm, NR_OF_LR_STEPS, -1, sampleMin, sampleMax, LR_L, LR_R, LR_EXH_START);
         lrrep.init();
 
-        List<Future> localAndREMCfutures = new ArrayList<Future>(nrOfNonTabuReplicas);
+        List<Future> localAndMCReplicas = new ArrayList<Future>(nrOfNonTabuReplicas);
         List<Future> tabuFutures = new ArrayList<Future>(nrOfTabuReplicas);
         List<List<Accession>> parents = new ArrayList<List<Accession>>();
         List<List<Accession>> children = new ArrayList<List<Accession>>();
@@ -1169,12 +670,8 @@ public final class CoreSubsetSearch {
 
         boolean lrChecked = false;
 
-        if(!stratifiedStart){
-            // if no clustering at start, timer is started AFTER random initialization,
-            // like with REMC, for fair comparison of runtimes
-            sTime = System.currentTimeMillis();
-            eTime = sTime + (long)(runtime * 1000);
-        }
+        long sTime = System.currentTimeMillis();
+        long eTime = sTime + (long)(runtime * 1000);
 
         ProgressWriter pw;
         if(WRITE_PROGRESS_FILE){
@@ -1185,7 +682,6 @@ public final class CoreSubsetSearch {
         Thread lrThread = factory.newThread(lrrep);
         lrThread.setPriority(Thread.MAX_PRIORITY);
         lrThread.start();
-        //System.out.println("[LR submitted]");
 
         long firstRounds = 0;
 
@@ -1196,42 +692,27 @@ public final class CoreSubsetSearch {
                     tabuFutures.add(pool.submit(rep));
                 }
             }
-            //System.out.println("[tabus submitted]");
-
+            
+            // loop submission of Local and REMC replicas (short runs)
             while((firstRounds < roundsWithoutTabu || tabuReplicasBusy(tabuFutures))
                     && cont && System.currentTimeMillis() < eTime){
 
-                //System.out.println("LR steps done: " + lrrep.getCurSteps());
-
-                /*if(firstRounds < ROUNDS_WITHOUT_TABU){
-                    System.out.println("[NO TABU]");
-                }*/
-
                 firstRounds++;
 
-                /*System.out.print("["+replicas.get(0).shortType());
-                for(int i=1; i<replicas.size(); i++){
-                    System.out.print(", " + replicas.get(i).shortType());
-                }
-                System.out.println("]");*/
-
-                // loop submission of Local and REMC replicas (short runs)
-
-                localAndREMCfutures.clear();
+                localAndMCReplicas.clear();
                 // Submit non-tabu replicas
                 for(int i=0; i<replicas.size(); i++){
                     Replica rep = replicas.get(i);
                     if(!rep.shortType().equals("Tabu")){
-                        localAndREMCfutures.add(pool.submit(rep));
+                        localAndMCReplicas.add(pool.submit(rep));
                     }
                 }
-                //System.out.println("[non-tabus submitted]");
 
                 // Wait until all non-tabu replicas have completed their current run
-                for(int i=0; i<localAndREMCfutures.size(); i++){
+                for(int i=0; i<localAndMCReplicas.size(); i++){
                     try {
                         //System.out.println("Waiting for non-tabu rep #" + (i+1));
-                        localAndREMCfutures.get(i).get(); // doesn't return a result, but blocks until done
+                        localAndMCReplicas.get(i).get(); // doesn't return a result, but blocks until done
                     } catch (InterruptedException ex) {
                         System.err.println("Error in thread pool: " + ex);
                         ex.printStackTrace();
@@ -1242,14 +723,9 @@ public final class CoreSubsetSearch {
                         System.exit(1);
                     }
                 }
-                //System.out.println("[Done waiting!]");
 
-                // Replicas are done, inspect results
+                // Non-tabu replicas are done, inspect results
                 impr = false;
-
-                // Check non-tabu replica results
-
-                // Check LS, Tabu and REMC replica results
                 nrStuck = 0;
                 Iterator<Replica> itr = replicas.iterator();
                 while(itr.hasNext()){
@@ -1283,9 +759,6 @@ public final class CoreSubsetSearch {
 
                 // Check LR result, if done and not checked before
                 if(lrrep.isDone() && !lrChecked){
-
-                    System.out.println("[LR done!]");
-
                     if (lrrep.getBestScore() > bestScore
                             || (lrrep.getBestScore() == bestScore && lrrep.getBestCore().size() < bestCore.size())){
 
@@ -1310,15 +783,12 @@ public final class CoreSubsetSearch {
                     nrOfNonTabus++;
                 }
 
-                //System.out.println("[Best score updated]");
-
                 // update boost time
                 if(!boostTimeLocked){
                     boostTime = boostTime / boostTimeFactor;
                     boostTime = (boostTime * (numround-1) + (System.currentTimeMillis() - sTime - prevRoundTime)/1000.0)/numround;
                     boostTime = boostTime * boostTimeFactor;
                     prevRoundTime = System.currentTimeMillis() - sTime;
-                    //System.out.println("BoostTime: " + boostTime + " (#rep = " + replicas.size() + ")");
                 }
 
                 prog = bestScore - prevBestScore;
@@ -1334,55 +804,45 @@ public final class CoreSubsetSearch {
 
                 // check boost prog
                 if(impr && prog < boostMinProg){
+                    
                     lastBoostTime = System.currentTimeMillis()-sTime;
                     // only boost with some fraction of the normal nr of boost replicas in case of min prog boost
                     int progBoostNr = boostNr/PROG_BOOST_FACTOR;
                     boostReplicas(replicas, progBoostNr, ac, pm, randNh, NR_OF_LS_STEPS, sampleMin, sampleMax);
                     nrOfNonTabus += progBoostNr;
-                    System.out.println("[progBoost] - #rep: " + replicas.size());
+                    //System.out.println("[progBoost] - #rep: " + replicas.size());
+                    
                 }
 
-                // check boost time
+                // check boost time -- do not boost if previous boost effect still visible!
                 if((System.currentTimeMillis()-sTime-Math.max(lastImprTime, lastBoostTime))/1000.0 > Math.max(boostTime, minBoostTime)
-                        && replicas.size() == nrOfNonTabuReplicas + nrOfTabuReplicas){ // do not boost if previous boost effect still visible!
+                        && replicas.size() == nrOfNonTabuReplicas + nrOfTabuReplicas){
+                    
                     lastBoostTime = System.currentTimeMillis()-sTime;
                     boostReplicas(replicas, boostNr, ac, pm, randNh, NR_OF_LS_STEPS, sampleMin, sampleMax);
                     nrOfNonTabus += boostNr;
                     boostTimeLocked = true;
-                    System.out.println("[timeBoost] - #rep: " + replicas.size());
+                    //System.out.println("[timeBoost] - #rep: " + replicas.size());
+                    
                 }
 
-                //System.out.println("[Possible boost done]");
-
-                // "Genetic" cross-over to create new REMC (non-tabu) replicas
+                // Merge replicas to create new MC replicas (non-tabu)
                 int nonTabuChildren = nrOfNonTabuReplicas - (nrOfNonTabus-nrStuck);
-                //System.out.println("[non-tabu] Stuck: " + nrStuck + " - Current: " + nrOfNonTabus + " - Create: " + nonTabuChildren);
                 if(nonTabuChildren > 0){
                     // Select parents from non-tabu replicas only! (tabus are still being manipulated, so skip these)
                     selectParents(replicas, parents, 2*nonTabuChildren, tournamentSize, rg, "Tabu");
-
-                    //System.out.println("[Parents created]");
-
-                    if(stratifiedMerge && rg.nextDouble() < STRAT_MERGE_PROB){
-                        createNewStratifiedChildren(parents, children, rg, clustering);
-                    } else {
-                        createNewChildren(parents, children, rg);
-                    }
-
-                    //System.out.println("[Children created]");
-
+                    // Create new children by merging parents
+                    createNewChildren(parents, children, rg);
+                    // Create new MC recplicas which use merged children as initial solutions
                     for(List<Accession> child : children){
                         // New REMC replicas
                         Replica rep = new SimpleMonteCarloReplica(ac, pm, randNh.clone(), NR_OF_LS_STEPS, -1,
-                                    sampleMin, sampleMax, minSimAnTemp + rg.nextDouble()*(maxSimAnTemp-minSimAnTemp));
+                                    sampleMin, sampleMax, minMCTemp + rg.nextDouble()*(maxMCTemp-minMCTemp));
                         nrOfNonTabus++;
                         
                         rep.init(child);
                         replicas.add(rep);
                     }
-
-                    //System.out.println("[New non-tabu replicas created]");
-
                 }
 
 
@@ -1396,14 +856,10 @@ public final class CoreSubsetSearch {
                     }
                 }
 
-                //System.out.println("[Non-tabu stucks removed]");
-
                 prevBestScore = bestScore;
                 prevBestSize = bestCore.size();
 
                 numround++;
-
-                //System.out.println("[Non-tabu round finished]");
             }
 
             if(!tabuReplicasBusy(tabuFutures)){
@@ -1441,15 +897,12 @@ public final class CoreSubsetSearch {
 
                 // Create new tabus by merging current results (from all replicas!!!)
                 int tabuChildren = nrOfTabuReplicas - (nrOfTabus-nrStuck);
-                //System.out.println("[tabu] Stuck: " + nrStuck + " - Current: " + nrOfTabus + " - Create: " + tabuChildren);
                 if(tabuChildren > 0){
                     // Select parents from all replicas!
                     selectParents(replicas, parents, 2*tabuChildren, tournamentSize, rg);
-                    if(stratifiedMerge && rg.nextDouble() < STRAT_MERGE_PROB){
-                        createNewStratifiedChildren(parents, children, rg, clustering);
-                    } else {
-                        createNewChildren(parents, children, rg);
-                    }
+                    // Merge parents to create children
+                    createNewChildren(parents, children, rg);
+                    // Create new tabu replicas with merged children as initial solutions
                     for(List<Accession> child : children){
                         // new Tabu replicas
                         int listsize = rg.nextInt(tabuListSize)+1;
@@ -1518,43 +971,6 @@ public final class CoreSubsetSearch {
             replicas.add(rep);
         }
 
-    }
-
-    /**
-     * Sample one accession from each cluster.
-     *
-     * @param clusters
-     * @param sampleSize
-     * @param rg
-     * @return
-     */
-    public static List<Accession> sampleStratifiedStart(Collection<AccessionCluster> clusters, Random rg){
-
-        Iterator<AccessionCluster> itr;
-        AccessionCluster clust;
-        Accession remAcc;
-
-        List<Accession> start = new ArrayList<Accession>(clusters.size());
-
-        List<Accession> tmp = new ArrayList<Accession>();
-        itr = clusters.iterator();
-        while(itr.hasNext()){
-            clust = itr.next();
-            int clustSampleSize = 1;
-            // Randomly sample accessions from cluster
-            tmp.clear();
-            for(int k=0; k<clustSampleSize; k++){
-                int rem = rg.nextInt(clust.size());
-                remAcc = clust.getAccessions().remove(rem);
-                start.add(remAcc);
-                tmp.add(remAcc);
-            }
-            // Restore cluster
-            clust.getAccessions().addAll(tmp);
-        }
-
-        return start;
-        
     }
 
     private static void selectParents(List<Replica> replicas, List<List<Accession>> parents,
@@ -1649,63 +1065,6 @@ public final class CoreSubsetSearch {
             // Add new child to list
             children.add(child);
         }
-    }
-
-    private static final Set<Accession> childSet = new HashSet<Accession>();
-
-    private static void createNewStratifiedChildren(List<List<Accession>> parents, List<List<Accession>> children,
-                                                    Random rg, Clustering clustering){
-
-        List<Accession> parent1, parent2, child;
-        int p1size, p2size, pminSize, pmaxSize, childSize;
-        Iterator<AccessionCluster> itr;
-        AccessionCluster clust;
-
-        children.clear();
-        for(int i=0; i<parents.size()-1; i+=2){
-
-            // Cross-over
-
-            // Get parents
-            parent1 = parents.get(i);
-            p1size = parent1.size();
-            parent2 = parents.get(i+1);
-            p2size = parent2.size();
-
-            pminSize = Math.min(p1size, p2size);
-            pmaxSize = Math.max(p1size, p2size);
-
-            // Create child (stratified merge)
-            childSize = pminSize + rg.nextInt(pmaxSize - pminSize + 1);
-            childSet.clear();
-            childSet.addAll(parent1);
-            childSet.addAll(parent2);
-
-            // Cluster childset
-            clustering.reset();
-            clustering.setDesiredClusters(childSize);
-            for(Accession a : childSet){
-                clustering.addAccession(a);
-            }
-
-            // Stratified sampling from clustered childset to create child
-            // --> Add one accession from each cluster
-            child = new ArrayList<Accession>(childSize);
-            itr = clustering.getClusters().iterator();
-            while(itr.hasNext()){
-                clust = itr.next();
-                int sampleSize = 1;
-                // Randomly sample accessions from cluster
-                for(int k=0; k<sampleSize; k++){
-                    int rem = rg.nextInt(clust.size());
-                    child.add(clust.getAccessions().remove(rem));
-                }
-            }
-
-            // Add new child to list
-            children.add(child);
-        }
-
     }
 
     public static AccessionCollection lrSearch(AccessionCollection ac, PseudoMeasure pm, int sampleMin, int sampleMax,

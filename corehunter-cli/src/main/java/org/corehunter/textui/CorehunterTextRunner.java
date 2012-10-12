@@ -12,14 +12,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.textui;
+package org.corehunter.textui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -28,41 +27,34 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import org.cimmyt.corehunter.*;
-import org.cimmyt.corehunter.measures.*;
-import org.cimmyt.corehunter.search.CoreSubsetSearch;
-import org.cimmyt.corehunter.search.HeuristicSingleNeighborhood;
-import org.cimmyt.corehunter.search.Neighborhood;
-import org.cimmyt.corehunter.search.RandomSingleNeighborhood;
+import org.corehunter.AccessionCollection;
+import org.corehunter.DuplicateMeasureException;
+import org.corehunter.SSRDataset;
+import org.corehunter.UnknownMeasureException;
+import org.corehunter.measures.MeasureFactory;
+import org.corehunter.measures.PseudoMeasure;
+import org.corehunter.search.CoreSubsetSearch;
+import org.corehunter.search.HeuristicSingleNeighborhood;
+import org.corehunter.search.Neighborhood;
+import org.corehunter.search.RandomSingleNeighborhood;
 
 /**
- * A simple text based driver for Corehunter.
+ * A simple text based driver for Core Hunter.
  *
  * @author Chris Thachuk <chris.thachuk@gmail.com>
  */
 public final class CorehunterTextRunner {
 
     private final String[] measureNames = {"MR", "MRmin", "CE", "CEmin","SH", "HE", "NE", "PN", "CV", "EX"};
-    
-    private final int DEFAULT_REPLICAS = 10;
-    private final int DEFAULT_MC_STEPS = 50;
 
     private final double DEFAULT_RUNTIME = 60.0;
     private final double DEFAULT_MINPROG = 0.0;
-    private final double DEFAULT_MIN_TEMPERATURE = 50.0;
-    private final double DEFAULT_MAX_TEMPERATURE = 200.0;
     private final double DEFAULT_SAMPLING_INTENSITY = 0.2;
-
-    private final int DEFAULT_GEN_POP_SIZE = 10;
-    private final int DEFAULT_GEN_NR_OF_CHILDREN = 2;
-    private final int DEFAULT_GEN_TOURNAMENT_SIZE = 4;
-    private final double DEFAULT_GEN_MUTATION_RATE = 0.4;
-
-    private final int DEFAULT_MERGEREP_NR_OF_REPLICAS = 6;
-    private final int DEFAULT_MERGEREP_NR_OF_CHILDREN = 1;
-    private final int DEFAULT_MERGEREP_TOURNAMENT_SIZE = 2;
-    private final int DEFAULT_MERGEREP_NR_OF_STEPS = 50;
+    
+    private final double DEFAULT_REMC_MIN_TEMPERATURE = 50.0;
+    private final double DEFAULT_REMC_MAX_TEMPERATURE = 200.0;
+    private final int DEFAULT_REMC_REPLICAS = 10;
+    private final int DEFAULT_REMC_MC_STEPS = 50;
 
     private final int DEFAULT_MIXREP_NR_OF_TABU_REPLICAS = 2;
     private final int DEFAULT_MIXREP_NR_OF_NON_TABU_REPLICAS = 3;
@@ -73,8 +65,8 @@ public final class CorehunterTextRunner {
     private final double DEFAULT_MIXREP_BOOST_MIN_PROG = 10e-9;
     private final int DEFAULT_MIXREP_BOOST_TIME_FACTOR = 15;
     private final double DEFAULT_MIXREP_MIN_BOOST_TIME = 0.25;
-    private final double DEFAULT_MIXREP_MIN_SIMAN_TEMP = 50.0;
-    private final double DEFAULT_MIXREP_MAX_SIMAN_TEMP = 100.0;
+    private final double DEFAULT_MIXREP_MIN_MC_TEMP = 50.0;
+    private final double DEFAULT_MIXREP_MAX_MC_TEMP = 100.0;
 
     private final int DEFAULT_LR_L = 2;
     private final int DEFAULT_LR_R = 1;
@@ -85,8 +77,6 @@ public final class CorehunterTextRunner {
     private Options commonSearchOpts;
     private Options remcSearchOpts;
     private Options tabuSearchOpts;
-    private Options genSearchOpts;
-    private Options mergerepSearchOpts;
     private Options mixrepSearchOpts;
     private Options lrSearchOpts;
     private Options opts;
@@ -96,27 +86,18 @@ public final class CorehunterTextRunner {
     private double minProg;
     private double stuckTime;
     private boolean stuckTimeSpecified = false;
-
-    private double minT;
-    private double maxT;
+    
     private int sampleMin;
     private int sampleMax;
-    private int replicas;
-    private int mcSteps;
     private boolean sampleSizesSpecified = false;
 
+    private double remcMinT;
+    private double remcMaxT;
+    private int remcReplicas;
+    private int remcMcSteps;
+    
     private int tabuListSize;
     private boolean tabuListSizeSpecified = false;
-
-    private int genPopSize;
-    private int genNrOfChildren;
-    private int genTournamentSize;
-    private double genMutationRate;
-
-    private int mergerepNrOfReplicas;
-    private int mergerepNrOfSteps;
-    private int mergerepNrOfChildren;
-    private int mergerepTournamentSize;
 
     private int mixrepNrOfTabuReplicas;
     private int mixrepNrOfNonTabuReplicas;
@@ -127,8 +108,8 @@ public final class CorehunterTextRunner {
     private double mixrepBoostMinProg;
     private int mixrepBoostTimeFactor;
     private double mixrepMinBoostTime;
-    private double mixrepMinSimAnTemp;
-    private double mixrepMaxSimAnTemp;
+    private double mixrepMinMCTemp;
+    private double mixrepMaxMCTemp;
 
     private int lr_l;
     private int lr_r;
@@ -138,16 +119,12 @@ public final class CorehunterTextRunner {
     private Map<String,Double> measureWeights;
 
     private boolean remcSearch = false;
-    private boolean parRemcSearch = false;
     private boolean exhSearch = false;
     private boolean randSearch = false;
     private boolean tabuSearch = false;
     private boolean localSearch = false;
     private boolean steepestDescentSearch = false;
     private boolean mstratSearch = false;
-    private boolean geneticSearch = false;
-    private boolean mergeReplicaSearch = false;
-    private boolean parMergeReplicaSearch = false;
     private boolean mixedReplicaSearch = false;
     private boolean lrSearch = false;
     private boolean semiLrSearch = false;
@@ -165,8 +142,6 @@ public final class CorehunterTextRunner {
 	commonSearchOpts = new Options();
         remcSearchOpts = new Options();
         tabuSearchOpts = new Options();
-        genSearchOpts = new Options();
-        mergerepSearchOpts = new Options();
         mixrepSearchOpts = new Options();
         lrSearchOpts = new Options();
 	opts = new Options();
@@ -178,20 +153,10 @@ public final class CorehunterTextRunner {
 	sampleIntensity = DEFAULT_SAMPLING_INTENSITY;
 	runtime = DEFAULT_RUNTIME;
         minProg = DEFAULT_MINPROG;
-	replicas = DEFAULT_REPLICAS;
-	mcSteps = DEFAULT_MC_STEPS;
-	minT = DEFAULT_MIN_TEMPERATURE;
-	maxT = DEFAULT_MAX_TEMPERATURE;
-
-        genPopSize = DEFAULT_GEN_POP_SIZE;
-        genNrOfChildren = DEFAULT_GEN_NR_OF_CHILDREN;
-        genMutationRate = DEFAULT_GEN_MUTATION_RATE;
-        genTournamentSize = DEFAULT_GEN_TOURNAMENT_SIZE;
-
-        mergerepNrOfReplicas = DEFAULT_MERGEREP_NR_OF_REPLICAS;
-        mergerepNrOfChildren = DEFAULT_MERGEREP_NR_OF_CHILDREN;
-        mergerepTournamentSize = DEFAULT_MERGEREP_TOURNAMENT_SIZE;
-        mergerepNrOfSteps = DEFAULT_MERGEREP_NR_OF_STEPS;
+	remcReplicas = DEFAULT_REMC_REPLICAS;
+	remcMcSteps = DEFAULT_REMC_MC_STEPS;
+	remcMinT = DEFAULT_REMC_MIN_TEMPERATURE;
+	remcMaxT = DEFAULT_REMC_MAX_TEMPERATURE;
 
         mixrepNrOfTabuReplicas = DEFAULT_MIXREP_NR_OF_TABU_REPLICAS;
         mixrepNrOfNonTabuReplicas = DEFAULT_MIXREP_NR_OF_NON_TABU_REPLICAS;
@@ -202,8 +167,8 @@ public final class CorehunterTextRunner {
         mixrepBoostMinProg = DEFAULT_MIXREP_BOOST_MIN_PROG;
         mixrepBoostTimeFactor = DEFAULT_MIXREP_BOOST_TIME_FACTOR;
         mixrepMinBoostTime = DEFAULT_MIXREP_MIN_BOOST_TIME;
-        mixrepMinSimAnTemp = DEFAULT_MIXREP_MIN_SIMAN_TEMP;
-        mixrepMaxSimAnTemp = DEFAULT_MIXREP_MAX_SIMAN_TEMP;
+        mixrepMinMCTemp = DEFAULT_MIXREP_MIN_MC_TEMP;
+        mixrepMaxMCTemp = DEFAULT_MIXREP_MAX_MC_TEMP;
 
         lr_l = DEFAULT_LR_L;
         lr_r = DEFAULT_LR_R;
@@ -228,63 +193,6 @@ public final class CorehunterTextRunner {
 	ac.addDataset(ds);
 
         int collectionSize = ac.size();
-        
-        /*** TMP: compute distance distribution of loaded dataset
-        System.out.println("Computing distance distribution...");
-        List<Pair<Integer, List<Pair<Accession, Accession>>>> distanceFreq = new ArrayList<Pair<Integer, List<Pair<Accession, Accession>>>>(101);
-        for(int i=0; i<101; i++){
-            distanceFreq.add(null);
-        }
-        DistanceMeasure mr = new ModifiedRogersDistance(collectionSize);
-        List<Accession> acs = ac.getAccessions();
-        for(int i=0; i<collectionSize; i++){
-            System.out.print(".");
-            for(int j=i+1; j<collectionSize; j++){
-                Accession acc1 = acs.get(i);
-                Accession acc2 = acs.get(j);
-                double dist = mr.calculate(acc1, acc2);
-                int dist_int = (int) (dist/0.01);
-                Pair<Integer, List<Pair<Accession, Accession>>> freqPair = distanceFreq.get(dist_int);
-                if(freqPair == null){
-                    List<Pair<Accession, Accession>> list = new ArrayList<Pair<Accession, Accession>>();
-                    list.add(new Pair<Accession, Accession>(acc1, acc2));
-                    freqPair = new Pair<Integer, List<Pair<Accession, Accession>>>(1, list);
-                    distanceFreq.set(dist_int, freqPair);
-                } else {
-                    List<Pair<Accession, Accession>> list = freqPair.snd;
-                    list.add(new Pair<Accession, Accession>(acc1, acc2));
-                    Integer newFreq = freqPair.fst+1;
-                    freqPair = new Pair<Integer, List<Pair<Accession, Accession>>>(newFreq, list);
-                    distanceFreq.set(dist_int, freqPair);
-                }
-            }
-        }
-        System.out.println("");
-        // write distance distribution to file with name 'distancefreq'
-        File distfreqoutput = new File("distancefreq");
-        try {
-            FileWriter wr = new FileWriter(distfreqoutput);
-            for(int i=0; i<distanceFreq.size(); i++){
-                Pair<Integer, List<Pair<Accession, Accession>>> freqPair = distanceFreq.get(i);
-                if(freqPair != null){
-                    wr.write(((double)i)/100 + " -- " + freqPair.fst + " times:\n\n");
-                    List<Pair<Accession, Accession>> list = freqPair.snd;
-                    for(int j=0; j<list.size(); j++){
-                        Pair<Accession, Accession> accPair = list.get(j);
-                        wr.write(accPair.fst.getName() + " <-> " + accPair.snd.getName() + "\n");
-                    }
-                    wr.write("\n");
-                }
-            }
-            wr.flush();
-            wr.close();
-        } catch (IOException ex) {
-            System.err.println("Error writing distance distribution file: " + ex);
-            System.exit(1);
-        }
-        System.exit(0);
-         END TMP ***/
-
 
         if (!stuckTimeSpecified){
             stuckTime = runtime;
@@ -343,11 +251,6 @@ public final class CorehunterTextRunner {
         } else if(exhSearch) {
             System.out.println("---\nExhaustive search\n---");
             core = CoreSubsetSearch.exhaustiveSearch(ac, pm, sampleMin, sampleMax);
-        } else if(geneticSearch) {
-            System.out.println("---\nGenetic algorithm search\n---");
-            core = CoreSubsetSearch.geneticSearch(ac, pm, sampleMin, sampleMax, runtime,
-                                                  minProg, stuckTime, genPopSize, genNrOfChildren,
-                                                  genTournamentSize, genMutationRate);
         } else if(lrSearch) {
             // check (l,r) setting
             if(Math.abs(lr_l-lr_r) > 1){
@@ -379,31 +282,14 @@ public final class CorehunterTextRunner {
                 System.out.println("---\nREMC (Replica Exchange Monte Carlo)\n---");
                 nh = new RandomSingleNeighborhood(sampleMin, sampleMax);
                 core = CoreSubsetSearch.remcSearch(ac, nh, pm, sampleMin, sampleMax,
-                                                   runtime, minProg, stuckTime, replicas, minT, maxT, mcSteps);
-            } else if(parRemcSearch){
-                System.out.println("---\nParallel REMC (Replica Exchange Monte Carlo)\n---");
-                nh = new RandomSingleNeighborhood(sampleMin, sampleMax);
-                core = CoreSubsetSearch.parRemcSearch(ac, nh, pm, sampleMin, sampleMax,
-                                                   runtime, minProg, stuckTime, replicas, minT, maxT, mcSteps);
-            } else if(mergeReplicaSearch){
-                System.out.println("---\nMerge Replica Search\n---");
-                nh = new RandomSingleNeighborhood(sampleMin, sampleMax);
-                core = CoreSubsetSearch.mergeReplicaSearch(ac, nh, pm, sampleMin,
-                                            sampleMax, runtime, minProg, stuckTime, mergerepNrOfReplicas,
-                                            mergerepNrOfSteps, mergerepNrOfChildren, mergerepTournamentSize, false, false);
-            } else if(parMergeReplicaSearch){
-                System.out.println("---\nParallel Merge Replica Search\n---");
-                nh = new RandomSingleNeighborhood(sampleMin, sampleMax);
-                core = CoreSubsetSearch.parMergeReplicaSearch(ac, nh, pm, sampleMin,
-                                            sampleMax, runtime, minProg, stuckTime, mergerepNrOfReplicas,
-                                            mergerepNrOfSteps, mergerepNrOfChildren, mergerepTournamentSize, false, false);
+                                                   runtime, minProg, stuckTime, remcReplicas, remcMinT, remcMaxT, remcMcSteps);
             } else if(mixedReplicaSearch){
-                System.out.println("---\nParallel Mixed Replica Search\n---");
+                System.out.println("---\nMixed Replica Search\n---");
                 core = CoreSubsetSearch.mixedReplicaSearch(ac, pm, sampleMin, sampleMax, runtime,
                                             minProg, stuckTime, mixrepNrOfTabuReplicas, mixrepNrOfNonTabuReplicas,
                                             mixrepRoundsWithoutTabu, mixrepNrOfTabuSteps, mixrepTournamentSize, tabuListSize,
-                                            false, false, mixrepBoostNr, mixrepBoostMinProg, mixrepBoostTimeFactor, mixrepMinBoostTime,
-                                            mixrepMinSimAnTemp, mixrepMaxSimAnTemp);
+                                            mixrepBoostNr, mixrepBoostMinProg, mixrepBoostTimeFactor, mixrepMinBoostTime,
+                                            mixrepMinMCTemp, mixrepMaxMCTemp);
             } else if (localSearch) {
                 System.out.println("---\nLocal Search\n---");
                 nh = new RandomSingleNeighborhood(sampleMin, sampleMax);
@@ -448,16 +334,12 @@ public final class CorehunterTextRunner {
 
         // set up the  search type option group
 	searchTypeOpts.addOption( new Option("remc", "REMC search (Replica Exchange Monte Carlo)") );
-	searchTypeOpts.addOption( new Option("premc", "parallel REMC search (Replica Exchange Monte Carlo)") );
 	searchTypeOpts.addOption( new Option("exh", "exhaustive search") );
 	searchTypeOpts.addOption( new Option("rand", "random core set") );
 	searchTypeOpts.addOption( new Option("tabu", "tabu search") );
 	searchTypeOpts.addOption( new Option("local", "standard local search") );
 	searchTypeOpts.addOption( new Option("steepest", "steepest descent search") );
 	searchTypeOpts.addOption( new Option("mstrat", "heuristic steepest descent (cfr. MSTRAT)") );
-	searchTypeOpts.addOption( new Option("genetic", "genetic algorithm search") );
-	searchTypeOpts.addOption( new Option("mergerep", "merge replica search") );
-	searchTypeOpts.addOption( new Option("pmergerep", "parallel merge replica search") );
 	searchTypeOpts.addOption( new Option("mixrep", "parallel mixed replica search") );
 	searchTypeOpts.addOption( new Option("lr", "lr search (deterministic)") );
 	searchTypeOpts.addOption( new Option("lrsemi", "lr search with random first pair (semi-deterministic)") );
@@ -534,21 +416,21 @@ public final class CorehunterTextRunner {
 	// set up the REMC advanced search option group
 	remcSearchOpts.addOption( OptionBuilder.withArgName("r")
 			      .hasArg()
-			      .withDescription("use r replicas for search, defaults to " + DEFAULT_REPLICAS)
+			      .withDescription("use r replicas for search, defaults to " + DEFAULT_REMC_REPLICAS)
 			      .create("replicas") );
 	remcSearchOpts.addOption( OptionBuilder.withArgName("s")
 			      .hasArg()
-			      .withDescription("use s local steps for each monte carlo search, defaults to " + DEFAULT_MC_STEPS)
+			      .withDescription("use s local steps for each monte carlo search, defaults to " + DEFAULT_REMC_MC_STEPS)
 			      .create("mc_steps") );
 	remcSearchOpts.addOption( OptionBuilder.withArgName("t")
 			      .hasArg()
 			      .withDescription("minimum temperature of any replica, " +
-					       "defaults to " + DEFAULT_MIN_TEMPERATURE)
+					       "defaults to " + DEFAULT_REMC_MIN_TEMPERATURE)
 			      .create("min_t") );
 	remcSearchOpts.addOption( OptionBuilder.withArgName("t")
 			      .hasArg()
 			      .withDescription("maximum temperature of any replica, " +
-					       "defaults to " + DEFAULT_MAX_TEMPERATURE)
+					       "defaults to " + DEFAULT_REMC_MAX_TEMPERATURE)
 			      .create("max_t") );
 
         // set up the Tabu advanced search option group
@@ -556,48 +438,6 @@ public final class CorehunterTextRunner {
 			      .hasArg()
 			      .withDescription("use tabu list of size s, defaults to 30% of the minimum core size")
 			      .create("list_size") );
-
-        // set up the Genetic Algorithm advanced search option group
-        genSearchOpts.addOption( OptionBuilder.withArgName("p")
-			      .hasArg()
-			      .withDescription("use population of size p, defaults to " + DEFAULT_GEN_POP_SIZE)
-			      .create("pop_size") );
-
-        genSearchOpts.addOption( OptionBuilder.withArgName("c")
-			      .hasArg()
-			      .withDescription("create c children for each new generation of the population, defaults to " + DEFAULT_GEN_NR_OF_CHILDREN)
-			      .create("children") );
-
-        genSearchOpts.addOption( OptionBuilder.withArgName("t")
-			      .hasArg()
-			      .withDescription("select parents in tournaments of size t, defaults to " + DEFAULT_GEN_TOURNAMENT_SIZE)
-			      .create("tournament_size") );
-
-        genSearchOpts.addOption( OptionBuilder.withArgName("m")
-			      .hasArg()
-			      .withDescription("mutate new children with probability m, defaults to " + DEFAULT_GEN_MUTATION_RATE)
-			      .create("mutation_rate") );
-
-        // set up the Genetic Replica advanced search option group
-        mergerepSearchOpts.addOption( OptionBuilder.withArgName("r")
-			      .hasArg()
-			      .withDescription("use r replicas, defaults to " + DEFAULT_MERGEREP_NR_OF_REPLICAS)
-			      .create("replicas") );
-
-        mergerepSearchOpts.addOption( OptionBuilder.withArgName("c")
-			      .hasArg()
-			      .withDescription("create c new children replicas at each escape move, defaults to " +  DEFAULT_MERGEREP_NR_OF_CHILDREN)
-			      .create("children") );
-
-        mergerepSearchOpts.addOption( OptionBuilder.withArgName("t")
-			      .hasArg()
-			      .withDescription("select parent replicas in tournaments of size t, defaults to " + DEFAULT_MERGEREP_TOURNAMENT_SIZE)
-			      .create("tournament_size") );
-
-        mergerepSearchOpts.addOption( OptionBuilder.withArgName("s")
-			      .hasArg()
-			      .withDescription("perform s monte carlo steps in each replica between escape moves, defaults to " + DEFAULT_MERGEREP_NR_OF_STEPS)
-			      .create("mc_steps") );
 
         // set up the Mixed Replica advanced search option group
         mixrepSearchOpts.addOption( OptionBuilder.withArgName("tr")
@@ -623,8 +463,7 @@ public final class CorehunterTextRunner {
         mixrepSearchOpts.addOption( OptionBuilder.withArgName("s")
 			      .hasArg()
 			      .withDescription("each tabu replica performs s steps in each search round, defaults to "
-                              + DEFAULT_MIXREP_NR_OF_TABU_STEPS + " (nr of steps for other replicas is automatically determined "
-                              + "according to this number of tabu steps)")
+                              + DEFAULT_MIXREP_NR_OF_TABU_STEPS + " (nr of steps for other replicas is automatically determined)")
 			      .create("tabu_steps") );
 
         mixrepSearchOpts.addOption( OptionBuilder.withArgName("s")
@@ -655,12 +494,12 @@ public final class CorehunterTextRunner {
 
         mixrepSearchOpts.addOption( OptionBuilder.withArgName("t")
 			      .hasArg()
-			      .withDescription("minimum temperature of Simple Monte Carlo replicas, defaults to " + DEFAULT_MIXREP_MIN_SIMAN_TEMP)
+			      .withDescription("minimum temperature of Simple Monte Carlo replicas, defaults to " + DEFAULT_MIXREP_MIN_MC_TEMP)
 			      .create("min_t") );
 
         mixrepSearchOpts.addOption( OptionBuilder.withArgName("t")
 			      .hasArg()
-			      .withDescription("maximum temperature of Simple Monte Carlo replicas, defaults to " + DEFAULT_MIXREP_MAX_SIMAN_TEMP)
+			      .withDescription("maximum temperature of Simple Monte Carlo replicas, defaults to " + DEFAULT_MIXREP_MAX_MC_TEMP)
 			      .create("max_t") );
 
         // set up the LR Search advanced search option group
@@ -701,16 +540,6 @@ public final class CorehunterTextRunner {
 	}
 
         i = tabuSearchOpts.getOptions().iterator();
-	while (i.hasNext()) {
-	    opts.addOption((Option)i.next());
-	}
-
-        i = genSearchOpts.getOptions().iterator();
-	while (i.hasNext()) {
-	    opts.addOption((Option)i.next());
-	}
-
-        i = mergerepSearchOpts.getOptions().iterator();
 	while (i.hasNext()) {
 	    opts.addOption((Option)i.next());
 	}
@@ -761,7 +590,9 @@ public final class CorehunterTextRunner {
 		if(cl.hasOption(m)) {
 		    try {
 			double weight = Double.parseDouble(cl.getOptionValue(m));
-			if (weight<=0.0) throw new NumberFormatException();
+			if (weight<=0.0) {
+                            throw new NumberFormatException();
+                        }
 			measureWeights.put(m, weight);
 		    } catch(NumberFormatException nfe) {
 			System.err.println("\nweight for " + measureNames[i] +
@@ -846,10 +677,6 @@ public final class CorehunterTextRunner {
             remcSearch = cl.hasOption("remc");
             if(remcSearch) j++;
 
-            // check for -premc
-            parRemcSearch = cl.hasOption("premc");
-            if(parRemcSearch) j++;
-
             // check for -exh
             exhSearch = cl.hasOption("exh");
             if(exhSearch) j++;
@@ -873,18 +700,6 @@ public final class CorehunterTextRunner {
             // check for -mstrat
             mstratSearch = cl.hasOption("mstrat");
             if(mstratSearch) j++;
-
-            // check for -genetic
-            geneticSearch = cl.hasOption("genetic");
-            if(geneticSearch) j++;
-
-            // check for -mergerep
-            mergeReplicaSearch = cl.hasOption("mergerep");
-            if(mergeReplicaSearch) j++;
-
-            // check for -pmergerep
-            parMergeReplicaSearch = cl.hasOption("pmergerep");
-            if(parMergeReplicaSearch) j++;
 
             // check for -mixrep
             mixedReplicaSearch = cl.hasOption("mixrep");
@@ -925,9 +740,8 @@ public final class CorehunterTextRunner {
 	    // check for replicas
 	    if (cl.hasOption("replicas")) {
 		try {
-		    replicas = Integer.parseInt(cl.getOptionValue("replicas"));
-                    mergerepNrOfReplicas = replicas; // in case of Merge Replica Search
-		    if (replicas < 1 || replicas > 100) throw new NumberFormatException();
+		    remcReplicas = Integer.parseInt(cl.getOptionValue("replicas"));
+		    if (remcReplicas < 1 || remcReplicas > 100) throw new NumberFormatException();
 		} catch(NumberFormatException nfe) {
 		    System.err.println("\nreplicas must be a positive integer in the range [1..100]");
 		    return false;
@@ -937,9 +751,8 @@ public final class CorehunterTextRunner {
 	    // check for mc_steps
 	    if (cl.hasOption("mc_steps")) {
 		try {
-		    mcSteps = Integer.parseInt(cl.getOptionValue("mc_steps"));
-                    mergerepNrOfSteps = mcSteps; // in case of Merge Replica Search
-		    if (mcSteps < 1 || mcSteps > 1000000) throw new NumberFormatException();
+		    remcMcSteps = Integer.parseInt(cl.getOptionValue("mc_steps"));
+		    if (remcMcSteps < 1 || remcMcSteps > 1000000) throw new NumberFormatException();
 		} catch(NumberFormatException nfe) {
 		    System.err.println("\nmc_steps must be a positive integer in the range [1..1000000]");
 		    return false;
@@ -949,9 +762,9 @@ public final class CorehunterTextRunner {
 	    // check for min_t
 	    if (cl.hasOption("min_t")) {
 		try {
-		    minT = Double.parseDouble(cl.getOptionValue("min_t"));
-                    mixrepMinSimAnTemp = minT; // in case of MixRep
-		    if (minT <= 0.0) throw new NumberFormatException();
+		    remcMinT = Double.parseDouble(cl.getOptionValue("min_t"));
+                    mixrepMinMCTemp = remcMinT; // in case of MixRep
+		    if (remcMinT <= 0.0) throw new NumberFormatException();
 		} catch(NumberFormatException nfe) {
 		    System.err.println("\nmin_t must be a positve numeric value");
 		    return false;
@@ -961,9 +774,9 @@ public final class CorehunterTextRunner {
 	    // check for max_t
 	    if (cl.hasOption("max_t")) {
 		try {
-		    maxT = Double.parseDouble(cl.getOptionValue("max_t"));
-                    mixrepMaxSimAnTemp = maxT; // in case of MixRep
-		    if (maxT <= minT) throw new NumberFormatException();
+		    remcMaxT = Double.parseDouble(cl.getOptionValue("max_t"));
+                    mixrepMaxMCTemp = remcMaxT; // in case of MixRep
+		    if (remcMaxT <= remcMinT) throw new NumberFormatException();
 		} catch(NumberFormatException nfe) {
 		    System.err.println("\nmax_t must be a postive numeric value, larger than min_t");
 		    return false;
@@ -983,67 +796,6 @@ public final class CorehunterTextRunner {
 		    return false;
 		}
 	    }
-
-            // check Genetic Algorithm advanced options
-
-            // check for pop_size
-            if (cl.hasOption("pop_size")) {
-		try {
-		    genPopSize = Integer.parseInt(cl.getOptionValue("pop_size"));
-		    if (genPopSize < 2) throw new NumberFormatException();
-		} catch(NumberFormatException nfe) {
-		    System.err.println("\npop_size must be a postive integer >= 2");
-		    return false;
-		}
-	    }
-
-            // check for children
-            if (cl.hasOption("children")) {
-		try {
-		    genNrOfChildren = Integer.parseInt(cl.getOptionValue("children"));
-                    mergerepNrOfChildren = genNrOfChildren; // in case of Merge Replica Search
-		    if (genNrOfChildren < 1) throw new NumberFormatException();
-		} catch(NumberFormatException nfe) {
-		    System.err.println("\nchildren must be a postive integer >= 1");
-		    return false;
-		}
-	    }
-
-            // check for tournament_size
-            if (cl.hasOption("tournament_size")) {
-		try {
-		    genTournamentSize = Integer.parseInt(cl.getOptionValue("tournament_size"));
-                    mergerepTournamentSize = genTournamentSize; // in case of Merge Replica Search
-                    mixrepTournamentSize = genTournamentSize; // in case of Mixed Replica Search
-		    if (genTournamentSize < 1) throw new NumberFormatException();
-		} catch(NumberFormatException nfe) {
-		    System.err.println("\ntournament_size must be a postive integer >= 1");
-		    return false;
-		}
-	    }
-
-            // check for mutation_rate
-            if (cl.hasOption("mutation_rate")) {
-		try {
-		    genMutationRate = Double.parseDouble(cl.getOptionValue("mutation_rate"));
-		    if (genMutationRate < 0.0 || genMutationRate > 1.0) throw new NumberFormatException();
-		} catch(NumberFormatException nfe) {
-		    System.err.println("\nmutation_rate must be a real number between 0.0 and 1.0");
-		    return false;
-		}
-	    }
-
-
-
-            // check Genetic Replica Search advanced options
-
-            // check for replicas --> see REMC
-
-            // check for mc_steps --> see REMC
-
-            // check for tournament_size --> see Genetic Algorithm
-
-            // check for children --> see Genetic Algorithm
 
 
             // check Mixed Replica Search advanced options
@@ -1092,11 +844,16 @@ public final class CorehunterTextRunner {
 		}
 	    }
 
-            // check for tournament_size --> see Genetic Algorithm
-
-            // check for children --> see Genetic Algorithm
-            
-            // check for tabu_list --> see Tabu Search
+            // check for tournament_size
+            if (cl.hasOption("tournament_size")) {
+		try {
+		    mixrepTournamentSize = Integer.parseInt(cl.getOptionValue("tournament_size"));
+		    if (mixrepTournamentSize < 1) throw new NumberFormatException();
+		} catch(NumberFormatException nfe) {
+		    System.err.println("\ntournament_size must be a postive integer >= 1");
+		    return false;
+		}
+	    }
 
             // check for boost_nr
             if (cl.hasOption("boost_nr")) {
@@ -1208,10 +965,6 @@ public final class CorehunterTextRunner {
         f.printHelp("REMC - advanced search options:", remcSearchOpts);
 	System.out.println("");
         f.printHelp("Tabu - advanced search options:", tabuSearchOpts);
-	System.out.println("");
-        f.printHelp("Genetic Algorithm - advanced search options:", genSearchOpts);
-	System.out.println("");
-        f.printHelp("Merge Replica Search - advanced search options:", mergerepSearchOpts);
 	System.out.println("");
         f.printHelp("Mixed Replica Search - advanced search options:", mixrepSearchOpts);
 	System.out.println("");

@@ -1,4 +1,4 @@
-package org.cimmyt.corehunter.textui;
+package org.corehunter.textui;
 
 //  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
 //
@@ -15,7 +15,6 @@ package org.cimmyt.corehunter.textui;
 //  limitations under the License.
 
 import java.util.Map;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -24,12 +23,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import org.cimmyt.corehunter.*;
-import org.cimmyt.corehunter.measures.*;
+import org.corehunter.*;
+import org.corehunter.measures.*;
 
 /**
- * A simple text based driver for Corehunter.
+ * A simple text based driver for Core Hunter.
  *
  * @author Chris Thachuk <chris.thachuk@gmail.com>
  */

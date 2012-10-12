@@ -12,10 +12,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.search;
+package org.corehunter.search;
 
-import org.cimmyt.corehunter.AccessionCollection;
-import org.cimmyt.corehunter.measures.PseudoMeasure;
+import org.corehunter.AccessionCollection;
+import org.corehunter.measures.PseudoMeasure;
 
 /**
  *

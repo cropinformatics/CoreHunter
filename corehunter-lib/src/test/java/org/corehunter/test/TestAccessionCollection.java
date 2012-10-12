@@ -1,18 +1,18 @@
-package org.cimmyt.corehunter.test;
+package org.corehunter.test;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.junit.Before; 
-import org.junit.Ignore;
-import org.junit.Test; 
+import org.corehunter.AccessionCollection;
+import org.corehunter.SSRDataset;
+import org.corehunter.UnknownMeasureException; 
 import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import org.cimmyt.corehunter.*;
-import org.cimmyt.corehunter.measures.*;
 
 /**
  * <<Class summary>>
@@ -26,7 +26,6 @@ public final class TestAccessionCollection {
 	private SSRDataset ssrData;
 	Collection<String> ssrAccessionNames;
 	Map<String, List<String>> ssrMarkersToAlleles;
-	private DArTDataset dartData;
 	Collection<String> dartAccessionNames;
 	Collection<String> dartMarkerNames;
 
@@ -82,39 +81,12 @@ public final class TestAccessionCollection {
 		
 		ssrData.setValue("A4", "M2", "allele1", 0.5);
 		ssrData.setValue("A4", "M2", "allele2", 0.5);
-		
-		dartAccessionNames = new HashSet<String>();
-		dartAccessionNames.add("A1");
-		dartAccessionNames.add("A5");
-		dartAccessionNames.add("A9");
-		
-		dartMarkerNames = new HashSet<String>();
-		dartMarkerNames.add("M1");
-		dartMarkerNames.add("M2");
-		
-		dartData = new DArTDataset(dartAccessionNames, dartMarkerNames);
-		dartData.setValue("A1", "M2", DArTValue.PRESENT);
-		dartData.setValue("A1", "M1", DArTValue.ABSENT);
-		dartData.setValue("A5", "M1", DArTValue.ABSENT);
-		dartData.setValue("A5", "M2", DArTValue.ABSENT);
-		dartData.setValue("A9", "M1", DArTValue.PRESENT);
-		dartData.setValue("A9", "M2", DArTValue.ABSENT);
 	}
 	
 	@Test
 	public void verifyAddDataset() throws Exception {
 		ac.addDataset(ssrData);
 		assertTrue(ssrAccessionNames.equals(ac.getAccessionNames()));
-	}
-	
-	@Test
-	public void verifyMultipleAddDataset() throws Exception {
-		ac.addDataset(ssrData);
-		ac.addDataset(dartData);
-		
-		Set<String> ssrAndDartNames = new HashSet<String>(ssrAccessionNames);
-		ssrAndDartNames.addAll(dartAccessionNames);
-		assertTrue(ssrAndDartNames.equals(ac.getAccessionNames()));
 	}
 	
 	@Ignore @Test

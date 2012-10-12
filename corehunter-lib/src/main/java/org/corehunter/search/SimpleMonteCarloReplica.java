@@ -12,13 +12,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.search;
+package org.corehunter.search;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import org.cimmyt.corehunter.Accession;
-import org.cimmyt.corehunter.AccessionCollection;
-import org.cimmyt.corehunter.measures.PseudoMeasure;
+import org.corehunter.Accession;
+import org.corehunter.AccessionCollection;
+import org.corehunter.measures.PseudoMeasure;
 
 /**
  *
@@ -47,7 +48,8 @@ public class SimpleMonteCarloReplica extends Replica {
 
     @Override
     public String type(){
-        return type + " (T = " + T + ")";
+        DecimalFormat df = new DecimalFormat("#.##");
+        return type + " (T = " + df.format(T) + ")";
     }
 
     @Override

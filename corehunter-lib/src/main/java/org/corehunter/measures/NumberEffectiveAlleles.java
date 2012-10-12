@@ -12,7 +12,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.cimmyt.corehunter.measures;
+package org.corehunter.measures;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.cimmyt.corehunter.Accession;
+import org.corehunter.Accession;
 
 /**
  * <<Class summary>>

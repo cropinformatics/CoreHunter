@@ -3,13 +3,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>org.cimmyt.corehunter</groupId>
+    <groupId>org.corehunter</groupId>
     <artifactId>corehunter</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.cimmyt.corehunter</groupId>
+  <groupId>org.corehunter</groupId>
   <artifactId>coreanalyser-cli</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
@@ -22,10 +22,15 @@
       <name>Chris Thachuk</name>
       <email>chris.thachuk@gmail.com</email>
     </developer>
+    <developer>
+      <id>hdbeukel</id>
+      <name>Herman De Beukelaer</name>
+      <email>herman.debeukelaer@ugent.be</email>
+    </developer>
   </developers>
   <dependencies>
     <dependency>
-      <groupId>org.cimmyt.corehunter</groupId>
+      <groupId>org.corehunter</groupId>
       <artifactId>corehunter-lib</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
@@ -46,7 +51,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>org.cimmyt.corehunter.textui.CoreanalyserTextRunner</mainClass>
+              <mainClass>org.corehunter.textui.CoreanalyserTextRunner</mainClass>
             </manifest>
           </archive>
         </configuration>

@@ -1,17 +1,18 @@
-package org.cimmyt.corehunter.test;
+package org.corehunter.test;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before; 
-import org.junit.Ignore;
-import org.junit.Test; 
-import static org.junit.Assert.*; 
+import org.corehunter.Accession;
+import org.corehunter.SSRDataset;
+import org.corehunter.measures.DistanceMeasure; 
+import org.corehunter.measures.ModifiedRogersDistance;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
-import org.cimmyt.corehunter.*;
-import org.cimmyt.corehunter.measures.*;
 
 /**
  * <<Class summary>>
