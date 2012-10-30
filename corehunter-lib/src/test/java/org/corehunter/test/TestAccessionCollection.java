@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import org.corehunter.AccessionCollection;
 import org.corehunter.SSRDataset;
-import org.corehunter.UnknownMeasureException; 
+import org.corehunter.measures.UnknownMeasureException;
+
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;

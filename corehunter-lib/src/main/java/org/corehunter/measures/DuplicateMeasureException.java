@@ -1,4 +1,4 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -12,7 +12,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.corehunter;
+package org.corehunter.measures;
+
+import org.corehunter.CoreHunterException;
 
 /**
  * <<Class summary>>
@@ -20,8 +22,15 @@ package org.corehunter;
  * @author Chris Thachuk &lt;&gt;
  * @version $Rev$
  */
-public final class DuplicateMeasureException extends java.lang.Exception {
-   public DuplicateMeasureException(String msg) {
-        super(msg);
+public final class DuplicateMeasureException extends CoreHunterException 
+{
+    public DuplicateMeasureException(String message) 
+    {
+        super(message);
     }
+
+	public DuplicateMeasureException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
 }

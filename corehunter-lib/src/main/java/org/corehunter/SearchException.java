@@ -1,4 +1,4 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
+//  Copyright 2012 Guy Davenport, Herman De Beukelaer
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@ package org.corehunter;
 /**
  * <<Class summary>>
  *
- * @author Chris Thachuk <chris.thachuk@gmail.com>
+ * @author Chris Thachuk <chris.thachuk@gmail.com>;
  */
-public final class UnknownTraitException extends CoreHunterException 
+public final class SearchException extends CoreHunterException 
 {
-    public UnknownTraitException(String message) 
+    public SearchException(String message) 
     {
         super(message);
     }
 
-	public UnknownTraitException(String message, Throwable cause)
+	public SearchException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
