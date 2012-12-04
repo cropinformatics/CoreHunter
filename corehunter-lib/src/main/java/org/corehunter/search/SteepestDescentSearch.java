@@ -18,7 +18,6 @@ import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import org.corehunter.Accession;
 import org.corehunter.AccessionCollection;
 import org.corehunter.CoreHunterException;

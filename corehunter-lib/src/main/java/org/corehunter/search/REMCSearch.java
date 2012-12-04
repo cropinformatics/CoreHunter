@@ -21,13 +21,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
 import org.corehunter.Accession;
 import org.corehunter.AccessionCollection;
+import static org.corehunter.Constants.K_b2;
 import org.corehunter.CoreHunterException;
 import org.corehunter.measures.PseudoMeasure;
-
-import static org.corehunter.Constants.K_b2;
 
 public class REMCSearch extends AbstractSubsetSearch
 {

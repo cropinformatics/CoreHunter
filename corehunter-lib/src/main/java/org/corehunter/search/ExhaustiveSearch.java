@@ -16,7 +16,6 @@ package org.corehunter.search;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-
 import org.corehunter.AccessionCollection;
 import org.corehunter.CoreHunterException;
 import org.corehunter.SearchException;
