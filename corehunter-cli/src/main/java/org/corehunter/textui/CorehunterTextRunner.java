@@ -246,7 +246,7 @@ public final class CorehunterTextRunner {
 	AccessionCollection core = null;
         if(randSearch){
             System.out.println("---\nRandom subset\n---");
-            core = CoreSubsetSearch.randomSearch(ac, sampleMin, sampleMax);
+            core = CoreSubsetSearch.randomSearch(ac, pm, sampleMin, sampleMax);
         } else if(exhSearch) {
             System.out.println("---\nExhaustive search\n---");
             core = CoreSubsetSearch.exhaustiveSearch(ac, pm, sampleMin, sampleMax);

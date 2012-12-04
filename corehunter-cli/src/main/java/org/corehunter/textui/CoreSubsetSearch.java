@@ -37,11 +37,6 @@ import org.corehunter.search.TabuSearch;
 public final class CoreSubsetSearch
 {
 
-	// Progress Writer settings
-	private final static boolean WRITE_PROGRESS_FILE = true;
-	private final static String PROGRESS_FILE_PATH = "progress";
-	private final static long PROGRESS_WRITE_PERIOD = 100;
-
 	// this class should not be instantiable from outside class
 	private CoreSubsetSearch()
 	{
@@ -163,9 +158,9 @@ public final class CoreSubsetSearch
 	 * @return
 	 */
 	public static AccessionCollection randomSearch(AccessionCollection ac,
-			int sampleMin, int sampleMax)
+			PseudoMeasure pm, int sampleMin, int sampleMax)
 	{
-		return runSearch(new RandomSearch(ac, sampleMin, sampleMax));
+		return runSearch(new RandomSearch(ac, pm, sampleMin, sampleMax));
 	}
 
 	public static AccessionCollection lrSearch(AccessionCollection ac,

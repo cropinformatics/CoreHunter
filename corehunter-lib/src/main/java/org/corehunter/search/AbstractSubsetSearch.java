@@ -15,7 +15,6 @@
 package org.corehunter.search;
 
 import java.util.List;
-
 import org.corehunter.Accession;
 import org.corehunter.AccessionCollection;
 

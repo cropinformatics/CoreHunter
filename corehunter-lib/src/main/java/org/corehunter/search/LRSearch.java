@@ -5,11 +5,9 @@ import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
 import org.corehunter.Accession;
 import org.corehunter.AccessionCollection;
 import org.corehunter.CoreHunterException;
-import org.corehunter.Search;
 import org.corehunter.measures.PseudoMeasure;
 
 public class LRSearch extends AbstractSubsetSearch
@@ -64,7 +62,7 @@ public class LRSearch extends AbstractSubsetSearch
 				// Random first pair, to save computational cost: this
 				// transforms the
 				// deterministic lr search into a semi-random method
-				core = randomSearch(ac, 2, 2).getAccessions();
+				core = randomSearch(ac, pm, 2, 2).getAccessions();
 			}
 			unselected = new ArrayList<Accession>(accessions);
 			unselected.removeAll(core);
@@ -181,15 +179,15 @@ public class LRSearch extends AbstractSubsetSearch
 
 	}
 
-	private AccessionCollection exhaustiveSearch(AccessionCollection ac,
-			PseudoMeasure pm, int sampleMin, int sampleMax)
+	private AccessionCollection exhaustiveSearch(AccessionCollection ac, PseudoMeasure pm,
+                                                                    int sampleMin, int sampleMax)
 	{
 		return SimpleSearchRunner.runSearch(new ExhaustiveSearch(ac, pm, sampleMin, sampleMax));
 	}
 
-	private AccessionCollection randomSearch(AccessionCollection ac, int i,
-			int j)
+	private AccessionCollection randomSearch(AccessionCollection ac, PseudoMeasure pm,
+                                                                    int sampleMin, int sampleMax)
 	{
-		return SimpleSearchRunner.runSearch(new RandomSearch(ac, sampleMin, sampleMax));
+		return SimpleSearchRunner.runSearch(new RandomSearch(ac, pm, sampleMin, sampleMax));
 	}
 }

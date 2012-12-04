@@ -17,9 +17,6 @@ package org.corehunter.search;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.corehunter.Accession;
-import org.corehunter.AccessionCollection;
 import org.corehunter.CoreHunterException;
 import org.corehunter.Search;
 import org.corehunter.SearchListener;
@@ -29,11 +26,15 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 {
 	private SolutionType bestSolution ;
 	private double bestSolutionEvaluation ;
-	private List<SearchListener<SolutionType>> searchListeners ;
+	private final List<SearchListener<SolutionType>> searchListeners ;
 	private SearchStatus status = SearchStatus.NOT_STARTED ;
 
 	long startTime ;
 	long endTime ;
+        
+        public AbstractSearch(){
+            searchListeners = new LinkedList<SearchListener<SolutionType>>();
+        }
 	
 	@Override
 	public void start() throws CoreHunterException
@@ -63,20 +64,18 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 		return status;
 	}
 	
-	public synchronized void addSearchListener(SearchListener<SolutionType> searchListener)
+	public void addSearchListener(SearchListener<SolutionType> searchListener)
 	{
-		if (searchListeners == null)
-			searchListeners = new LinkedList<SearchListener<SolutionType>>() ;
-		
-		searchListeners.add(searchListener) ;
+                synchronized(searchListeners){
+                    searchListeners.add(searchListener);
+                }
 	}
 	
-	public synchronized void removeSearchListener(SearchListener<SolutionType> searchListener)
+	public void removeSearchListener(SearchListener<SolutionType> searchListener)
 	{
-		if (searchListeners != null)
-		{
-			searchListeners.remove(searchListener) ;
-		}
+                synchronized(searchListeners){
+                    searchListeners.remove(searchListener);
+                }
 	}
 	
 	public final long getStartTime()
@@ -95,10 +94,11 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 	protected void handleNewBestSolution(SolutionType bestSolution,
 			double bestSolutionEvalution, boolean copySolution)
 	{
-		if (copySolution)
-			setBestSolution((SolutionType)bestSolution.copy()) ;
-		else
-			setBestSolution(bestSolution) ;
+		if (copySolution){
+                    setBestSolution((SolutionType)bestSolution.copy());
+                } else {
+                    setBestSolution(bestSolution) ;
+                }
 		
 		setBestSolutionEvalution(bestSolutionEvalution) ;
 		fireNewBestSolution(bestSolution, bestSolutionEvalution);
@@ -127,8 +127,9 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 		{
 			Iterator<SearchListener<SolutionType>> iterator = searchListeners.iterator() ;
 			
-			while (iterator.hasNext())
+			while (iterator.hasNext()){
 				iterator.next().searchStarted(this) ;
+                        }
 		}
 	}
 
@@ -140,8 +141,9 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 		{
 			Iterator<SearchListener<SolutionType>> iterator = searchListeners.iterator() ;
 			
-			while (iterator.hasNext())
+			while (iterator.hasNext()){
 				iterator.next().searchCompleted(this) ;
+                        }
 		}
 	}
 	
@@ -153,8 +155,9 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 		{
 			Iterator<SearchListener<SolutionType>> iterator = searchListeners.iterator() ;
 			
-			while (iterator.hasNext())
+			while (iterator.hasNext()){
 				iterator.next().searchFailed(this) ;
+                        }
 		}
 	}
 
@@ -165,8 +168,9 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 		{
 			Iterator<SearchListener<SolutionType>> iterator = searchListeners.iterator() ;
 			
-			while (iterator.hasNext())
+			while (iterator.hasNext()){
 				iterator.next().newBestSolution(this, bestSolution, bestScore) ;
+                        }
 		}
 	}
 	
@@ -177,8 +181,9 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 		{
 			Iterator<SearchListener<SolutionType>> iterator = searchListeners.iterator() ;
 			
-			while (iterator.hasNext())
+			while (iterator.hasNext()){
 				iterator.next().searchProgress(this, searchProgress) ;
+                        }
 		}
 	}
 
@@ -188,8 +193,9 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 		{
 			Iterator<SearchListener<SolutionType>> iterator = searchListeners.iterator() ;
 			
-			while (iterator.hasNext())
+			while (iterator.hasNext()){
 				iterator.next().searchMessage(this, message) ;
+                        }
 		}
 	}
 }

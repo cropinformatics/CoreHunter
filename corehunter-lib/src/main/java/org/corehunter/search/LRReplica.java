@@ -64,7 +64,7 @@ public class LRReplica extends Replica {
             } else {
                 // Random first pair, to save computational cost: this transforms the
                 // deterministic lr search into a semi-random method
-                core = SimpleSearchRunner.runSearch(new RandomSearch(ac, 2, 2)).getAccessions();
+                core = SimpleSearchRunner.runSearch(new RandomSearch(ac, pm, 2, 2)).getAccessions();
             }
             unselected = new ArrayList<Accession>(accessions);
             unselected.removeAll(core);
