@@ -85,7 +85,6 @@ public class LocalSearch extends AbstractSubsetSearch
 		boolean cont = true;
 		double lastImprTime = 0.0;
 
-		ProgressWriter pw;
 		handleNewBestSolution(core, score) ;
 
 		while (cont && tb.getCurrentThreadCpuTime() < eTime)

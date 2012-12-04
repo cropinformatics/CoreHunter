@@ -14,8 +14,6 @@
 
 package org.corehunter;
 
-import java.util.Iterator;
-
 public interface SearchListener<SolutionType extends Solution>
 {
 

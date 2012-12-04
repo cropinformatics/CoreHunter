@@ -14,8 +14,6 @@
 
 package org.corehunter.search;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 import org.corehunter.AccessionCollection;
 import org.corehunter.CoreHunterException;
 import org.corehunter.SearchException;
@@ -56,23 +54,18 @@ public class ExhaustiveSearch extends AbstractSearch<AccessionCollection>
 		// search)
 		if (sampleMin != sampleMax)
 		{
-			throw new SearchException(
-					"Minimum and maximum sample size should be equal for exhaustive search.\n");
+			throw new SearchException("Minimum and maximum sample size should be equal for exhaustive search.\n");
 		}
 		int coreSize = sampleMin;
 		
-		AccessionCollection temp = null ;
-		AccessionCollection core = null;
+		AccessionCollection temp;
+		AccessionCollection core;
 		double score, bestScore = -Double.MAX_VALUE;
 		double progress = 0 ;
 		double newProgress ;
 		String cacheID = PseudoMeasure.getUniqueId();
 
-		// Calculate pseudomeasure for all possible core sets and return best
-		// core
-
-		ThreadMXBean tb = ManagementFactory.getThreadMXBean();
-		double sTime = tb.getCurrentThreadCpuTime();
+		// Calculate pseudomeasure for all possible core sets and return best core
 
 		KSubsetGenerator ksub = new KSubsetGenerator(coreSize, ac.size());
 		long nr = ksub.getNrOfKSubsets();

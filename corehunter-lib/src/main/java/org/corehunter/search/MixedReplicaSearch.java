@@ -26,6 +26,7 @@ import java.util.concurrent.ThreadFactory;
 import org.corehunter.Accession;
 import org.corehunter.AccessionCollection;
 import org.corehunter.CoreHunterException;
+import org.corehunter.SearchException;
 import org.corehunter.measures.PseudoMeasure;
 
 public class MixedReplicaSearch extends AbstractSubsetSearch
@@ -128,7 +129,7 @@ public class MixedReplicaSearch extends AbstractSubsetSearch
 
 		int nrOfTabus = 0;
 		int nrOfNonTabus = nrOfNonTabuReplicas;
-		int nrStuck = 0;
+		int nrStuck;
 
 		// create and init one LR Semi replica
 		LRReplica lrrep = new LRReplica(ac, pm, NR_OF_LR_STEPS, -1, sampleMin,
@@ -211,23 +212,18 @@ public class MixedReplicaSearch extends AbstractSubsetSearch
 				{
 					try
 					{
-						// System.out.println("Waiting for non-tabu rep #" +
-						// (i+1));
+						// System.out.println("Waiting for non-tabu rep #" + (i+1));
 						localAndMCReplicas.get(i).get(); // doesn't return a
-															// result, but
-															// blocks until done
+                                                                                 // result, but
+                                                                                 // blocks until done
 					}
 					catch (InterruptedException ex)
 					{
-						System.err.println("Error in thread pool: " + ex);
-						ex.printStackTrace();
-						System.exit(1);
+						throw new SearchException("Error in thread pool: " + ex);
 					}
 					catch (ExecutionException ex)
 					{
-						System.err.println("Error in thread pool: " + ex);
-						ex.printStackTrace();
-						System.exit(1);
+						throw new SearchException("Error in thread pool: " + ex);
 					}
 				}
 

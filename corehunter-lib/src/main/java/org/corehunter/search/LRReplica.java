@@ -78,7 +78,7 @@ public class LRReplica extends Replica {
         bestNewScore = score;
     }
 
-	/**
+    /**
      * LR Replica always start with empty or full set, so if an initial core is
      * given, it is ignored and the default init method is called instead.
      *

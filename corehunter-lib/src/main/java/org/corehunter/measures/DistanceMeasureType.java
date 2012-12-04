@@ -20,9 +20,9 @@ package org.corehunter.measures;
  */
 public enum DistanceMeasureType {
 
-    MEAN_DISTANCE("",""), // for optimzing minimum distance
+    MEAN_DISTANCE("",""), // for optimizing mean distance
 
-    MIN_DISTANCE("min", " (minimum)"); // for optimizing mean distance
+    MIN_DISTANCE("min", " (minimum)"); // for optimizing minimum distance
 
 
     private final String nameSuffix;

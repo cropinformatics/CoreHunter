@@ -27,13 +27,14 @@ public abstract class AbstractSearch<SolutionType extends Solution> implements S
 	private SolutionType bestSolution ;
 	private double bestSolutionEvaluation ;
 	private final List<SearchListener<SolutionType>> searchListeners ;
-	private SearchStatus status = SearchStatus.NOT_STARTED ;
+	private SearchStatus status;
 
 	long startTime ;
 	long endTime ;
         
         public AbstractSearch(){
             searchListeners = new LinkedList<SearchListener<SolutionType>>();
+            status = SearchStatus.NOT_STARTED;
         }
 	
 	@Override
