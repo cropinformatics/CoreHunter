@@ -1,4 +1,4 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -23,95 +23,127 @@ import java.util.Set;
 
 /**
  * <<Class summary>>
- *
+ * 
  * @author Chris Thachuk <chris.thachuk@gmail.com>
  * @version $Rev$
  */
-public class AccessionCollection {
-    private List<Accession> accessions;
-    private Map<String, Accession> accessionNameMap;
-    
-    /**
+public class AccessionCollection implements Solution
+{
+	private List<Accession> accessions;
+	private Map<String, Accession> accessionNameMap;
+
+	/**
      * 
      */
-    public AccessionCollection() {
-	accessions = new ArrayList<Accession>();
-	accessionNameMap = new HashMap<String, Accession>();
-    }
-
-    public void add(Accession a) {
-	if (!accessionNameMap.containsKey(a.getName())) {
-	    accessions.add(a);
-	    accessionNameMap.put(a.getName(), a);
-	}
-    }
-
-    public void add(List<Accession> as) {
-	for(Accession a : as) {
-	    add(a);
-	}
-    }
-    
-    public void addDataset(AccessionDataset<?> ds) {
-	// first determine if we need to add any new accessions
-	Set<String> newAccessionNames = new HashSet<String>(ds.getAccessionNames());
-	newAccessionNames.removeAll(accessionNameMap.keySet());
-	
-	for (String accessionName : newAccessionNames) {
-	    Accession newAccession = new Accession(accessionName);
-	    add(newAccession);
+	public AccessionCollection()
+	{
+		accessions = new ArrayList<Accession>();
+		accessionNameMap = new HashMap<String, Accession>();
 	}
 	
-	// next we bind trait values from new data set
-	// to any existing accessions in our collection
-	for (Accession accession : accessions) {
-	    accession.bindTraitValues(ds);
+	public AccessionCollection(AccessionCollection accessionCollection)
+	{
+		accessions = new ArrayList<Accession>(accessionCollection != null ? accessionCollection.getAccessions().size() : 0);
+		accessions.addAll(accessionCollection.getAccessions()) ;
+		accessionNameMap = new HashMap<String, Accession>(accessionCollection. getAccessionNameMap());
 	}
-    }
-    
-    /**
-     * getAccessionNames
-     *
-     * @param  
-     * @return 
-     */
-    public Set<String> getAccessionNames() {
-	return accessionNameMap.keySet();
-    }
-    
-    /**
-     * getAccessions
-     *
-     * @param  
-     * @return 
-     */
-    public List<Accession> getAccessions() {
-	return accessions;
-    }
-    
-    /**
-     * size
-     *
-     * @param  
-     * @return 
-     */
-    public int size() {
-	return accessions.size();
-    }
 
-    /**
-     * Get a subset of this accession collection, given an array of indices
-     * in the range [1..col_size]
-     *
-     * @param indices
-     * @return
-     */
-    public AccessionCollection subset(Integer[] indices){
-        AccessionCollection subset = new AccessionCollection();
-        for(int i : indices){
-            subset.add(accessions.get(i-1));
-        }
-        return subset;
-    }
+	@Override
+	public Solution copy()
+	{
+		return new AccessionCollection(this);
+	}
+
+	public void add(Accession a)
+	{
+		if (!accessionNameMap.containsKey(a.getName()))
+		{
+			accessions.add(a);
+			accessionNameMap.put(a.getName(), a);
+		}
+	}
+
+	public void add(List<Accession> as)
+	{
+		for (Accession a : as)
+		{
+			add(a);
+		}
+	}
+
+	public void addDataset(AccessionDataset<?> ds)
+	{
+		// first determine if we need to add any new accessions
+		Set<String> newAccessionNames = new HashSet<String>(
+				ds.getAccessionNames());
+		newAccessionNames.removeAll(accessionNameMap.keySet());
+
+		for (String accessionName : newAccessionNames)
+		{
+			Accession newAccession = new Accession(accessionName);
+			add(newAccession);
+		}
+
+		// next we bind trait values from new data set
+		// to any existing accessions in our collection
+		for (Accession accession : accessions)
+		{
+			accession.bindTraitValues(ds);
+		}
+	}
+
+	/**
+	 * getAccessionNames
+	 * 
+	 * @param
+	 * @return
+	 */
+	public Set<String> getAccessionNames()
+	{
+		return accessionNameMap.keySet();
+	}
+
+	/**
+	 * getAccessions
+	 * 
+	 * @param
+	 * @return
+	 */
+	public List<Accession> getAccessions()
+	{
+		return accessions;
+	}
+
+	/**
+	 * size
+	 * 
+	 * @param
+	 * @return
+	 */
+	public int size()
+	{
+		return accessions.size();
+	}
+
+	/**
+	 * Get a subset of this accession collection, given an array of indices in
+	 * the range [1..col_size]
+	 * 
+	 * @param indices
+	 * @return
+	 */
+	public AccessionCollection subset(Integer[] indices)
+	{
+		AccessionCollection subset = new AccessionCollection();
+		for (int i : indices)
+		{
+			subset.add(accessions.get(i - 1));
+		}
+		return subset;
+	}
+
+	protected final Map<String, Accession> getAccessionNameMap()
+	{
+		return accessionNameMap;
+	}
 }
-

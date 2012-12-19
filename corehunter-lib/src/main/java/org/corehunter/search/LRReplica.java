@@ -1,4 +1,4 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -60,11 +60,11 @@ public class LRReplica extends Replica {
             if(exhFirstPair){
                 // Because distance measures require at least two accessions to be
                 // computable, exhaustively select the best core set of size 2
-                core = CoreSubsetSearch.exhaustiveSearch(ac, pm, 2, 2, false).getAccessions();
+                core = SimpleSearchRunner.runSearch(new ExhaustiveSearch(ac, pm, 2, 2)).getAccessions();
             } else {
                 // Random first pair, to save computational cost: this transforms the
                 // deterministic lr search into a semi-random method
-                core = CoreSubsetSearch.randomSearch(ac, 2, 2).getAccessions();
+                core = SimpleSearchRunner.runSearch(new RandomSearch(ac, pm, 2, 2)).getAccessions();
             }
             unselected = new ArrayList<Accession>(accessions);
             unselected.removeAll(core);

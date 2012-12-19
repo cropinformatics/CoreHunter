@@ -1,4 +1,4 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -28,12 +28,11 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.corehunter.AccessionCollection;
-import org.corehunter.DuplicateMeasureException;
 import org.corehunter.SSRDataset;
-import org.corehunter.UnknownMeasureException;
+import org.corehunter.measures.DuplicateMeasureException;
 import org.corehunter.measures.MeasureFactory;
 import org.corehunter.measures.PseudoMeasure;
-import org.corehunter.search.CoreSubsetSearch;
+import org.corehunter.measures.UnknownMeasureException;
 import org.corehunter.search.HeuristicSingleNeighborhood;
 import org.corehunter.search.Neighborhood;
 import org.corehunter.search.RandomSingleNeighborhood;
@@ -247,7 +246,7 @@ public final class CorehunterTextRunner {
 	AccessionCollection core = null;
         if(randSearch){
             System.out.println("---\nRandom subset\n---");
-            core = CoreSubsetSearch.randomSearch(ac, sampleMin, sampleMax);
+            core = CoreSubsetSearch.randomSearch(ac, pm, sampleMin, sampleMax);
         } else if(exhSearch) {
             System.out.println("---\nExhaustive search\n---");
             core = CoreSubsetSearch.exhaustiveSearch(ac, pm, sampleMin, sampleMax);

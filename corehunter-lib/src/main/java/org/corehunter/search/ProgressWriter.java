@@ -1,4 +1,4 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 import java.util.Timer;
 import java.util.TimerTask;
 

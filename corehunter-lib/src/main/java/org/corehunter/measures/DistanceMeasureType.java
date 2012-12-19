@@ -1,4 +1,4 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ package org.corehunter.measures;
  */
 public enum DistanceMeasureType {
 
-    MEAN_DISTANCE("",""), // for optimzing minimum distance
+    MEAN_DISTANCE("",""), // for optimizing mean distance
 
-    MIN_DISTANCE("min", " (minimum)"); // for optimizing mean distance
+    MIN_DISTANCE("min", " (minimum)"); // for optimizing minimum distance
 
 
     private final String nameSuffix;

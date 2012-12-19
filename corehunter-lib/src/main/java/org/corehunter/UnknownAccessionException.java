@@ -1,4 +1,4 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,9 +19,15 @@ package org.corehunter;
  *
  * @author Chris Thachuk <chris.thachuk@gmail.com>;
  */
-public final class UnknownAccessionException extends java.lang.Exception {
-    public UnknownAccessionException(String msg) {
-        super(msg);
+public final class UnknownAccessionException extends CoreHunterException 
+{
+    public UnknownAccessionException(String message) 
+    {
+        super(message);
     }
-	// }}}
+
+	public UnknownAccessionException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
 }
