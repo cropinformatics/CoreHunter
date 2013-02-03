@@ -18,13 +18,9 @@ Core Analyser CLI application:
 
 # Building the source
 
-The project currently required Maven, and any JDK version 1.5+.
+The project currently requires Maven, and any JDK version 1.6+.
 
-On a unix/linux flavoured OS:
-
-    ./build.sh
-
-On windows:
+On a unix/linux flavoured OS or windows:
 
     mvn package
 

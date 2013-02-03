@@ -1,4 +1,4 @@
-// Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
+// Copyright 2012 Guy Davenport, Herman De Beukelaer
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.corehunter;
+package org.corehunter.search;
 
-public class CoreHunterException extends Exception
+import org.corehunter.CoreHunterException;
+
+public interface Solution
 {
-
 	/**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
-
-	public CoreHunterException(String message)
-	{
-		super(message);
-	}
+	 * Creates a copy of this solution. Exactly what is copied (the depth of the
+	 * copy) depends on the implementation
+	 * 
+	 * @return a copy of this solution
+	 */
+	public Solution copy();
 	
-	public CoreHunterException(Throwable cause)
-	{
-		super(cause.getLocalizedMessage(), cause);
-	}
-
-	public CoreHunterException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
-
+	public void validate() throws CoreHunterException;
 }

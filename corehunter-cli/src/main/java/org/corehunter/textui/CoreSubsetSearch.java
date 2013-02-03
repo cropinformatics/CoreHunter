@@ -1,32 +1,35 @@
-//  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
+// Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package org.corehunter.textui;
 
-import org.corehunter.AccessionCollection;
 import org.corehunter.CoreHunterException;
-import org.corehunter.Search;
-import org.corehunter.measures.PseudoMeasure;
-import org.corehunter.search.ExhaustiveSearch;
-import org.corehunter.search.LRSearch;
-import org.corehunter.search.LocalSearch;
-import org.corehunter.search.MixedReplicaSearch;
-import org.corehunter.search.Neighborhood;
-import org.corehunter.search.REMCSearch;
-import org.corehunter.search.RandomSearch;
-import org.corehunter.search.SteepestDescentSearch;
-import org.corehunter.search.TabuSearch;
+import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
+import org.corehunter.neighbourhood.SubsetNeighbourhood;
+import org.corehunter.neighbourhood.impl.HeuristicSingleNeighbourhood;
+import org.corehunter.neighbourhood.impl.RandomSingleNeighbourhood;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.impl.ExhaustiveSearch;
+import org.corehunter.search.impl.LRSearch;
+import org.corehunter.search.impl.LocalSearch;
+import org.corehunter.search.impl.MetropolisSearch;
+import org.corehunter.search.impl.MixedReplicaSearch;
+import org.corehunter.search.impl.REMCSearch;
+import org.corehunter.search.impl.RandomSearch;
+import org.corehunter.search.impl.SteepestDescentSearch;
+import org.corehunter.search.impl.TabuSearch;
 
 /**
  * <<Class summary>>
@@ -43,35 +46,94 @@ public final class CoreSubsetSearch
 
 	}
 
-	public static AccessionCollection remcSearch(AccessionCollection ac,
-			Neighborhood nh, PseudoMeasure pm, int sampleMin, int sampleMax,
-			double runtime, double minProg, double stuckTime, int numReplicas,
-			double minT, double maxT, int mcSteps)
+	public static REMCSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> remcSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int sampleMinimum, int sampleMaximum, long runtime,
+	    long minimumProgression, long stuckTime, int numberOfReplicas,
+	    double minimumTemperature, double maximumTemperature, int steps)
+	    throws CoreHunterException
 	{
-		return runSearch(new REMCSearch(ac, nh, pm, sampleMin, sampleMax,
-				runtime, minProg, stuckTime, numReplicas, minT, maxT, mcSteps));
+		REMCSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new REMCSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+
+		search.setData(data);
+		search.setNeighbourhood(neighbourhood);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setSubsetMaximumSize(sampleMaximum);
+		search.setRuntime(runtime);
+		search.setMinimumProgressionTime(minimumProgression);
+		search.setStuckTime(stuckTime);
+		search.setNumberOfReplicas(numberOfReplicas);
+		search.setMinimumTemperature(minimumTemperature);
+		search.setMaximumTemperature(maximumTemperature);
+		search.setSteps(steps);
+
+		search.start();
+
+		return search;
+	}
+	
+	public static MetropolisSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> metropolisSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int runtime, int numberOfSteps)
+	    throws CoreHunterException
+	{
+		MetropolisSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = 
+					new MetropolisSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+
+		search.setData(data);
+		search.setNeighbourhood(neighbourhood);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setRuntime(runtime);
+		search.setNumberOfSteps(numberOfSteps) ;
+
+		search.start();
+
+		return search;
 	}
 
-	public static AccessionCollection exhaustiveSearch(AccessionCollection ac,
-			PseudoMeasure pm, int sampleMin, int sampleMax)
+	public static ExhaustiveSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> exhaustiveSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize) throws CoreHunterException
 	{
-		return runSearch(new ExhaustiveSearch(ac, pm, sampleMin, sampleMax));
+		ExhaustiveSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new ExhaustiveSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+
+		search.setData(data);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setSubsetMinimumSize(subsetMinimumSize);
+		search.setSubsetMaximumSize(subsetMaximumSize);
+
+		return search;
 	}
 
-	public static AccessionCollection localSearch(AccessionCollection ac,
-			Neighborhood nh, PseudoMeasure pm, int sampleMin, int sampleMax,
-			double runtime, double minProg, double stuckTime)
+	public static LocalSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> localSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    long runtime, long minimumProgressionTime, long stuckTime)
+	    throws CoreHunterException
 	{
+		LocalSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new LocalSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
-		return runSearch(new LocalSearch(ac, nh, pm, sampleMin, sampleMax, runtime, minProg, stuckTime));
+		search.setData(data);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setNeighbourhood(neighbourhood);
+		search.setRuntime(runtime);
+		search.setMinimumProgressionTime(minimumProgressionTime);
+		search.setStuckTime(stuckTime);
+
+		return search;
 	}
 
 	/**
-	 * Steepest Descent search.
-	 * 
-	 * Always continue with the best of all neighbors, if it is better than the
-	 * current core set, and stop search if no improvement can be made. This is
-	 * also called an "iterative improvement" strategy.
+	 * Steepest Descent search. Always continue with the best of all neighbours,
+	 * if it is better than the current core set, and stop search if no
+	 * improvement can be made. This is also called an "iterative improvement"
+	 * strategy.
 	 * 
 	 * @param ac
 	 * @param nh
@@ -81,29 +143,37 @@ public final class CoreSubsetSearch
 	 * @param runtime
 	 * @param minProg
 	 * @return
+	 * @throws CoreHunterException
 	 */
-	public static AccessionCollection steepestDescentSearch(
-			AccessionCollection ac, Neighborhood nh, PseudoMeasure pm,
-			int sampleMin, int sampleMax, double runtime, double minProg)
+	public static SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> steepestDescentSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    long runtime, long minimumProgressionTime) throws CoreHunterException
 	{
-		return runSearch(new SteepestDescentSearch(ac, nh, pm, sampleMin, sampleMax, runtime, minProg));
+		SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+
+		search.setData(data);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setNeighbourhood(neighbourhood);
+		search.setRuntime(runtime);
+		search.setMinimumProgressionTime(minimumProgressionTime);
+
+		return search;
+
 	}
 
 	/**
-	 * TABU Search.
-	 * 
-	 * Tabu list is a list of indices at which the current core set cannot be
-	 * perturbed (delete, swap) to form a new core set as long as the index is
-	 * contained in the tabu list. After each perturbation step, the index of
-	 * the newly added accession (if it exists) is added to the tabu list, to
-	 * ensure this accesion is not again removed from the core set (or replaced)
-	 * during the next few rounds.
-	 * 
-	 * If no new accession was added (pure deletion), a value "-1" is added to
-	 * the tabu list. As long as such values are contained in the tabu list,
-	 * adding a new accesion without removing one (pure addition) is considered
-	 * tabu, to prevent immediately re-adding the accession which was removed in
-	 * the previous step.
+	 * TABU Search. Tabu list is a list of indices at which the current core set
+	 * cannot be perturbed (delete, swap) to form a new core set as long as the
+	 * index is contained in the tabu list. After each perturbation step, the
+	 * index of the newly added accession (if it exists) is added to the tabu
+	 * list, to ensure this accesion is not again removed from the core set (or
+	 * replaced) during the next few rounds. If no new accession was added (pure
+	 * deletion), a value "-1" is added to the tabu list. As long as such values
+	 * are contained in the tabu list, adding a new accesion without removing one
+	 * (pure addition) is considered tabu, to prevent immediately re-adding the
+	 * accession which was removed in the previous step.
 	 * 
 	 * @param ac
 	 * @param nh
@@ -116,37 +186,79 @@ public final class CoreSubsetSearch
 	 * @param tabuListSize
 	 * @return
 	 */
-	public static AccessionCollection tabuSearch(AccessionCollection ac,
-			Neighborhood nh, PseudoMeasure pm, int sampleMin, int sampleMax,
-			double runtime, double minProg, double stuckTime, int tabuListSize)
+	public static TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> tabuSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    long runtime, long minimumProgressionTime, long stuckTime,
+	    int tabuListSize) throws CoreHunterException
 	{
-		return runSearch(new TabuSearch(ac, nh, pm, sampleMin, sampleMax, runtime, minProg, stuckTime, tabuListSize));
+		TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+
+		search.setData(data);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setNeighbourhood(neighbourhood);
+		search.setRuntime(runtime);
+		search.setMinimumProgressionTime(minimumProgressionTime);
+
+		return search;
 	}
 
-	public static AccessionCollection mixedReplicaSearch(
-			AccessionCollection ac, PseudoMeasure pm, int sampleMin,
-			int sampleMax, double runtime, double minProg, double stuckTime,
-			int nrOfTabuReplicas, int nrOfNonTabuReplicas,
-			int roundsWithoutTabu, int nrOfTabuSteps, int tournamentSize,
-			int tabuListSize, int boostNr, double boostMinProg,
-			int boostTimeFactor, double minBoostTime, double minMCTemp,
-			double maxMCTemp)
+	public static MixedReplicaSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> mixedReplicaSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize, long runtime,
+	    long minimumProgressionTime, long stuckTime, int numberOfTabuReplicas, int numberOfNonTabuReplicas,
+	    int roundsWithoutTabu, int numberOfTabuSteps, int tournamentSize,
+	    int tabuListSize, int boostNumber, long boostMinimumProgressionTime,
+	    int boostTimeFactor, long minBoostTime, double minMCTemp,
+	    double maxMCTemp) throws CoreHunterException
 	{
-		return runSearch(new MixedReplicaSearch(ac, pm, sampleMin, 
-				sampleMax, runtime, minProg, stuckTime, 
-				nrOfTabuReplicas, nrOfNonTabuReplicas, 
-				roundsWithoutTabu, nrOfTabuSteps, tournamentSize,
-				tabuListSize, boostNr, boostMinProg,
-				boostTimeFactor, minBoostTime, minMCTemp,
-				maxMCTemp));
+		MixedReplicaSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new MixedReplicaSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+
+		search.setData(data);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setSubsetMinimumSize(subsetMinimumSize);
+		search.setSubsetMaximumSize(subsetMaximumSize);
+		search.setRuntime(runtime);
+		search.setMinimumProgressionTime(minimumProgressionTime) ;
+		search.setStuckTime(stuckTime) ;
+		search.setNumberOfTabuReplicas(numberOfTabuReplicas);
+		search.setNumberOfNonTabuReplicas(numberOfNonTabuReplicas);
+		search.setRoundsWithoutTabu(roundsWithoutTabu);
+		search.setNumberOfTabuSteps(numberOfTabuSteps);
+		search.setTournamentSize(tournamentSize);
+		search.setTabuListSize(tabuListSize);
+		search.setBoostNumber(boostNumber);
+		search.setBoostMinimumProgressionTime(boostMinimumProgressionTime);
+		search.setBoostTimeFactor(boostTimeFactor);
+
+		// TODO set defaults for sub searches
+		search.setLrSearchTemplate(lrSearch(null, null, boostTimeFactor,
+		    boostTimeFactor, boostTimeFactor, boostTimeFactor));
+		search.setLocalSearchTemplate(localSearch(data, null, objectiveFunction, runtime, minimumProgressionTime, stuckTime));
+		search.setMetropolisSearchTemplate(metropolisSearch(data, null, objectiveFunction, boostTimeFactor, boostTimeFactor));
+		search.setTabuSearchTemplate(tabuSearch(data, null, objectiveFunction, runtime, minimumProgressionTime, stuckTime, boostTimeFactor));
+
+		return search;
 	}
 
-
-	public static AccessionCollection lrSearch(AccessionCollection ac,
-			PseudoMeasure pm, int sampleMin, int sampleMax, int l, int r,
-			boolean exhaustiveFirstPair)
+	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> lrSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize, int l, int r,
+	    boolean exhaustiveFirstPair) throws CoreHunterException
 	{
-		return runSearch(new LRSearch(ac, pm, sampleMin, sampleMax, l, r, exhaustiveFirstPair));
+		LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+
+		search.setData(data);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setSubsetMinimumSize(subsetMinimumSize);
+		search.setSubsetMaximumSize(subsetMaximumSize);
+		search.setL(l);
+		search.setR(r);
+		return search;
+
 	}
 
 	/**
@@ -156,68 +268,92 @@ public final class CoreSubsetSearch
 	 * @param sampleMin
 	 * @param sampleMax
 	 * @return
+	 * @throws CoreHunterException
 	 */
-	public static AccessionCollection randomSearch(AccessionCollection ac,
-			PseudoMeasure pm, int sampleMin, int sampleMax)
+	public static RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> randomSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize) throws CoreHunterException
 	{
-		return runSearch(new RandomSearch(ac, pm, sampleMin, sampleMax));
+		RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+
+		search.setData(data);
+		search.setObjectiveFunction(objectiveFunction);
+		search.setSubsetMinimumSize(subsetMinimumSize);
+		search.setSubsetMaximumSize(subsetMaximumSize);
+		
+		return search;
 	}
 
-	public static AccessionCollection lrSearch(AccessionCollection ac,
-			PseudoMeasure pm, int sampleMin, int sampleMax, int l, int r)
+	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> lrSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize, int l, int r)
+	    throws CoreHunterException
 	{
-
-		return lrSearch(ac, pm, sampleMin, sampleMax, l, r, true);
-
+		return lrSearch(data, objectiveFunction, subsetMinimumSize,
+		    subsetMaximumSize, l, r, true);
 	}
 
-	public static AccessionCollection semiLrSearch(AccessionCollection ac,
-			PseudoMeasure pm, int sampleMin, int sampleMax, int l, int r)
+	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> semiLrSearch(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize, int l, int r)
+	    throws CoreHunterException
 	{
-
-		return lrSearch(ac, pm, sampleMin, sampleMax, l, r, false);
-
+		return lrSearch(data, objectiveFunction, subsetMinimumSize,
+		    subsetMaximumSize, l, r, false);
 	}
 
-	public static AccessionCollection forwardSelection(AccessionCollection ac,
-			PseudoMeasure pm, int sampleMin, int sampleMax)
+	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> forwardSelection(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize)
+	    throws CoreHunterException
 	{
-
-		return lrSearch(ac, pm, sampleMin, sampleMax, 1, 0);
-
+		return lrSearch(data, objectiveFunction, subsetMinimumSize,
+		    subsetMaximumSize, 1, 0);
 	}
 
-	public static AccessionCollection semiForwardSelection(
-			AccessionCollection ac, PseudoMeasure pm, int sampleMin,
-			int sampleMax)
+	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> semiForwardSelection(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize)
+	    throws CoreHunterException
 	{
-
-		return semiLrSearch(ac, pm, sampleMin, sampleMax, 1, 0);
-
+		return semiLrSearch(data, objectiveFunction, subsetMinimumSize,
+		    subsetMaximumSize, 1, 0);
 	}
 
-	public static AccessionCollection backwardSelection(AccessionCollection ac,
-			PseudoMeasure pm, int sampleMin, int sampleMax)
+	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> backwardSelection(
+	    AccessionSSRMarkerMatrix<Integer> data,
+	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
+	    int subsetMinimumSize, int subsetMaximumSize)
+	    throws CoreHunterException
 	{
-
-		return lrSearch(ac, pm, sampleMin, sampleMax, 0, 1);
-
+		return lrSearch(data, objectiveFunction, subsetMinimumSize,
+		    subsetMaximumSize, 0, 1);
 	}
 
-	private static AccessionCollection runSearch(
-			Search<AccessionCollection> search)
-	{
-		try
-		{
-			search.start();
+	public static RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>> randomSingleNeighbourhood(
+      int sampleMin, int sampleMax) throws CoreHunterException
+  {
+		RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
+		
+		neighbourhood.setSubsetMinimumSize(sampleMin) ;
+		neighbourhood.setSubsetMaximumSize(sampleMax) ;
 
-			return search.getBestSolution();
-		}
-		catch (CoreHunterException e)
-		{
-			e.printStackTrace();
+	  return neighbourhood;
+  }
+	
+	public static HeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>> heuristicSingleNeighbourhood(
+      int sampleMin, int sampleMax) throws CoreHunterException
+  {
+		HeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new HeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
+		
+		neighbourhood.setSubsetMinimumSize(sampleMin) ;
+		neighbourhood.setSubsetMaximumSize(sampleMax) ;
 
-			return null;
-		}
-	}
+	  return neighbourhood;
+  }
 }
