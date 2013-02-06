@@ -5,3 +5,5 @@
 /data/output/
 .DS_Store
 /.settings
+/clean.sh
+/clean_and_build.sh
