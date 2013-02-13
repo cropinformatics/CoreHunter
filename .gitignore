@@ -7,3 +7,7 @@
 /.settings
 /clean.sh
 /clean_and_build.sh
+/manual/*.aux
+/manual/*.log
+/manual/*.out
+/manual/*.synctex.gz
