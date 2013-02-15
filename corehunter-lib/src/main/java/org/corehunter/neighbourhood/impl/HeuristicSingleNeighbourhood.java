@@ -76,7 +76,7 @@ public class HeuristicSingleNeighbourhood<
     
     try
     {
-	    double bestScore = objectiveFunction.isMinimizing() ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY ;
+	    double bestScore = objectiveFunction.isMinimizing() ? Double.MAX_VALUE : Double.MIN_VALUE ;
 	    double score;
 
 	    // first add best, then delete worst
@@ -110,7 +110,7 @@ public class HeuristicSingleNeighbourhood<
 	    } 
 
 	    // best addition has been determined, reset best score
-	    bestScore = objectiveFunction.isMinimizing() ? Double.POSITIVE_INFINITY: Double.NEGATIVE_INFINITY ;
+	    bestScore = objectiveFunction.isMinimizing() ? Double.MAX_VALUE: Double.MIN_VALUE ;
 
 	    // now determine best removal
 	    if (bestAddIndex == null)

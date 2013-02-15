@@ -79,7 +79,7 @@ public abstract class AbstractObjectiveSearch<
 	@Override
 	protected double getWorstEvaluation()
   {
-	  return getObjectiveFunction().isMinimizing() ? Double.POSITIVE_INFINITY: Double.NEGATIVE_INFINITY ;
+	  return getObjectiveFunction().isMinimizing() ? Double.MAX_VALUE: Double.MIN_VALUE;
   }
 
 	@Override

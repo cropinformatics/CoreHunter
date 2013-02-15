@@ -157,7 +157,7 @@ public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extend
 
 	protected double getWorstScore(boolean isMinimizing)
   {
-	  return isMinimizing ? Double.POSITIVE_INFINITY: Double.NEGATIVE_INFINITY ;
+	  return isMinimizing ? Double.MAX_VALUE: Double.MIN_VALUE ;
   }
 
 	/* (non-Javadoc)

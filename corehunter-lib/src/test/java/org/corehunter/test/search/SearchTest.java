@@ -28,9 +28,9 @@ public abstract class SearchTest<SolutionType extends Solution, SearchType exten
 	   assertEquals("Not completed", SearchStatus.COMPLETED, search.getStatus()) ;
 	   assertNotNull("No result", search.getBestSolution()) ;
 	   if (search instanceof ObjectiveSearch && !((ObjectiveSearch)search).getObjectiveFunction().isMinimizing())
-	  	 assertTrue("Not completed", Double.NEGATIVE_INFINITY < search.getBestSolutionEvaluation()) ;
+	  	 assertTrue("Not completed", Double.MIN_VALUE < search.getBestSolutionEvaluation()) ;
 	   else
-	  	 assertTrue("Not completed", Double.POSITIVE_INFINITY > search.getBestSolutionEvaluation()) ;
+	  	 assertTrue("Not completed", Double.MAX_VALUE > search.getBestSolutionEvaluation()) ;
     }
     catch (CoreHunterException e)
     {
