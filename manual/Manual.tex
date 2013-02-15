@@ -1,0 +1,203 @@
+\documentclass[a4paper, titlepage, 11pt]{article}
+
+\usepackage{a4wide}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{color}
+
+\newcommand{\todo}[1]{
+	\textcolor{red}{[TO DO: #1]}
+}
+
+\parskip=2ex
+\parindent=0ex
+
+\begin{document}
+
+\title{\Huge Core Hunter user manual\\[1ex] \Large \url{http://www.corehunter.org}}
+\date{}
+
+\maketitle
+
+\section{Overview}
+
+Core Hunter is a library for selecting and analyzing genetic
+resources. The latest updates can be found on the Core Hunter website: \url{http://www.corehunter.org}.
+
+\section{Building the Core Hunter software}
+
+If you have downloaded a binary release of the software, containing prebuilt jar packages, you can skip this section. If you have downloaded a source code archive, read this section for instructions on how to build the source.
+
+\subsection{Requirements}
+
+Building the Core Hunter software requires Maven and a JDK version 1.6+:
+\begin{itemize}
+	
+	\item You can download and install Maven from
+
+	\url{http://maven.apache.org/download.cgi}
+
+	\item You can download and install a Java Development Kit (JDK) from
+
+	\url{http://www.oracle.com/technetwork/java/javase/downloads/index.html}
+
+	The JDK also includes a Java Runtime Environment (JRE) needed to run the software.
+
+\end{itemize}
+
+\subsection{Building the software}
+
+Please use the appropriate script to build the Core Hunter software on your machine.
+
+\subsubsection{On a Unix/Linux flavored OS}
+
+Run
+\begin{verbatim}
+    ./build.sh
+\end{verbatim}
+to build the software. This will create a \texttt{bin} subdirectory with compiled jar files of both the \texttt{corehunter} and \texttt{coreanalyser} tools.
+
+\subsubsection{On Windows}
+
+If your downloaded source archive contains the Windows build script
+\begin{verbatim}
+    build.bat
+\end{verbatim}
+run this script to build the software. This will create a \texttt{bin} subdirectory with compiled jar files of both the \texttt{corehunter} and \texttt{coreanalyser} tools.
+
+To build an older release which does not contain the Windows build script yet, run:
+\begin{verbatim}
+    mvn package
+\end{verbatim}
+In this case no \texttt{bin} folder is created so it is required to manually grab the compiled jar files from
+\footnotesize
+\begin{verbatim}
+corehunter-cli/target/corehunter-cli-[VERSION]-SNAPSHOT-jar-with-dependencies.jar
+coreanalyser-cli/target/coreanalyser-cli-[VERSION]-SNAPSHOT-jar-with-dependencies.jar
+\end{verbatim}
+\normalsize
+after running the Maven build command, replacing \texttt{[VERSION]} with the appropriate version number. In this case we strongly advise you to manually create the \texttt{bin} folder and to copy the compiled jar files to this location, renaming them to
+\begin{verbatim}
+corehunter-cli.jar
+coreanalyser-cli.jar
+\end{verbatim}
+for a simplified user experience.
+
+\section{Running the Core Hunter software}
+
+Currently the advised method for running the Core Hunter software is to use the command-line interface (CLI). We also provide a basic wrapper script to run the CLI from R. In the future we will release a user-friendly graphical interface (GUI) as well as a more flexible R interface. Check the website for updates on this.
+
+\subsection{Requirements}
+
+Running the Core Hunter software requires Java version 1.6+:
+\begin{itemize}
+
+	\item You can download and install a Java Runtime Environment (JRE) from
+
+	\url{http://www.java.com/en/download/index.jsp}
+
+\end{itemize}
+
+\subsection{Running the command-line interface}
+\label{subsect:CLI}
+
+Assuming that your current working directory is the root directory of Core Hunter, and assuming that it contains a \texttt{bin} subdirectory with compiled jar files of the CLIs, an example command to run Core Hunter is:
+\small
+\begin{verbatim}
+java -jar bin/corehunter-cli.jar -MR 0.7 -SH 0.3 data/examples/bul.csv core.csv
+\end{verbatim}
+\normalsize
+
+This uses the default Mixed Replica algorithm to sample a core from the example dataset \texttt{bul.csv}, optimizing both Modified Rogers' distance (with weight 0.7) and Shannon's diversity index (with weight 0.3). The sampling intensity defaults to 20\% and also the default runtime limit of 60 seconds is applied. The resulting core subset is stored in the file \texttt{core.csv}.
+Alternatively, an optimization algorithm of choice can be selected, e.g.:
+\small
+\begin{verbatim}
+java -jar bin/corehunter-cli.jar -remc -MR 0.7 -SH 0.3 data/examples/bul.csv core.csv
+\end{verbatim}
+\normalsize
+
+Run the help command
+\small
+\begin{verbatim}
+java -jar bin/corehunter-cli.jar -help
+\end{verbatim}
+\normalsize
+
+for an overview of all parameters. The general usage of Core Hunter is described by
+\small
+\begin{verbatim}
+corehunter [options] [measures] <collection_file> <coresubset_file>
+\end{verbatim}
+\normalsize
+
+Three different stop criteria can be applied: a maximum runtime (60 seconds by default), a required minimum progression in the score of the current core (by default not used) or a maximum time without improvement (stuck time, by default also not used). For more information about these stop criteria look in the \emph{common advanced search options} section of the output of the help command.
+
+The Core Analyser tool can be applied using a similar command, e.g.:
+\small
+\begin{verbatim}
+java -jar bin/coreanalyser-cli.jar data/examples/bul.csv
+\end{verbatim}
+\normalsize
+which will analyze the given dataset using all evaluation measures included in Core Hunter. Alternatively you may also specify multiple datasets, in this case they will all be analyzed separately and individual values will be reported, as well as minimum, maximum and mean values over the different datasets. The general usage of Core Analyser is described by
+\small
+\begin{verbatim}
+coreanalyser [options] <file1> [<file2> [<file3> ...]]
+\end{verbatim}
+\normalsize
+
+\subsection{Running Core Hunter from R}
+
+We also provide a basic script \texttt{corehunter.R} to run the Core Hunter and Core Analyser tools from R\footnote{If you cannot find the script \texttt{corehunter.R} in your downloaded package, you can also obtain it from the website (\url{http://www.corehunter.org}) and copy the script to the Core Hunter root directory.}. To use it set your working directory in R to the Core Hunter root directory, using
+\begin{verbatim}
+    setwd(...)
+\end{verbatim}
+Then load the script with
+\begin{verbatim}
+    source("corehunter.R")
+\end{verbatim}
+and use the commands \texttt{corehunter.run} and \texttt{coreanalyser.run} to run the Core Hunter and Core Analyser tools, respectively. Both commands expect a single argument which is an option string similar to those used in the command-line interface. For example you can print the Core Hunter help information using
+\begin{verbatim}
+    corehunter.run("-help")
+\end{verbatim}
+and sample a core subset from the \texttt{bul.csv} dataset using a command like
+\begin{verbatim}
+    corehunter.run("-MR 0.7 -SH 0.3 data/examples/bul.csv core.csv")
+\end{verbatim}
+which samples a core with the same parameters as the first example discussed in subsection~\ref{subsect:CLI}. To analyze the \texttt{bul.csv} dataset, run the following command:
+\begin{verbatim}
+    coreanalyser.run("data/examples/bul.csv")
+\end{verbatim}
+A more flexible R interface will be released in the future, please check the website for updates.
+
+\section{Dataset file format}
+
+The Core Hunter file format is demonstrated in the example dataset file \texttt{bul.csv} found in the \texttt{data/examples} directory. Dataset files are comma separated files (.csv) in which the first column denotes all genetic markers used in the dataset. The second column indicates the different alleles that may occur at each specific marker locus. Subsequent columns describe the accessions included in the dataset.
+
+For each combination of accession, marker and allele the file indicates the allelic frequency observed in this accession at the respective marker locus. Usually allelic frequencies of alleles at the same locus should sum to 1. In case of missing data, fields may be left blank. The same file format is used for the output files generated by Core Hunter to store core subsets.
+
+\section{Questions}
+
+Any questions about Core Hunter should be directed to
+\begin{itemize}
+
+	\item Herman De Beukelaer (\href{mailto:herman.debeukelaer@gmail.com}{herman.debeukelaer@gmail.com})
+
+	\item Guy Davenport (\href{mailto:daveneti@gmail.com}{daveneti@gmail.com})
+
+\end{itemize}
+
+Please check the website \url{http://www.corehunter.org} for updates. You can also subscribe to our user group at \url{https://groups.google.com/d/forum/corehunter-users} to receive the latest news on Core Hunter or to post questions.
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
