@@ -31,8 +31,9 @@ import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileRea
 import org.corehunter.objectivefunction.DuplicateMeasureException;
 import org.corehunter.objectivefunction.MultipleObjectiveFunction;
 import org.corehunter.objectivefunction.UnknownMeasureException;
-import org.corehunter.search.SubsetSolution;
-import org.corehunter.search.solution.UnorderedIntegerListSubsetSolution;
+import org.corehunter.search.impl.IntegerSubsetGenerator;
+import org.corehunter.search.solution.SubsetSolution;
+import org.corehunter.search.solution.impl.UnorderedIntegerListSubsetSolution;
 import org.corehunter.ssr.MeasureFactorySSR;
 
 /**
@@ -126,7 +127,10 @@ public final class CoreanalyserTextRunner
 	    		}
 	    	}
 	    	
-	    	SubsetSolution<Integer> solution = new UnorderedIntegerListSubsetSolution(dataset.getIndices()) ;
+	    	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
+	    	integerSubsetGenerator.setSubsetSize(2) ;
+
+	    	SubsetSolution<Integer> solution = new UnorderedIntegerListSubsetSolution(dataset.getIndices(), integerSubsetGenerator.first()) ;
 
 	    	Map<String, Double> scores = objectiveFunction.componentScores(solution);
 
