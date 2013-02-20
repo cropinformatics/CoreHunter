@@ -14,8 +14,10 @@
 
 package org.corehunter.objectivefunction.impl;
 
+import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -33,10 +35,15 @@ public abstract class AbstractSubsetObjectiveFunction<
 		super (name, description) ;
 	}
 	
+	protected AbstractSubsetObjectiveFunction(
+			AbstractSubsetObjectiveFunction<IndexType, DatasetType> objectiveFuncton)
+  {
+	  super(objectiveFuncton);
+  }
+
 	@Override
   public boolean isMinimizing()
   {
 	  return false;
   }
-
 }

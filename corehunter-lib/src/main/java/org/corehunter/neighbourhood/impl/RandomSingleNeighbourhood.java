@@ -14,6 +14,7 @@
 
 package org.corehunter.neighbourhood.impl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,7 +22,7 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.Move;
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * Implements a standard neighbourhood which contains all sets that differ in at
@@ -62,7 +63,7 @@ public class RandomSingleNeighbourhood<
 	@Override
   public Move<SolutionType> performBestMove(SolutionType solution,
       ObjectiveFunction<SolutionType> objectiveFunction, List<IndexType> tabuList,
-      double currentBestEvaluation, String cacheID)
+      double currentBestEvaluation)
 	{
 
 		// search for (one of the) best neighbour(s) by perturbing core
@@ -84,7 +85,7 @@ public class RandomSingleNeighbourhood<
 	      {
 	      	index = selected.next() ;
 	      	solution.removeIndex(index) ;
-	      	score = objectiveFunction.calculate(solution, cacheID);
+	      	score = objectiveFunction.calculate(solution);
 	      	
 	      	// ensure index is not tabu
 	      	if (isBetterScore(objectiveFunction.isMinimizing(), score, bestScore) 
@@ -105,27 +106,29 @@ public class RandomSingleNeighbourhood<
       }
 		}
 		
-		Iterator<IndexType> selected ;
-		Iterator<IndexType> unselected = solution.getRemainingIndices().iterator() ;
+		List<IndexType> selected = new ArrayList<IndexType>(solution.getSubsetIndices()) ;
+		List<IndexType> unselected = new ArrayList<IndexType>(solution.getRemainingIndices()) ;
 		IndexType indexToAdd ;
 		IndexType indexToRemove ;
+		Iterator<IndexType> selectedIterator ;
+		Iterator<IndexType> unselectedIterator = unselected.iterator() ;
 		
 		// try all possible swaps: remove 1 AND add 1 to replace it
-		while (unselected.hasNext())
+		while (unselectedIterator.hasNext())
 		{
 			// accession to add
-			indexToAdd = unselected.next() ;
+			indexToAdd = unselectedIterator.next() ;
 			// loop over all possible elements and try replacing them with
 			// new element
 			
-			selected = solution.getSubsetIndices().iterator() ;
+			selectedIterator = selected.iterator() ;
 			
 			// try all possible swaps: remove 1 AND add 1 to replace it
-			while (selected.hasNext())
+			while (selectedIterator.hasNext())
 			{
-				indexToRemove = selected.next() ;
+				indexToRemove = selectedIterator.next() ;
 				
-				// replace accession with new accession
+				// replace index with new index
 				solution.swapIndices(indexToAdd, indexToRemove) ;
 				
 				// ensure index is not tabu
@@ -134,7 +137,7 @@ public class RandomSingleNeighbourhood<
 				{
 					bestScore = score;
 					bestAddIndex = indexToAdd; // add element
-					// collection
+
 					bestRemoveIndex = indexToRemove; // remove element
 				}
 				// undo swap
@@ -148,16 +151,16 @@ public class RandomSingleNeighbourhood<
 		// is not allowed to prevent going back to the previous solution!)
 		if (solution.getSubsetSize() < getSubsetMaximumSize())
 		{
-			unselected = solution.getRemainingIndices().iterator() ;
+			unselectedIterator = unselected.iterator() ;
 			IndexType index ;
 			
 			try
       {
-	      while (unselected.hasNext())
+	      while (unselectedIterator.hasNext())
 	      {
-	      	index = unselected.next() ;
+	      	index = unselectedIterator.next() ;
 	      	solution.addIndex(index) ;
-	      	score = objectiveFunction.calculate(solution, cacheID);
+	      	score = objectiveFunction.calculate(solution);
 	      	
 	      	// ensure index is not tabu
 	      	if (isBetterScore(objectiveFunction.isMinimizing(), score, bestScore) 

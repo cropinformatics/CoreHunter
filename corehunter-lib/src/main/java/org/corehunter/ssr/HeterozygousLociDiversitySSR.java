@@ -21,8 +21,9 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.objectivefunction.CachedResult;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.objectivefunction.impl.CachedResult;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -32,7 +33,7 @@ import org.corehunter.search.SubsetSolution;
  */
 public final class HeterozygousLociDiversitySSR<IndexType> extends AbstractAccessionSSRObjectiveFunction<IndexType>
 {
-	private Map<String, HECachedResult<IndexType>>	cachedResults;
+	private HECachedResult<IndexType>	cachedResults;
 
 	public HeterozygousLociDiversitySSR()
 	{
@@ -42,36 +43,29 @@ public final class HeterozygousLociDiversitySSR<IndexType> extends AbstractAcces
 	public HeterozygousLociDiversitySSR(String name, String description)
 	{
 		super(name, description);
-		cachedResults = Collections
-		    .synchronizedMap(new HashMap<String, HECachedResult<IndexType>>());
 	}
 
+	protected HeterozygousLociDiversitySSR(HeterozygousLociDiversitySSR<IndexType> objectiveFunction) 
+	{
+		super(objectiveFunction) ;
+	}
+	
+	@Override
+  public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  {
+	  return new HeterozygousLociDiversitySSR<IndexType>(this);
+  }
+	
 	@Override
 	public final double calculate(SubsetSolution<IndexType> solution) throws CoreHunterException 
 	{
-		return calculate(solution, new HECachedResult<IndexType>(solution));
-	}
+		if (cachedResults == null)
+			cachedResults = new HECachedResult<IndexType>(solution) ;
+		
+		List<IndexType> aIndices = cachedResults.getAddedIndices(solution.getIndices());
+		List<IndexType> rIndices = cachedResults.getRemovedIndices(solution.getIndices());
 
-	@Override
-	public final double calculate(SubsetSolution<IndexType> solution, String cacheId) throws CoreHunterException 
-	{
-		HECachedResult<IndexType> cache = cachedResults.get(cacheId);
-
-		if (cache == null)
-		{
-			cache = new HECachedResult<IndexType>(solution);
-			cachedResults.put(cacheId, cache);
-		}
-
-		return calculate(solution, cache);
-	}
-	
-	protected final double calculate(SubsetSolution<IndexType> solution, HECachedResult<IndexType> cache) throws CoreHunterException 
-	{
-		List<IndexType> aIndices = cache.getAddedIndices(solution.getIndices());
-		List<IndexType> rIndices = cache.getRemovedIndices(solution.getIndices());
-
-		double markerAlleleTotals[][] = cache.getMarkerAlleleTotals();
+		double markerAlleleTotals[][] = cachedResults.getMarkerAlleleTotals();
 		double addTotals[][] = getData().getMarkerAlleleTotals(aIndices);
 		double remTotals[][] = getData().getMarkerAlleleTotals(rIndices);
 
@@ -106,8 +100,8 @@ public final class HeterozygousLociDiversitySSR<IndexType> extends AbstractAcces
 		}
 
 		double score = (1.0 / (double) markerAlleleTotals.length) * diversityTotal;
-		// recache our results under this id
-		cache.setIndices(solution.getIndices());
+		// recache our results
+		cachedResults.setIndices(solution.getIndices());
 
 		return score;
 	}

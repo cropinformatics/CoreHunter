@@ -21,8 +21,9 @@ import java.util.Map;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.UnknownIndexException;
-import org.corehunter.objectivefunction.CachedResult;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.objectivefunction.impl.CachedResult;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -46,6 +47,17 @@ public final class ProportionNonInformativeAllelesSSR<IndexType> extends Abstrac
 		    .synchronizedMap(new HashMap<String, PNCachedResult<IndexType>>());
 	}
 
+	protected ProportionNonInformativeAllelesSSR(ProportionNonInformativeAllelesSSR<IndexType> objectiveFunction) 
+	{
+		super(objectiveFunction) ;
+	}
+	
+	@Override
+  public ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  {
+	  return new ProportionNonInformativeAllelesSSR<IndexType>(this);
+  }
+	
 	@Override
   public boolean isMinimizing()
   {

@@ -25,8 +25,10 @@ import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.Search;
+import org.corehunter.search.SearchListenerAdapter;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.Solution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public class REMCSearch<
 	IndexType,
@@ -35,15 +37,15 @@ public class REMCSearch<
 	NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
 	extends AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType, MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>>
 {
-	private long	              minimumProgressionTime;
+	private double	            minimumProgression;
 	private long	              stuckTime;
 	private int	                numberOfReplicas;
 	private double	            minimumTemperature;
 	private double	            maximumTemperature;
-	private int	                steps;
+	private int	                numberOfSteps;
 	private long   						  runtime;
 	
-	private boolean 						continueSearch ;
+	private boolean continueSearch ;
 	
 	public REMCSearch()
 	{
@@ -54,12 +56,12 @@ public class REMCSearch<
 	{
 		super(search);
 		
-		setMinimumProgressionTime(search.getMinimumProgressionTime()) ;
+		setMinimumProgression(search.getMinimumProgression()) ;
 		setStuckTime(search.getStuckTime()) ;
 		setNumberOfReplicas(search.getNumberOfReplicas()) ;
 		setMinimumTemperature(search.getMinimumTemperature()) ;
 		setMaximumTemperature(search.getMaximumTemperature()) ;
-		setSteps(search.getSteps()) ;
+		setNumberOfSteps(search.getNumberOfSteps()) ;
 		setRuntime(search.getRuntime()) ;
 	}
 
@@ -84,18 +86,18 @@ public class REMCSearch<
 		}
   }
 
-	public final long getMinimumProgressionTime()
+	public final double getMinimumProgression()
   {
-  	return minimumProgressionTime;
+  	return minimumProgression;
   }
 
-	public final void setMinimumProgressionTime(long minimumProgressionTime) throws CoreHunterException
+	public final void setMinimumProgression(double minimumProgression) throws CoreHunterException
   {
-		if (this.minimumProgressionTime != minimumProgressionTime)
+		if (this.minimumProgression != minimumProgression)
 		{
-			this.minimumProgressionTime = minimumProgressionTime;
+			this.minimumProgression = minimumProgression;
 			
-			handleMinimumProgressionTimeSet() ;
+			handleMinimumProgressionSet() ;
 		}
   }
 
@@ -159,15 +161,20 @@ public class REMCSearch<
 		}
   }
 
-	public final int getSteps()
-	{
-		return steps;
-	}
+	public final int getNumberOfSteps()
+  {
+  	return numberOfSteps;
+  }
 
-	public final void setSteps(int steps)
-	{
-		this.steps = steps;
-	}
+	public final void setNumberOfSteps(int numberOfSteps) throws CoreHunterException
+  {
+		if (this.numberOfSteps != numberOfSteps)
+		{
+			this.numberOfSteps = numberOfSteps;
+			
+			handleNumberOfStepsSet() ;
+		}
+  }
 	
 	protected void handleRuntimeSet() throws CoreHunterException
   {
@@ -178,13 +185,10 @@ public class REMCSearch<
 	  	throw new CoreHunterException("Runtime can not be set while search in process") ;
   }
 	
-	protected void handleMinimumProgressionTimeSet() throws CoreHunterException
+	protected void handleMinimumProgressionSet() throws CoreHunterException
   {
-	  if (minimumProgressionTime < 0)
-	  	throw new CoreHunterException("Minimum Progression Time can not be less than zero!") ;
-	  
 		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Minimum Progression Time can not be set while search in process") ;
+	  	throw new CoreHunterException("Minimum Progression can not be set while search in process") ;
   }
 	
 	protected void handleStuckTimeSet() throws CoreHunterException
@@ -223,10 +227,31 @@ public class REMCSearch<
 	  	throw new CoreHunterException("Maximum Temperature can not be set while search in process") ;
   }
 	
+	protected void handleNumberOfStepsSet() throws CoreHunterException
+  {
+		if (SearchStatus.STARTED.equals(getStatus()))
+	  	throw new CoreHunterException("Number Of Steps can not be set while search in process") ;
+  }
+
 	@Override
   protected void validate() throws CoreHunterException
   {
 	  super.validate();
+	  
+	  if (runtime < 0)
+	  	throw new CoreHunterException("Runtime can not be less than zero!") ;
+	  
+	  if (stuckTime < 0)
+	  	throw new CoreHunterException("Stuck Time can not be less than zero!") ;
+	  
+	  if (numberOfReplicas < 0)
+	  	throw new CoreHunterException("Number Of Replicas can not be less than zero!") ;
+	  
+	  if (minimumTemperature < 0)
+	  	throw new CoreHunterException("Minimum Temperature can not be less than zero!") ;
+	  
+	  if (maximumTemperature < 0)
+	  	throw new CoreHunterException("Maximum Temperature can not be less than zero!") ;
 	  
 	  if (maximumTemperature < minimumTemperature)
 	  	throw new CoreHunterException("Maximum Temperature can not be less than Miimum Temperature!") ;
@@ -235,82 +260,58 @@ public class REMCSearch<
 	@SuppressWarnings("unchecked")
   protected void runSearch() throws CoreHunterException
 	{
+		continueSearch = true ;
+		
 		List<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> replicas = new ArrayList<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>>(numberOfReplicas);
 
 		for (int i = 0; i < numberOfReplicas; i++)
 		{
 			double temperature = minimumTemperature + i * (maximumTemperature - minimumTemperature) / (numberOfReplicas - 1);
-			replicas.add(createMetropolisSearch((SolutionType)getSolution().copy(), getObjectiveFunction(), (NeighbourhoodType)getNeighbourhood().copy(), steps,
+			replicas.add(createMetropolisSearch((SolutionType)getSolution().copy(), getObjectiveFunction().copy(), (NeighbourhoodType)getNeighbourhood().copy(), numberOfSteps,
 			    -1, temperature));
 		
 		}
 
 		int swapBase = 0;
-		continueSearch = true ;
+		
 		double previousBestEvaluation = getBestSolutionEvaluation() ;
 		int previousBestSubsetSize = getBestSolution().getSubsetSize();
 		
 		double progression;
-		long lastImprovementTime = 0;
 		
-		// All tasks are done, inspect results
-		Iterator<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> iterator ;
-		
-		MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> subSearch ;
-		double bestReplicaScore ;
-		boolean improvement ;
-		MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> bestSubSearch ;
+		registerSubSearches(replicas) ;
 
-		while (continueSearch &&  getSearchTime() < runtime)
+		while (continueSearch)
 		{
-			progression = 0 ;
-			bestSubSearch = null ;
+			startSubSearches(replicas) ; // returns when all are complete
 			
-			startSubSearches(replicas) ;
-
-			// All tasks are done, find best result
-			iterator = replicas.iterator() ;
+			findBestSubSearch(replicas) ;
 			
-			improvement = false ;
-			
-			while (iterator.hasNext())
+			if (minimumProgression > 0)
 			{
-				subSearch = iterator.next() ;
-				
-				if (SearchStatus.COMPLETED.equals(subSearch.getStatus()))
-				{
-					bestReplicaScore = subSearch.getBestSolutionEvaluation() ;
+				// All tasks are done, check minimum progression
+				progression = getDeltaScore(getBestSolutionEvaluation() , previousBestEvaluation) ;
 	
-					if (bestReplicaScore > previousBestEvaluation
-					    || (previousBestEvaluation == previousBestEvaluation && subSearch.getBestSolution().getSubsetSize() < previousBestSubsetSize))
-					{
-						lastImprovementTime = getBestSolutionTime() ;
-						
-						bestSubSearch = subSearch ;
-					}
-				}
-			}
-
-			if (bestSubSearch != null)
-			{
-				progression = bestSubSearch.getBestSolutionEvaluation() - previousBestEvaluation;
-
-				// check min progression
-				if (improvement && bestSubSearch.getBestSolution().getSubsetSize() >= previousBestSubsetSize && progression < minimumProgressionTime)
+				// check minimum progression
+				if (progression > 0 && getBestSolution().getSubsetSize() >= previousBestSubsetSize && progression < minimumProgression)
 				{
 					continueSearch = false;
 				}
+			}
 				
-				previousBestEvaluation = bestSubSearch.getBestSolutionEvaluation() ;
-				previousBestSubsetSize = bestSubSearch.getBestSolution().getSubsetSize();
+			previousBestEvaluation = getBestSolutionEvaluation() ;
+			previousBestSubsetSize = getBestSolution().getSubsetSize();
+		
+			// check stuckTime
+			continueSearch = continueSearch && stuckTime > getBestSolutionTime() ;
+			
+			// consider swapping temperatures of adjacent replicas
+			for (int i = swapBase; i < numberOfReplicas - 1; i += 2)
+			{
+				MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> m = replicas.get(i);
+				MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> n = replicas.get(i + 1);
 			}
 			
-			// check stuckTime
-			if ((getBestSolutionTime() - lastImprovementTime) > stuckTime)
-			{
-				continueSearch = false;
-			}
-
 			// consider swapping temperatures of adjacent replicas
 			for (int i = swapBase; i < numberOfReplicas - 1; i += 2)
 			{
@@ -320,6 +321,7 @@ public class REMCSearch<
 				double B_m = 1.0 / (K_b2 * m.getTemperature());
 				double B_n = 1.0 / (K_b2 * n.getTemperature());
 				double B_diff = B_n - B_m;
+				// TODO check if this the right around +ve delta here means m is better than n
 				double E_delta = getDeltaScore(m.getBestSolutionEvaluation(), n.getBestSolutionEvaluation()) ;
 
 				boolean swap = false;
@@ -348,11 +350,39 @@ public class REMCSearch<
 			}
 
 			swapBase = 1 - swapBase;
+			
+			continueSearch = continueSearch && getSearchTime() < runtime ;
 		}
 
-		fireSearchCompleted();
+		unregisterSubSearches(replicas) ;
 	}
 	
+	// this is temp method to double check the best solution
+	private void findBestSubSearch(
+      List<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> replicas)
+  {
+		Iterator<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> iterator = replicas.iterator() ;
+		
+		double bestSolutionEvaluation = this.getWorstEvaluation() ;
+		
+		MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search ;
+		SolutionType bestSolution = null ;
+		
+		while (iterator.hasNext())
+		{
+			search = iterator.next() ;
+			
+			if (isBetterSolution(search.getBestSolutionEvaluation(), bestSolutionEvaluation))
+			{
+				bestSolution = search.getBestSolution() ;
+				bestSolutionEvaluation = search.getBestSolutionEvaluation() ;
+			}
+		}
+		
+		if (bestSolution != null)
+			handleNewBestSolution(bestSolution, bestSolutionEvaluation) ;
+  }
+
 	@Override
   protected void stopSearch() throws CoreHunterException
   {
@@ -366,11 +396,13 @@ public class REMCSearch<
 		MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> subsearch = 
 				new MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>() ;
 		
+		subsearch.setData(getData()) ;
 		subsearch.setSolution(solution) ;
 		subsearch.setObjectiveFunction(objectiveFunction) ;
 		subsearch.setNeighbourhood(neighbourhood) ;
-		subsearch.setRuntime(runtime) ;
 		subsearch.setNumberOfSteps(numberOfSteps) ;
+		subsearch.setRuntime(runtime) ;
+		subsearch.setTemperature(temperature) ;
 		
 	  return subsearch;
   }

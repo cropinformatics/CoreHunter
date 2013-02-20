@@ -18,6 +18,7 @@ import static org.corehunter.Constants.INVALID_SIZE;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -30,7 +31,7 @@ import org.corehunter.neighbourhood.impl.DeletionMove;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public class LRSearch<
 	IndexType,
@@ -42,7 +43,7 @@ public class LRSearch<
 	private int	r = INVALID_SIZE ;
 	
 	private boolean continueSearch ;
-	private ExhaustiveSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch;
+	private ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch;
 
 	public LRSearch()
 	{
@@ -55,7 +56,7 @@ public class LRSearch<
 		
 		setL(search.getL()) ;
 		setR(search.getR()) ;
-		setExhaustiveSearch((ExhaustiveSearch<IndexType, SolutionType, DatasetType>)search.getExhaustiveSearch().copy()) ;
+		setExhaustiveSearch((ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType>)search.getExhaustiveSearch().copy()) ;
   }
 
 	@Override
@@ -94,13 +95,13 @@ public class LRSearch<
 		}
   }
 
-	public final ExhaustiveSearch<IndexType, SolutionType, DatasetType> getExhaustiveSearch()
+	public final ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> getExhaustiveSearch()
   {
   	return exhaustiveSearch;
   }
 
 	public final void setExhaustiveSearch(
-      ExhaustiveSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch) throws CoreHunterException
+      ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch) throws CoreHunterException
   {
 		if (this.exhaustiveSearch != exhaustiveSearch)
 		{
@@ -137,6 +138,8 @@ public class LRSearch<
 	@Override
 	protected void runSearch() throws CoreHunterException
 	{
+		continueSearch = true;
+
 		double score, newScore, bestNewScore, dscore;
 
 		IndexType bestAddIndex = null, bestRemIndex = null;
@@ -168,12 +171,10 @@ public class LRSearch<
 			skipadd = true;
 		}
 		
-		score = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+		score = getObjectiveFunction().calculate(getSolution());
 		bestNewScore = score;
 		handleNewBestSolution(getSolution(), bestNewScore);
 	
-		continueSearch = true;
-
 		while (continueSearch)
 		{
 			// Add l new accessions to core
@@ -181,7 +182,7 @@ public class LRSearch<
 			{
 				for (int i = 0; i < l; i++)
 				{
-					List<IndexType> unselected = getSolution().getRemainingIndices() ;
+					List<IndexType> unselected = new ArrayList<IndexType>(getSolution().getRemainingIndices()) ;
 
 					// Search for best new accession
 					bestNewScore = getWorstEvaluation() ; 
@@ -193,7 +194,7 @@ public class LRSearch<
 					{
 						index = iterator.next() ;
 						getSolution().addIndex(index) ;
-						newScore = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+						newScore = getObjectiveFunction().calculate(getSolution());
 						
 						if (isBetterSolution(newScore, bestNewScore))
 						{
@@ -215,7 +216,7 @@ public class LRSearch<
 				// Search for worst accession
 				bestNewScore = getWorstEvaluation() ; 
 				
-				List<IndexType> selected = getSolution().getSubsetIndices() ;
+				List<IndexType> selected = new ArrayList<IndexType>(getSolution().getSubsetIndices()) ;
 				
 				Iterator<IndexType> iterator = selected.iterator() ;
 				IndexType index ;
@@ -224,7 +225,7 @@ public class LRSearch<
 				{
 					index = iterator.next() ;
 					getSolution().removeIndex(index) ;
-					newScore = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+					newScore = getObjectiveFunction().calculate(getSolution());
 					
 					if (isBetterSolution(newScore, bestNewScore))
 					{

@@ -21,12 +21,12 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetGenerator;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * Evaluate all possible core sets and return best one
  */
-public class ExhaustiveSearch<
+public class ExhaustiveSubsetSearch<
 	IndexType,
 	SolutionType extends SubsetSolution<IndexType>, 
 	DatasetType extends IndexedData<IndexType>> 
@@ -34,23 +34,23 @@ public class ExhaustiveSearch<
 {
 	private SubsetGenerator<IndexType> subsetGenerator ;
 	
-	public ExhaustiveSearch() 
+	public ExhaustiveSubsetSearch() 
   {
 	  super() ;
   }
 	
-	protected ExhaustiveSearch(
-			ExhaustiveSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch) throws CoreHunterException
+	protected ExhaustiveSubsetSearch(
+			ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch) throws CoreHunterException
   {
 	  super(exhaustiveSearch) ;
   }
 
 	@Override
-	public ExhaustiveSearch<IndexType, SolutionType, DatasetType> copy()
+	public ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> copy()
 	{
 		try
     {
-	    return new ExhaustiveSearch<IndexType, SolutionType, DatasetType>(this);
+	    return new ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType>(this);
     }
     catch (Exception e)
     {
@@ -130,13 +130,14 @@ public class ExhaustiveSearch<
 	
 				getSolution().setSubsetIndices(subsetIndices);
 	
-				score = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+				score = getObjectiveFunction().calculate(getSolution());
 				
-				if (score > bestScore)
+				if (isBetterSolution(score, bestScore))
 				{
 					bestScore = score;
 					handleNewBestSolution(getSolution(), bestScore);
 				}
+				
 				subsetGenerator.next(subsetIndices);
 			}
 		}

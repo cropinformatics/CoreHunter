@@ -14,7 +14,8 @@
 
 package org.corehunter.ssr;
 
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * @author hermandebeukelaer
@@ -32,6 +33,17 @@ public class ExternalDistanceMeasureSSR<IndexType> extends AbstractAccessionSSRO
 		super(name, description);
 	}
 
+	protected ExternalDistanceMeasureSSR(ExternalDistanceMeasureSSR<IndexType> objectiveFunction) 
+	{
+		super(objectiveFunction) ;
+	}
+	
+	@Override
+  public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  {
+	  return new ExternalDistanceMeasureSSR<IndexType>(this);
+  }
+	
 	@Override
 	public final double calculate(SubsetSolution<IndexType> solution)
 	{

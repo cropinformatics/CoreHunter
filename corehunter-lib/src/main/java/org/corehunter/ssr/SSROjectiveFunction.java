@@ -14,7 +14,7 @@
 package org.corehunter.ssr;
 
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public interface SSROjectiveFunction<IndexType> extends ObjectiveFunction<SubsetSolution<IndexType>>
 {

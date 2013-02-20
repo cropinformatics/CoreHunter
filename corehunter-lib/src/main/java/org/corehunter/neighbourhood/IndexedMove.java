@@ -14,7 +14,7 @@
 
 package org.corehunter.neighbourhood;
 
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 
 

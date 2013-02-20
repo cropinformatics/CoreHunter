@@ -19,7 +19,7 @@ import org.corehunter.model.Data;
 import org.corehunter.neighbourhood.Neighbourhood;
 import org.corehunter.search.NeighbourhoodSearch;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
 
 public abstract class AbstractNeighbourhoodSearch<
 	SolutionType extends Solution, 

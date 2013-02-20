@@ -26,7 +26,7 @@ import org.corehunter.neighbourhood.Move;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * @author hermandebeukelaer
@@ -44,12 +44,14 @@ public class MetropolisSearch<
 
 	private int numberOfSteps = INVALID_NUMBER_OF_STEPS ;
 
-	private int runtime = INVALID_TIME ;
+	private long runtime = INVALID_TIME ;
 
 	private int	accepts;
 	private int	rejects;
 	private int	improvements;
 	private int	totalSteps;
+	
+	private boolean continueSearch ;
 
 	public MetropolisSearch()
 	{
@@ -109,12 +111,12 @@ public class MetropolisSearch<
 		}
   }
 
-	public final int getRuntime()
+	public final long getRuntime()
   {
   	return runtime;
   }
 
-	public final void setRuntime(int runtime) throws CoreHunterException
+	public final void setRuntime(long runtime) throws CoreHunterException
   {
 		if (this.runtime != runtime)
 		{
@@ -122,6 +124,15 @@ public class MetropolisSearch<
 			
 			handleRuntimeSet() ;
 		}
+  }
+	
+	@Override
+  protected void validate() throws CoreHunterException
+  {
+	  super.validate();
+	  
+	  if (temperature < 0)
+	  	throw new CoreHunterException("Temperature can not be less than zero!") ;
   }
 
 	@Override
@@ -144,9 +155,6 @@ public class MetropolisSearch<
   {
 		if (SearchStatus.STARTED.equals(getStatus()))
 	  	throw new CoreHunterException("Number Of Steps can not be set while search in process") ;
-		
-	  if (numberOfSteps < 1)
-	  	throw new CoreHunterException("Number Of Steps can not be less than one!") ;
   }
 
 	protected void handleRuntimeSet() throws CoreHunterException
@@ -158,76 +166,88 @@ public class MetropolisSearch<
 	@Override
 	protected void runSearch() throws CoreHunterException
 	{
+		continueSearch = true ;
 		setStuck(true) ;
 		
 		int i = 0;
 		double newEvalution ;
+		boolean acceptMove = true ;
 		double size ;
 		Move<SolutionType> move ;
 
 		size = getSolution().getSubsetSize() ;
 		
-		setEvaluation(getObjectiveFunction().calculate(getSolution(), getCacheIdentifier()));
+		setEvaluation(getObjectiveFunction().calculate(getSolution()));
 
-		while (((numberOfSteps > 0 && i < numberOfSteps) || (runtime > 0 && getSearchTime() < runtime)))
+		while (continueSearch)
 		{
 			move = getNeighbourhood().performRandomMove(getSolution());
-			newEvalution = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+			newEvalution = getObjectiveFunction().calculate(getSolution());
 			
 			double deltaScore = getDeltaScore(newEvalution, getEvaluation()) ;
 
 			if (deltaScore > 0)
 			{
-				// accept new core!
+				// accept new solution!
 				improvements++;
-				setEvaluation(newEvalution) ;
-				size = getSolution().getSubsetSize() ;
+				acceptMove = true ;
 			}
 			else
 			{
 				double deltaSize = getSolution().getSubsetSize() - size;
 
-				if (deltaSize > 0)
+				if (deltaSize > 0) // TODO should we always reject large solutions or worst evaluations!
 				{
-					// new core is bigger than old core and has no better
-					// score --> reject new core, stick with old core
-					rejects++;
-					getNeighbourhood().undoMove(move, getSolution()) ;
+					// new solution is bigger than old solution and has no better
+					// evaluation --> reject new solution, stick with old solution
+					
+					acceptMove = false ;
 				}
 				else
 				{
-					// new core is not bigger, but has lower score
-					// accept or reject new core based on temperature
+					// new solution is not bigger, but has worse evaluation
+					// accept or reject new solution based on temperature
 					double P = Math.exp(deltaScore / (temperature * K_b));
 					double Q = getRandom().nextDouble();
 					
 					if (Q > P)
 					{
-						rejects++;
-						getNeighbourhood().undoMove(move, getSolution()) ;
+						acceptMove = false ;
 					}
 					else
 					{
-						// accept new core!
-						// reassign newCore to the old core, which can now be
-						// overwritten
-						accepts++;
-						setEvaluation(newEvalution) ;
-						size = getSolution().getSubsetSize() ;
+						// accept new solution!
+						acceptMove = true ;
 					}
 				}
 			}
-
-			// check if new best core was found
-			if (getEvaluation() > getBestSolutionEvaluation() || 
-					(getEvaluation() == getBestSolutionEvaluation() && size < getBestSolution().getSubsetSize()))
+			
+			if (acceptMove)
 			{
-				setStuck(false) ;
 				handleNewBestSolution(getSolution(), getEvaluation()) ;
+				setStuck(false) ;
+				setEvaluation(newEvalution) ;
+				size = getSolution().getSubsetSize() ;
+	
+				accepts++;
+			}
+			else
+			{
+				getNeighbourhood().undoMove(move, getSolution()) ;
+				rejects++;
 			}
 
 			totalSteps++;
 			i++;
+			
+			if (continueSearch)
+			{
+				if (numberOfSteps > 0)
+					continueSearch = continueSearch && i < numberOfSteps ;
+				
+				if (runtime > 0)
+					continueSearch = continueSearch && getSearchTime() < runtime ;
+			}
 		}
 	}
 
@@ -241,6 +261,6 @@ public class MetropolisSearch<
 	@Override
   protected void stopSearch() throws CoreHunterException
   {
-
+		continueSearch = false ;
   }
 }

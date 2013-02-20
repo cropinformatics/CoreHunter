@@ -25,7 +25,7 @@ import org.corehunter.neighbourhood.Move;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public class LocalSearch<
 	IndexType,
@@ -35,7 +35,7 @@ public class LocalSearch<
 	extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
 {
 	private long runtime = INVALID_TIME ;
-	private long minimumProgressionTime = INVALID_TIME ;
+	private double minimumProgression = 0 ;
 	private long stuckTime = INVALID_TIME ;
 	
 	private boolean continueSearch ;
@@ -50,7 +50,7 @@ public class LocalSearch<
 		super(search);
 		
 		setRuntime(search.getRuntime()) ;
-		setMinimumProgressionTime(search.getMinimumProgressionTime()) ;
+		setMinimumProgression(search.getMinimumProgression()) ;
 		setStuckTime(search.getStuckTime()) ;
 	}
 
@@ -75,18 +75,18 @@ public class LocalSearch<
 		}
   }
 
-	public final long getMinimumProgressionTime()
+	public final double getMinimumProgression()
   {
-  	return minimumProgressionTime;
+  	return minimumProgression;
   }
 
-	public final void setMinimumProgressionTime(long minimumProgressionTime) throws CoreHunterException
+	public final void setMinimumProgression(double minimumProgression) throws CoreHunterException
   {
-		if (this.minimumProgressionTime != minimumProgressionTime)
+		if (this.minimumProgression != minimumProgression)
 		{
-			this.minimumProgressionTime = minimumProgressionTime;
+			this.minimumProgression = minimumProgression;
 			
-			handleMinimumProgressionTimeSet() ;
+			handleMinimumProgressionSet() ;
 		}
   }
 
@@ -113,8 +113,8 @@ public class LocalSearch<
 	  if (runtime <= 0)
 	  	throw new CoreHunterException("Runtime can not be less than or equal to zero!") ;
 	  
-	  if (minimumProgressionTime <= 0)
-	  	throw new CoreHunterException("Minimum Progression Time can not be less or equal to  than zero!") ;
+	  if (minimumProgression < 0)
+	  	throw new CoreHunterException("Minimum Progression can not be less than zero!") ;
 	  
 	  if (stuckTime <= 0)
 	  	throw new CoreHunterException("Stuck Time can not be less than or equal to zero!") ;
@@ -129,13 +129,13 @@ public class LocalSearch<
 	  	throw new CoreHunterException("Runtime can not be less than or equal to zero!") ;
   }
 	
-	protected void handleMinimumProgressionTimeSet() throws CoreHunterException
+	protected void handleMinimumProgressionSet() throws CoreHunterException
   {
 		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Minimum Progression Time can not be set while search in process") ;
+	  	throw new CoreHunterException("Minimum Progression can not be set while search in process") ;
 		
-	  if (minimumProgressionTime <= 0)
-	  	throw new CoreHunterException("Minimum Progression Time can not be less or equal to  than zero!") ;
+	  if (minimumProgression < 0)
+	  	throw new CoreHunterException("Minimum Progression can not be less than zero!") ;
   }
 	
 	protected void handleStuckTimeSet() throws CoreHunterException
@@ -150,53 +150,39 @@ public class LocalSearch<
 	@Override
 	protected void runSearch() throws CoreHunterException
 	{
-		double score, newScore;
-		int size, newSize;
-
-		size = getSolution().getSubsetSize() ;
-		
-		score = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
-		size = getSolution().getSubsetSize() ;
-
 		continueSearch = true;
-		long lastImprTime = 0;
+		
+		double newEvaluation;
+		int newSize;
 
-		handleNewBestSolution(getSolution(), score);
+		handleNewBestSolution(getSolution(), getObjectiveFunction().calculate(getSolution()));
 		
 		Move<SolutionType> move ;
-
+		
 		while (continueSearch && getSearchTime() < runtime)
 		{
 			// run Local Search step
 			move = getNeighbourhood().performRandomMove(getSolution());
-			newScore = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+			newEvaluation = getObjectiveFunction().calculate(getSolution());
 			newSize = getSolution().getSubsetSize();
 
-			if (newScore > score || (newScore == score && newSize < size))
+			if (isBetterSolution(newEvaluation, getBestSolutionEvaluation()) || 
+					(newEvaluation == getBestSolutionEvaluation() && newSize < getBestSolution().getSubsetSize())) // TODO assumes smaller cores are better
 			{
 				// check min progression
-				if (newSize >= size && newScore - score < minimumProgressionTime)
+				if (newSize >= getBestSolution().getSubsetSize() && getDeltaScore(newEvaluation, getBestSolutionEvaluation()) < minimumProgression) // TODO assumes minimisation
 				{
 					continueSearch = false;
 				}
-				
-				// accept new core!
-				score = newScore;
-				size = newSize;
 
-				handleNewBestSolution(getSolution(), newScore);
-				
-				lastImprTime = getBestSolutionTime() ;
+				handleNewBestSolution(getSolution(), newEvaluation);
 			}
 			else
 			{
 				// Reject new core
 				getNeighbourhood().undoMove(move, getSolution());
 				// check stuckTime
-				if (getSearchTime() - lastImprTime > stuckTime)
-				{
-					continueSearch = false;
-				}
+				continueSearch = continueSearch && stuckTime > getBestSolutionTime() ;
 			}
 		}
 	}

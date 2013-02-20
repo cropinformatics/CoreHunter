@@ -3,7 +3,7 @@ package org.corehunter.objectivefunction.impl;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Data;
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
 
 public interface ObjectiveFunctionWithData<SolutionType extends Solution, DataType extends Data> extends
     ObjectiveFunction<SolutionType> 

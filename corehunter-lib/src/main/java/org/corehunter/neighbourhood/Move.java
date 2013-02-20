@@ -13,7 +13,7 @@
 // limitations under the License.
 package org.corehunter.neighbourhood;
 
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
 
 
 public interface Move<SolutionType extends Solution>

@@ -20,8 +20,7 @@ import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.neighbourhood.impl.HeuristicSingleNeighbourhood;
 import org.corehunter.neighbourhood.impl.RandomSingleNeighbourhood;
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.search.SubsetSolution;
-import org.corehunter.search.impl.ExhaustiveSearch;
+import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.LRSearch;
 import org.corehunter.search.impl.LocalSearch;
 import org.corehunter.search.impl.MetropolisSearch;
@@ -30,6 +29,7 @@ import org.corehunter.search.impl.REMCSearch;
 import org.corehunter.search.impl.RandomSearch;
 import org.corehunter.search.impl.SteepestDescentSearch;
 import org.corehunter.search.impl.TabuSearch;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -51,7 +51,7 @@ public final class CoreSubsetSearch
 	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int sampleMinimum, int sampleMaximum, long runtime,
-	    long minimumProgression, long stuckTime, int numberOfReplicas,
+	    double minimumProgression, long stuckTime, int numberOfReplicas,
 	    double minimumTemperature, double maximumTemperature, int steps)
 	    throws CoreHunterException
 	{
@@ -62,12 +62,12 @@ public final class CoreSubsetSearch
 		search.setObjectiveFunction(objectiveFunction);
 		search.setSubsetMaximumSize(sampleMaximum);
 		search.setRuntime(runtime);
-		search.setMinimumProgressionTime(minimumProgression);
+		search.setMinimumProgression(minimumProgression);
 		search.setStuckTime(stuckTime);
 		search.setNumberOfReplicas(numberOfReplicas);
 		search.setMinimumTemperature(minimumTemperature);
 		search.setMaximumTemperature(maximumTemperature);
-		search.setSteps(steps);
+		search.setNumberOfSteps(steps);
 
 		search.start();
 
@@ -95,12 +95,12 @@ public final class CoreSubsetSearch
 		return search;
 	}
 
-	public static ExhaustiveSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> exhaustiveSearch(
+	public static ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> exhaustiveSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize) throws CoreHunterException
 	{
-		ExhaustiveSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new ExhaustiveSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+		ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
 
 		search.setData(data);
 		search.setObjectiveFunction(objectiveFunction);
@@ -123,7 +123,7 @@ public final class CoreSubsetSearch
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
 		search.setRuntime(runtime);
-		search.setMinimumProgressionTime(minimumProgressionTime);
+		search.setMinimumProgression(minimumProgressionTime);
 		search.setStuckTime(stuckTime);
 
 		return search;
@@ -157,7 +157,7 @@ public final class CoreSubsetSearch
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
 		search.setRuntime(runtime);
-		search.setMinimumProgressionTime(minimumProgressionTime);
+		search.setMinimumProgression(minimumProgressionTime);
 
 		return search;
 
@@ -199,7 +199,7 @@ public final class CoreSubsetSearch
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
 		search.setRuntime(runtime);
-		search.setMinimumProgressionTime(minimumProgressionTime);
+		search.setMinimumProgression(minimumProgressionTime);
 
 		return search;
 	}
@@ -221,7 +221,7 @@ public final class CoreSubsetSearch
 		search.setSubsetMinimumSize(subsetMinimumSize);
 		search.setSubsetMaximumSize(subsetMaximumSize);
 		search.setRuntime(runtime);
-		search.setMinimumProgressionTime(minimumProgressionTime) ;
+		search.setMinimumProgression(minimumProgressionTime) ;
 		search.setStuckTime(stuckTime) ;
 		search.setNumberOfTabuReplicas(numberOfTabuReplicas);
 		search.setNumberOfNonTabuReplicas(numberOfNonTabuReplicas);

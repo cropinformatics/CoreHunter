@@ -20,7 +20,7 @@ import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.objectivefunction.impl.ObjectiveFunctionWithData;
 import org.corehunter.search.ObjectiveSearch;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
 
 public abstract class AbstractObjectiveSearch<
 	SolutionType extends Solution, 
@@ -83,7 +83,10 @@ public abstract class AbstractObjectiveSearch<
   }
 
 	@Override
-	protected double getDeltaScore(double oldEvalution, double newEvalution)
+	/**
+	 * Positive for a better solution and negative for a worst solution
+	 */
+	protected double getDeltaScore(double newEvalution, double oldEvalution)
   {
 	  return getObjectiveFunction().isMinimizing() ? oldEvalution - newEvalution : newEvalution - oldEvalution ;
   }

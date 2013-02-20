@@ -21,8 +21,9 @@ import java.util.Map;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.UnknownIndexException;
-import org.corehunter.objectivefunction.CachedResult;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.objectivefunction.impl.CachedResult;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -32,7 +33,7 @@ import org.corehunter.search.SubsetSolution;
  */
 public final class ShannonsDiversitySSR<IndexType> extends AbstractAccessionSSRObjectiveFunction<IndexType>
 {
-	private Map<String, SHCachedResult<IndexType>>	cachedResults;
+	private SHCachedResult<IndexType>	cachedResults;
 
 	public ShannonsDiversitySSR()
 	{
@@ -42,37 +43,30 @@ public final class ShannonsDiversitySSR<IndexType> extends AbstractAccessionSSRO
 	public ShannonsDiversitySSR(String name, String description)
 	{
 		super(name, description);
-		cachedResults = Collections
-		    .synchronizedMap(new HashMap<String, SHCachedResult<IndexType>>());
 	}
+	
+	protected ShannonsDiversitySSR(ShannonsDiversitySSR<IndexType> objectiveFunction) 
+	{
+		super(objectiveFunction) ;
+	}
+	
+	@Override
+  public ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  {
+	  return new ShannonsDiversitySSR<IndexType>(this);
+  }
 
 	@Override
 	public double calculate(SubsetSolution<IndexType> solution) throws CoreHunterException, CoreHunterException
 	{
-		return calculate(solution, new SHCachedResult<IndexType>(solution));
-	}
+		if (cachedResults == null)
+			cachedResults = new SHCachedResult<IndexType>(solution) ;
+		
+		List<IndexType> aIndices = cachedResults.getAddedIndices(solution.getIndices());
+		List<IndexType> rIndices = cachedResults.getRemovedIndices(solution.getIndices());
 
-	@Override
-	public double calculate(SubsetSolution<IndexType> solution, String cacheId) throws CoreHunterException
-	{
-		SHCachedResult<IndexType> cache = cachedResults.get(cacheId);
-
-		if (cache == null)
-		{
-			cache = new SHCachedResult<IndexType>(solution);
-			cachedResults.put(cacheId, cache);
-		}
-
-		return calculate(solution, cache);
-	}
-
-	protected double calculate(SubsetSolution<IndexType> solution, SHCachedResult<IndexType> cache) throws CoreHunterException
-	{
-		List<IndexType> aIndices = cache.getAddedIndices(solution.getIndices());
-		List<IndexType> rIndices = cache.getRemovedIndices(solution.getIndices());
-
-		double total = cache.getTotal();
-		double alleleTotals[] = cache.getAlleleTotals();
+		double total = cachedResults.getTotal();
+		double alleleTotals[] = cachedResults.getAlleleTotals();
 		double addTotals[] = getData().getAlleleTotals(aIndices);
 		double remTotals[] = getData().getAlleleTotals(rIndices);
 
@@ -107,9 +101,9 @@ public final class ShannonsDiversitySSR<IndexType> extends AbstractAccessionSSRO
 			}
 		}
 
-		// recache our results under this id
-		cache.setTotal(total);
-		cache.setIndices(solution.getIndices());
+		// recache our results
+		cachedResults.setTotal(total);
+		cachedResults.setIndices(solution.getIndices());
 
 		return -sum;
 	}

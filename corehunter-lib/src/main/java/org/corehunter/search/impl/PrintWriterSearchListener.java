@@ -21,7 +21,7 @@ import java.io.PrintStream;
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchListener;
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
 
 public class PrintWriterSearchListener<SolutionType extends Solution> implements SearchListener<SolutionType>
 {

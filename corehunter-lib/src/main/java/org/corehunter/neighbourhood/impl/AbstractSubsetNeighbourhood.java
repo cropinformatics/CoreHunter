@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.corehunter.neighbourhood;
+package org.corehunter.neighbourhood.impl;
 
 import java.util.Random;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.neighbourhood.Neighbourhood;
+import org.corehunter.neighbourhood.SubsetNeighbourhood;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * Implements an abstract neighbourhood which defines the neighbours of a given
@@ -146,7 +148,7 @@ public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extend
 	
 	protected void handleHistorySizeSet() throws CoreHunterException
   {
-		if (historySize >= 0)
+		if (historySize < 0)
 	  	throw new CoreHunterException("History size must be greater than or equal to zero!") ;
   }
 	

@@ -20,7 +20,7 @@ import java.util.List;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.search.Search;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public class RandomSearch<
 	IndexType,
@@ -28,7 +28,7 @@ public class RandomSearch<
 	DatasetType extends IndexedData<IndexType>> 
 	extends AbstractSubsetSearch<IndexType, SolutionType, DatasetType>
 {
-	private boolean 						continueSearch ;
+	private boolean continueSearch ;
 
 	public RandomSearch()
 	{
@@ -53,11 +53,11 @@ public class RandomSearch<
 	@Override
 	protected void runSearch() throws CoreHunterException
 	{
+		continueSearch = true;
+		
 		List<IndexType> indices = new ArrayList<IndexType>(getData().getIndices());
 		List<IndexType> subsetIndices = new ArrayList<IndexType>();
-
-		continueSearch = true;
-
+		
 		while (continueSearch)
 		{
 			int position = getRandom().nextInt(indices.size());

@@ -23,7 +23,7 @@ import org.corehunter.search.Search;
 import org.corehunter.search.SearchListener;
 import org.corehunter.search.SearchListenerHandler;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
 
 public abstract class AbstractSearch<
 	SolutionType extends Solution, DataType extends Data> extends EntityImpl implements
@@ -43,7 +43,6 @@ public abstract class AbstractSearch<
 	private SearchStatus status;
 
 	private long startTime = -2 ;
-	@SuppressWarnings("unused")
   private long endTime = -1;
 	private long bestSolutionTime = -1;
 
@@ -119,13 +118,14 @@ public abstract class AbstractSearch<
 		if (!SearchStatus.STARTED.equals(status))
 		{
 			startTime = System.nanoTime() ;
+			bestSolutionTime = startTime ;
 			
-			validate() ;
-			
-			fireSearchStarted() ;
-					
 			try
       {
+				validate() ;
+			
+				fireSearchStarted() ;
+				
 	      runSearch();
 	      
 				endTime = System.nanoTime();
@@ -202,21 +202,12 @@ public abstract class AbstractSearch<
 	@Override
 	public final long getSearchTime()
 	{
-		 // TODO should we use this 
-		//ThreadMXBean tb = ManagementFactory.getThreadMXBean();
-		//double sTime = tb.getCurrentThreadCpuTime(); 
-		// or nanoTime()
-		return endTime = startTime;
+		return endTime < 0 ? System.nanoTime() - startTime : endTime - startTime ;
 	}
 	
 	@Override
 	public final long getBestSolutionTime()
   {
-		 // TODO should we use this 
-		//ThreadMXBean tb = ManagementFactory.getThreadMXBean();
-		//double sTime = tb.getCurrentThreadCpuTime(); 
-		// or nanoTime()
-		
   	return System.nanoTime() - bestSolutionTime;
   }
 
@@ -239,11 +230,6 @@ public abstract class AbstractSearch<
 	protected final void setStuck(boolean stuck)
   {
 	  this.stuck = stuck ;
-  }
-
-	protected final String getCacheIdentifier()
-  {
-	  return getUniqueIdentifier();
   }
 	
 	protected void validate() throws CoreHunterException
@@ -288,13 +274,13 @@ public abstract class AbstractSearch<
   }
 	
 	@SuppressWarnings("unchecked")
-  protected synchronized void handleNewBestSolution(SolutionType bestSolution,
-	    double bestSolutionEvalution)
+  protected void handleNewBestSolution(SolutionType bestSolution,
+	    double bestSolutionEvaluation)
 	{
-		setBestSolutionEvalution(bestSolutionEvalution);
+		setBestSolutionEvalution(bestSolutionEvaluation);
 		setBestSolution((SolutionType) bestSolution.copy());
 	
-		fireNewBestSolution(bestSolution, bestSolutionEvalution);
+		fireNewBestSolution(getBestSolution(), bestSolutionEvaluation);
 	}
 
 	protected void setCurrentSolution(SolutionType solution)
@@ -302,13 +288,13 @@ public abstract class AbstractSearch<
 		this.solution = solution ;
 	}
 
-	protected synchronized void setBestSolution(SolutionType bestSolution)
+	private void setBestSolution(SolutionType bestSolution)
 	{
 		this.bestSolutionTime = System.nanoTime() ;
 		this.bestSolution = bestSolution;
 	}
 
-	protected synchronized void setBestSolutionEvalution(
+	protected void setBestSolutionEvalution(
 	    double bestSolutionEvalution)
 	{
 		this.bestSolutionEvaluation = bestSolutionEvalution;
@@ -329,50 +315,50 @@ public abstract class AbstractSearch<
 	  return Double.POSITIVE_INFINITY ;
   }
 
-	protected double getDeltaScore(double oldEvalution, double newEvalution)
+	protected double getDeltaScore(double newEvalution, double oldEvalution)
   {
 	  return oldEvalution - newEvalution ;
   }
 
-	protected synchronized void fireSearchStarted()
+	private void fireSearchStarted()
 	{
 		status = SearchStatus.STARTED;
 
 		searchListenerHandler.fireSearchStarted() ;
 	}
 
-	protected synchronized void fireSearchCompleted()
+	private void fireSearchCompleted()
 	{
 		status = SearchStatus.COMPLETED;
 
 		searchListenerHandler.fireSearchCompleted() ;
 	}
 	
-	protected synchronized void fireSearchStopped()
+	private void fireSearchStopped()
 	{
 		status = SearchStatus.STOPPED ;
 
 		searchListenerHandler.fireSearchStopped() ;
 	}
 
-	protected synchronized void fireSearchFailed(CoreHunterException exception)
+	private void fireSearchFailed(CoreHunterException exception)
 	{
 		status = SearchStatus.FAILED;
 
 		searchListenerHandler.fireSearchFailed(exception) ;
 	}
 
-  protected synchronized void fireNewBestSolution(SolutionType bestSolution, double bestScore)
+  private void fireNewBestSolution(SolutionType bestSolution, double bestScore)
 	{
 		searchListenerHandler.fireNewBestSolution(bestSolution, bestScore) ;
 	}
 
-	protected synchronized void fireSearchProgress(double searchProgress)
+	protected void fireSearchProgress(double searchProgress)
 	{
 		searchListenerHandler.fireSearchProgress(searchProgress) ;
 	}
 
-	protected synchronized void fireSearchMessage(String message)
+	protected void fireSearchMessage(String message)
 	{
 		searchListenerHandler.fireSearchMessage(message) ;
 	}

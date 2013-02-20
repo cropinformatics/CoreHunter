@@ -14,6 +14,7 @@
 package org.corehunter.search;
 
 import org.corehunter.CoreHunterException;
+import org.corehunter.search.solution.Solution;
 
 public class SearchListenerAdapter<SolutionType extends Solution> implements SearchListener<SolutionType>
 {

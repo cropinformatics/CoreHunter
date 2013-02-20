@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.corehunter.search;
+package org.corehunter.search.solution;
 
-import org.corehunter.CoreHunterException;
+import org.corehunter.model.Validatable;
 
-public interface Solution
+public interface Solution extends Validatable
 {
 	/**
 	 * Creates a copy of this solution. Exactly what is copied (the depth of the
@@ -25,6 +25,4 @@ public interface Solution
 	 * @return a copy of this solution
 	 */
 	public Solution copy();
-	
-	public void validate() throws CoreHunterException;
 }

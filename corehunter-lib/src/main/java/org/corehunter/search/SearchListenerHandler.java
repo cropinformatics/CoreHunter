@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.corehunter.CoreHunterException;
+import org.corehunter.search.solution.Solution;
 
 public class SearchListenerHandler<SolutionType extends Solution>
 {
@@ -48,13 +49,13 @@ public class SearchListenerHandler<SolutionType extends Solution>
 	
 	public void fireSearchStarted()
 	{
-		new Thread(new Runnable()
-		{
-			@Override
-      public void run()
-      {
-				synchronized (searchListeners)
-				{
+		//new Thread(new Runnable()
+		//{
+			//@Override
+      //public void run()
+     // {
+				//synchronized (searchListeners)
+				//{
 					Iterator<SearchListener<SolutionType>> iterator = searchListeners
 					    .iterator();
 
@@ -62,21 +63,21 @@ public class SearchListenerHandler<SolutionType extends Solution>
 					{
 						iterator.next().searchStarted(search);
 					}
-				}
-      }
+				//}
+     // }
 			
-		}).start() ;
+		//}).start() ;
 	}
 
 	public void fireSearchCompleted()
 	{
-		new Thread(new Runnable()
-		{
-			@Override
-      public void run()
-      {
-				synchronized (searchListeners)
-				{
+		//new Thread(new Runnable()
+		//{
+			//@Override
+     // public void run()
+     // {
+			//	synchronized (searchListeners)
+				//{
 					Iterator<SearchListener<SolutionType>> iterator = searchListeners
 					    .iterator();
 
@@ -84,21 +85,21 @@ public class SearchListenerHandler<SolutionType extends Solution>
 					{
 						iterator.next().searchCompleted(search);
 					}
-				}
-      }
+				//}
+     // }
 			
-		}).start() ;
+		//}).start() ;
 	}
 	
 	public void fireSearchStopped()
 	{
-		new Thread(new Runnable()
-		{
-			@Override
-      public void run()
-      {
-				synchronized (searchListeners)
-				{
+		//new Thread(new Runnable()
+		//{
+			//@Override
+     // public void run()
+      //{
+				//synchronized (searchListeners)
+				//{
 					Iterator<SearchListener<SolutionType>> iterator = searchListeners
 					    .iterator();
 
@@ -106,15 +107,25 @@ public class SearchListenerHandler<SolutionType extends Solution>
 					{
 						iterator.next().searchStopped(search);
 					}
-				}
-      }
+				//}
+    //  }
 			
-		}).start() ;
+		//}).start() ;
 	}
 
 	public void fireSearchFailed(final CoreHunterException exception)
 	{
-		new Thread(new Runnable()
+		//synchronized (searchListeners)
+	//	{
+			Iterator<SearchListener<SolutionType>> iterator = searchListeners
+			    .iterator();
+
+			while (iterator.hasNext())
+			{
+				iterator.next().searchFailed(search, exception);
+			}
+		//}
+		/*new Thread(new Runnable()
 		{
 			@Override
       public void run()
@@ -131,18 +142,18 @@ public class SearchListenerHandler<SolutionType extends Solution>
 				}
       }
 			
-		}).start() ;
+		}).start() ;*/
 	}
 
 	public void fireNewBestSolution(final SolutionType bestSolution, final double bestScore)
 	{
-		new Thread(new Runnable()
-		{
-			@Override
-      public void run()
-      {
-				synchronized (searchListeners)
-				{
+		//new Thread(new Runnable()
+		//{
+		//	@Override
+    //  public void run()
+    //  {
+			//	synchronized (searchListeners)
+			//	{
 					Iterator<SearchListener<SolutionType>> iterator = searchListeners
 					    .iterator();
 
@@ -150,21 +161,21 @@ public class SearchListenerHandler<SolutionType extends Solution>
 					{
 						iterator.next().newBestSolution(search, bestSolution, bestScore);
 					}
-				}
-      }
+			//	}
+    //  }
 			
-		}).start() ;
+		//}).start() ;
 	}
 
 	public void fireSearchProgress(final double searchProgress)
 	{
-		new Thread(new Runnable()
-		{
-			@Override
-      public void run()
-      {
-				synchronized (searchListeners)
-				{
+		//new Thread(new Runnable()
+		//{
+		//	@Override
+    //  public void run()
+    //  {
+			//	synchronized (searchListeners)
+				//{
 					Iterator<SearchListener<SolutionType>> iterator = searchListeners
 					    .iterator();
 
@@ -172,21 +183,21 @@ public class SearchListenerHandler<SolutionType extends Solution>
 					{
 						iterator.next().searchProgress(search, searchProgress);
 					}
-				}
-      }
+			//	}
+   //   }
 			
-		}).start() ;
+		//}).start() ;
 	}
 
 	public void fireSearchMessage(final String message)
 	{
-		new Thread(new Runnable()
-		{
-			@Override
-      public void run()
-      {
-				synchronized (searchListeners)
-				{
+		//new Thread(new Runnable()
+		//{
+		//	@Override
+    //  public void run()
+    //  {
+				//synchronized (searchListeners)
+			//	{
 					Iterator<SearchListener<SolutionType>> iterator = searchListeners
 					    .iterator();
 
@@ -194,9 +205,9 @@ public class SearchListenerHandler<SolutionType extends Solution>
 					{
 						iterator.next().searchMessage(search, message);
 					}
-				}
-      }
-			
-		}).start() ;
+				//}
+    //  }
+		//	
+	//	}).start() ;
 	}
 }

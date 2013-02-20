@@ -22,7 +22,7 @@ import java.util.ListIterator;
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.Move;
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * @author hermandebeukelaer
@@ -60,7 +60,7 @@ public class HeuristicSingleNeighbourhood<
 	@Override
   public Move<SolutionType> performBestMove(SolutionType solution,
       ObjectiveFunction<SolutionType> objectiveFunction, List<IndexType> tabuList, 
-      double currentBestEvaluation, String cacheID)
+      double currentBestEvaluation)
   {
 		// search for a good neighbour by perturbing core using the following
 		// heuristic:
@@ -84,7 +84,7 @@ public class HeuristicSingleNeighbourhood<
 	    if (solution.getSubsetSize() > getSubsetMinimumSize())
 	    {
 	    	// pure deletion is possible - include option without addition
-	    	bestScore = objectiveFunction.calculate(solution, cacheID);
+	    	bestScore = objectiveFunction.calculate(solution);
 	    }
 
 	    ArrayList<IndexType> unselected = new ArrayList<IndexType>(solution.getRemainingIndices()) ;
@@ -98,7 +98,7 @@ public class HeuristicSingleNeighbourhood<
 	    	index = iterator.next() ;
 	    	
 	    	solution.addIndex(index) ;
-	    	score = objectiveFunction.calculate(solution, cacheID);
+	    	score = objectiveFunction.calculate(solution);
 	    	
 	    	if (score > bestScore)
 	    	{
@@ -124,7 +124,7 @@ public class HeuristicSingleNeighbourhood<
 	    		index = listIterator.previous() ;
 	    		
 	    		solution.removeIndex(index) ;
-	    		score = objectiveFunction.calculate(solution, cacheID);
+	    		score = objectiveFunction.calculate(solution);
 	    		
 	    		if (score > bestScore
 	    		    && (tabuList == null || !tabuList.contains(index) || score - currentBestEvaluation > MIN_TABU_ASPIRATION_PROG))
@@ -155,7 +155,7 @@ public class HeuristicSingleNeighbourhood<
 	    		index = iterator.next() ;
 	    		
 	    		solution.swapIndices(bestAddIndex, index) ;
-	    		score = objectiveFunction.calculate(solution, cacheID);
+	    		score = objectiveFunction.calculate(solution);
 	    		
 	    		if (score > bestScore
 	    		    && (tabuList == null || !tabuList.contains(index) || score - currentBestEvaluation > MIN_TABU_ASPIRATION_PROG))
@@ -171,7 +171,7 @@ public class HeuristicSingleNeighbourhood<
 	    	if (solution.getSubsetSize() < getSubsetMaximumSize())
 	    	{
 	    		solution.addIndex(bestAddIndex);
-	    		score = objectiveFunction.calculate(solution, cacheID);
+	    		score = objectiveFunction.calculate(solution);
 	    		if (score > bestScore
 	    		    && (tabuList == null || !tabuList.contains(-1) || score - currentBestEvaluation > MIN_TABU_ASPIRATION_PROG))
 	    		{

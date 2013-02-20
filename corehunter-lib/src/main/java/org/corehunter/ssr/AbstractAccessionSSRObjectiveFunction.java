@@ -24,10 +24,17 @@ import org.corehunter.objectivefunction.impl.AbstractSubsetObjectiveFunction;
  * @version $Rev$
  */
 public abstract class AbstractAccessionSSRObjectiveFunction<IndexType>
-	extends AbstractSubsetObjectiveFunction<IndexType, AccessionSSRMarkerMatrix<IndexType>> implements SSROjectiveFunction<IndexType>
+	extends AbstractSubsetObjectiveFunction<IndexType, AccessionSSRMarkerMatrix<IndexType>> 
+	implements SSROjectiveFunction<IndexType>
 {
 	public AbstractAccessionSSRObjectiveFunction(String name, String description)
 	{
 		super (name, description) ;
 	}
+
+	public AbstractAccessionSSRObjectiveFunction(
+      AbstractSubsetObjectiveFunction<IndexType, AccessionSSRMarkerMatrix<IndexType>> objectiveFuncton)
+  {
+	  super(objectiveFuncton);
+  }
 }

@@ -23,10 +23,10 @@ import java.util.TreeMap;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.UnknownIndexException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
-import org.corehunter.objectivefunction.CachedResult;
 import org.corehunter.objectivefunction.DistanceMeasureType;
 import org.corehunter.objectivefunction.impl.AbstractSubsetObjectiveFunction;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.objectivefunction.impl.CachedResult;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -37,12 +37,12 @@ import org.corehunter.search.SubsetSolution;
 public abstract class AbstractAccessionSSRDistanceMeasure extends 
 	AbstractSubsetObjectiveFunction<Integer, AccessionSSRMarkerMatrix<Integer>> implements SSROjectiveFunction<Integer>
 {
-	private double[][]	                      M;
-	private Map<String, DistanceCachedResult>	cachedResults;
+	private double[][] M;
+	private DistanceCachedResult	cachedResults;
 
-	protected static final double	            MISSING_VAL	= -1.0;
+	protected static final double	MISSING_VAL	= -1.0;
 
-	protected DistanceMeasureType	            type;	            // states
+	protected DistanceMeasureType	type;	            // states
 																																// whether mean
 																																// or min
 																																// distance
@@ -59,12 +59,17 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 	    DistanceMeasureType type)
 	{
 		super(name, description);
-
-		cachedResults = Collections
-		    .synchronizedMap(new HashMap<String, DistanceCachedResult>());
-
+		
 		this.type = type;
 	}
+
+	protected AbstractAccessionSSRDistanceMeasure(
+			AbstractAccessionSSRDistanceMeasure objectiveFuncton)
+  {
+	  super(objectiveFuncton);
+	  
+		setType(objectiveFuncton.getType()) ;
+  }
 
 	@Override
   protected void handleDataSet() throws CoreHunterException
@@ -88,38 +93,22 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
   }
 
 	@Override
-	public final double calculate(SubsetSolution<Integer> solution, String cacheId) throws CoreHunterException
-	{
-		DistanceCachedResult cache = cachedResults.get(cacheId);
-
-		if (cache == null)
-		{
-			cache = new DistanceCachedResult(solution);
-			cachedResults.put(cacheId, cache);
-		}
-
-		return calculate(solution, cache);
-	}
-
-	@Override
 	public final double calculate(SubsetSolution<Integer> solution) throws CoreHunterException
 	{
-		return calculate(solution, new DistanceCachedResult(solution));
-	}
-
-	public final double calculate(SubsetSolution<Integer> solution, DistanceCachedResult cache) throws CoreHunterException
-	{
-		List<Integer> aIndices = cache.getAddedIndices(solution.getIndices());
-		List<Integer> rIndices = cache.getRemovedIndices(solution.getIndices());
-		List<Integer> cIndices = cache.getCommonIndices(solution.getIndices());
+		if (cachedResults == null)
+			cachedResults = new DistanceCachedResult(solution) ;
+		
+		List<Integer> aIndices = cachedResults.getAddedIndices(solution.getSubsetIndices());
+		List<Integer> rIndices = cachedResults.getRemovedIndices(solution.getSubsetIndices());
+		List<Integer> cIndices = cachedResults.getCommonIndices(solution.getSubsetIndices());
 
 		double dist;
 
 		if (type == DistanceMeasureType.MEAN_DISTANCE)
 		{
 
-			double total = cache.getTotal();
-			double count = cache.getCount();
+			double total = cachedResults.getTotal();
+			double count = cachedResults.getCount();
 
 			for (Integer a : aIndices)
 			{
@@ -164,9 +153,9 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 			}
 
 			// recache our results under this id
-			cache.setTotal(total);
-			cache.setCount(count);
-			cache.setIndices(solution.getIndices());
+			cachedResults.setTotal(total);
+			cachedResults.setCount(count);
+			cachedResults.setIndices(solution.getSubsetIndices());
 
 			return total / count;
 
@@ -175,7 +164,7 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 			if (type == DistanceMeasureType.MIN_DISTANCE)
 			{
 
-				TreeMap<Double, Integer> minFreqTable = cache.getMinFreqTable();
+				TreeMap<Double, Integer> minFreqTable = cachedResults.getMinFreqTable();
 
 				// add new distances
 
@@ -266,7 +255,7 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 				}
 
 				// recache results
-				cache.setIndices(solution.getIndices());
+				cachedResults.setIndices(solution.getIndices());
 
 				// System.out.println("Min cache size: " + minFreqTable.size());
 				return minFreqTable.firstKey();
@@ -292,6 +281,16 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 	}
 
 	public abstract double calculate(Integer index1, Integer index2) throws UnknownIndexException;
+	
+	public final DistanceMeasureType getType()
+	{
+		return type;
+	}
+
+	public final void setType(DistanceMeasureType type)
+	{
+		this.type = type;
+	}
 
 	protected double getMemoizedValue(int id1, int id2)
 	{

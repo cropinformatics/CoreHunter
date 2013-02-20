@@ -13,9 +13,9 @@
 // limitations under the License.
 package org.corehunter.neighbourhood;
 
-import org.corehunter.Validatable;
+import org.corehunter.model.Validatable;
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
 
 public interface Neighbourhood<SolutionType extends Solution> extends Validatable
 {
@@ -49,13 +49,10 @@ public interface Neighbourhood<SolutionType extends Solution> extends Validatabl
 	 *          The objectiveFunction used to evaluate the solutions
 	 * @param currentBestEvaluation
 	 * 					The current best evaluation
-	 * @param cacheID
-	 *          The cacheID to be used for computing the (cached) evaluation for the solution,
-	 *          null if no caching
 	 * @return The move the that was made
 	 */
 	public Move<SolutionType> performBestMove(SolutionType solution,
-	    ObjectiveFunction<SolutionType> objectiveFunction, double currentBestEvaluation, String cacheID);
+	    ObjectiveFunction<SolutionType> objectiveFunction, double currentBestEvaluation);
 
 	/**
 	 * Randomly perturb the given core set into one of its neighbours.

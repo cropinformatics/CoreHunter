@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public interface SubsetNeighbourhood<
 	IndexType,
@@ -44,14 +44,11 @@ public interface SubsetNeighbourhood<
 	 *          e.g. in case of the deletion of an element.
 	 * @param currentBestEvaluation
 	 * 					The current best evaluation
-	 * @param cacheID
-	 *          The cacheID to be used for computing the (cached) evaluation for the solution,
-	 *          null if no caching
 	 * @return The move the that was made
 	 */
 	public Move<SolutionType> performBestMove(SolutionType solution,
 	    ObjectiveFunction<SolutionType> objectiveFunction, List<IndexType> tabu, 
-	    double currentBestEvaluation, String cacheID);
+	    double currentBestEvaluation);
 
 	public int getSubsetMinimumSize();
 

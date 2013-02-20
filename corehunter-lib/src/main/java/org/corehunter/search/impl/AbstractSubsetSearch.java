@@ -20,7 +20,7 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public abstract class AbstractSubsetSearch<
 	IndexType,

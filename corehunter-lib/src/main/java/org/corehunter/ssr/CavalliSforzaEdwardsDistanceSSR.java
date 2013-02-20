@@ -19,6 +19,8 @@ import java.util.ListIterator;
 
 import org.corehunter.model.UnknownIndexException;
 import org.corehunter.objectivefunction.DistanceMeasureType;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -46,6 +48,17 @@ public final class CavalliSforzaEdwardsDistanceSSR extends AbstractAccessionSSRD
 		super(name, description, type);
 	}
 	
+	protected CavalliSforzaEdwardsDistanceSSR(CavalliSforzaEdwardsDistanceSSR objectiveFunction) 
+	{
+		super(objectiveFunction) ;
+	}
+	
+	@Override
+  public final ObjectiveFunction<SubsetSolution<Integer>> copy()
+  {
+	  return new CavalliSforzaEdwardsDistanceSSR(this);
+  }
+
 	@Override
 	public final double calculate(Integer index1, Integer index2) throws UnknownIndexException
 	{

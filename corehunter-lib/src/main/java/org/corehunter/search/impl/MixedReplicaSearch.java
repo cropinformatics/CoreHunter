@@ -29,7 +29,7 @@ import org.corehunter.neighbourhood.impl.RandomSingleNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public class MixedReplicaSearch<
 	IndexType,
@@ -41,10 +41,9 @@ public class MixedReplicaSearch<
 	private static final int DEFAULT_LRSEARCH_L = 2;
 	private static final int DEFAULT_LRSEARCH_R = 1;
 	private static final int DEFAULT_PROG_BOOST_FACTOR = 2;
-	private static final boolean DEFAULT_LR_EXH_START = false;
-	
+
 	private long	              runtime;
-	private long	              minimumProgressionTime;
+	private double	              minimumProgression;
 	private long	              stuckTime;
 	private int	                numberOfTabuReplicas;
 	private int	                numberOfNonTabuReplicas;
@@ -63,6 +62,7 @@ public class MixedReplicaSearch<
 	private LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> localSearchTemplate;
 	private MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> metropolisSearchTemplate;
 	private TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> tabuSearchTemplate;
+	private boolean continueSearch;
 
 	public MixedReplicaSearch()
 	{
@@ -74,7 +74,7 @@ public class MixedReplicaSearch<
   	super(search) ;
   	
 		setRuntime(search.getRuntime()) ;
-		setMinimumProgressionTime(search.getMinimumProgressionTime()) ;
+		setMinimumProgression(search.getMinimumProgression()) ;
 		setStuckTime(search.getStuckTime()) ;
 		//TODO other members
   }
@@ -100,18 +100,18 @@ public class MixedReplicaSearch<
 		}
   }
 
-	public final long getMinimumProgressionTime()
+	public final double getMinimumProgression()
   {
-  	return minimumProgressionTime;
+  	return minimumProgression;
   }
 
-	public final void setMinimumProgressionTime(long minimumProgressionTime) throws CoreHunterException
+	public final void setMinimumProgression(double minimumProgression) throws CoreHunterException
   {
-		if (this.minimumProgressionTime != minimumProgressionTime)
+		if (this.minimumProgression != minimumProgression)
 		{
-			this.minimumProgressionTime = minimumProgressionTime;
+			this.minimumProgression = minimumProgression;
 			
-			handleMinimumProgressionTimeSet() ;
+			handleMinimumProgressionSet() ;
 		}
   }
 
@@ -354,13 +354,13 @@ public class MixedReplicaSearch<
 	  	throw new CoreHunterException("Runtime can not be set while search in process") ;
   }
 	
-	protected void handleMinimumProgressionTimeSet() throws CoreHunterException
+	protected void handleMinimumProgressionSet() throws CoreHunterException
   {
-	  if (minimumProgressionTime < 0)
-	  	throw new CoreHunterException("Minimum Progression Time can not be less than zero!") ;
+	  if (minimumProgression < 0)
+	  	throw new CoreHunterException("Minimum Progression can not be less than zero!") ;
 	  
 		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Minimum Progression Time can not be set while search in process") ;
+	  	throw new CoreHunterException("Minimum Progression can not be set while search in process") ;
   }
 	
 	protected void handleStuckTimeSet() throws CoreHunterException
@@ -489,6 +489,8 @@ public class MixedReplicaSearch<
 	@Override
 	protected void runSearch() throws CoreHunterException
 	{
+		continueSearch = true ;
+		
 		long boostTime = 0;
 		boolean boostTimeLocked = false;
 
@@ -512,12 +514,11 @@ public class MixedReplicaSearch<
 		int nrOfNonTabus = numberOfNonTabuReplicas;
 		int nrStuck;
 
-		boolean cont = true ;
 		double previousBestEvaluation = getBestSolutionEvaluation() ;
 		int previousBestSubsetSize = getBestSolution().getSubsetSize();
 		
 		double progression = 0 ;
-		long lastImprovementTime = 0;
+		//long lastImprovementTime = 0;
 		
 		// All tasks are done, inspect results
 		Iterator<SubsetSearch<IndexType, SolutionType>> iterator ;
@@ -555,14 +556,14 @@ public class MixedReplicaSearch<
 
 		long firstRounds = 0;
 
-		while (cont && getSearchTime() < runtime)
+		while (continueSearch && getSearchTime() < runtime)
 		{
 			// submit all tabu replicas
 			submitSubSearches(tabuReplicas) ;
 
 			// loop submission of Local and REMC replicas (short runs)
 			while ((firstRounds < roundsWithoutTabu || tabuReplicasBusy(tabuFutures))
-			    && cont && getSearchTime() < runtime)
+			    && continueSearch && getSearchTime() < runtime)
 			{
 				firstRounds++;
 
@@ -589,9 +590,7 @@ public class MixedReplicaSearch<
 		
 						if (isBetterSolution(subSearch.getBestSolutionEvaluation() , bestReplicaEvaluation)
 						    || (previousBestEvaluation == previousBestEvaluation && subSearch.getBestSolution().getSubsetSize() < previousBestSubsetSize))
-						{
-							lastImprovementTime = getBestSolutionTime() ;
-							
+						{	
 							bestSubSearch = subSearch ;
 						}
 					}
@@ -608,8 +607,6 @@ public class MixedReplicaSearch<
 					if (isBetterSolution(lrReplica.getBestSolutionEvaluation() , bestReplicaEvaluation)
 					    || (lrReplica.getBestSolutionEvaluation() == bestReplicaEvaluation && lrReplica.getBestSolution().getSubsetSize() < previousBestSubsetSize))
 					{
-						lastImprovementTime = getBestSolutionTime() ;
-						
 						bestSubSearch = lrReplica ;
 					}
 					
@@ -635,9 +632,9 @@ public class MixedReplicaSearch<
 					progression = bestSubSearch.getBestSolutionEvaluation() - previousBestEvaluation;
 
 					// check min progression
-					if (improvement && bestSubSearch.getBestSolution().getSubsetSize() >= previousBestSubsetSize && progression < minimumProgressionTime)
+					if (improvement && bestSubSearch.getBestSolution().getSubsetSize() >= previousBestSubsetSize && progression < minimumProgression)
 					{
-						cont = false;
+						continueSearch = false;
 					}
 					
 					previousBestEvaluation = bestSubSearch.getBestSolutionEvaluation() ;
@@ -645,15 +642,12 @@ public class MixedReplicaSearch<
 				}
 
 				// check stuckTime
-				if (getBestSolutionTime() - lastImprovementTime > stuckTime)
-				{
-					cont = false;
-				}
+				continueSearch = continueSearch && stuckTime > getBestSolutionTime() ;
 
 				// check boost prog
 				if (improvement && progression < boostMinimumProgressionTime)
 				{
-					lastBoostTime = getBestSolutionTime() ;
+					lastBoostTime = getBestSolutionTime() ; // TODO check if this correct, this is the nanoseconds since last best solution
 					// only boost with some fraction of the normal nr of boost
 					// replicas in case of min prog boost
 					int progBoostNr = boostNumber / DEFAULT_PROG_BOOST_FACTOR;
@@ -665,7 +659,8 @@ public class MixedReplicaSearch<
 
 				// check boost time -- do not boost if previous boost effect
 				// still visible!
-				if (getBestSolutionTime()  - Math.max(lastImprovementTime,
+				// TOOD getBestSolutionTime() may not be appropriate here
+				if (getBestSolutionTime()  - Math.max(getBestSolutionTime()  ,
 				    lastBoostTime)  > Math.max(boostTime, minimumBoostTime)
 				    && nonTabuReplicas.size() == numberOfNonTabuReplicas + numberOfTabuReplicas)
 				{
@@ -736,7 +731,6 @@ public class MixedReplicaSearch<
 						    || (replica.getBestSolutionEvaluation() == getBestSolutionEvaluation() && replica.getBestSolution().getSubsetSize() < previousBestSubsetSize))
 						{
 							improvement = true;
-							lastImprovementTime = getBestSolutionTime() ;
 						}
 						// count nr of stuck non-tabu reps
 						if (replica.isStuck())
@@ -789,6 +783,8 @@ public class MixedReplicaSearch<
 			}
 
 		}
+		
+		// TODO need to remove future etc.
 
 		lrReplica.stop();
 	}
@@ -796,8 +792,7 @@ public class MixedReplicaSearch<
 	@Override
   protected void stopSearch() throws CoreHunterException
   {
-	  // TODO stopSearch()
-	  
+		continueSearch = false;
   }
 	
   protected final void boostReplicas(List<SubsetSearch<IndexType, SolutionType>> replicas,

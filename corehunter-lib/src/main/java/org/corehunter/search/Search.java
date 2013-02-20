@@ -16,6 +16,7 @@ package org.corehunter.search;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Entity;
+import org.corehunter.search.solution.Solution;
 
 public interface Search<SolutionType extends Solution> extends Entity
 {

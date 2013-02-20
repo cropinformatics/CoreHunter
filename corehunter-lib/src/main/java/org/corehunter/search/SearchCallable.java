@@ -15,6 +15,8 @@ package org.corehunter.search;
 
 import java.util.concurrent.Callable;
 
+import org.corehunter.search.solution.Solution;
+
 public class SearchCallable<SolutionType extends Solution, SearchType extends Search<SolutionType>> implements Callable<SearchType>
 {
 	private SearchType search ;
@@ -34,7 +36,7 @@ public class SearchCallable<SolutionType extends Solution, SearchType extends Se
   public SearchType call() throws Exception
   {
     search.start() ;
-    
+
 	  return search;
   }
 

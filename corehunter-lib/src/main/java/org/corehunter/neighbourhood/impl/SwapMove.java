@@ -16,7 +16,7 @@ package org.corehunter.neighbourhood.impl;
 
 import org.corehunter.neighbourhood.AddedIndexMove;
 import org.corehunter.neighbourhood.RemovedIndexMove;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * @author hermandebeukelaer

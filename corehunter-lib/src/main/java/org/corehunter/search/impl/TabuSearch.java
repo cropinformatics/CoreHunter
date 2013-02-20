@@ -25,7 +25,7 @@ import org.corehunter.neighbourhood.Move;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * TABU Search. Tabu list is a list of indices at which the current core set
@@ -47,7 +47,7 @@ public class TabuSearch<
 	extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
 {
 	private long	              runtime;
-	private long	              minimumProgressionTime;
+	private double	            minimumProgression;
 	private long	              stuckTime;
 	private int	                tabuListSize;
 	private boolean 						continueSearch ;
@@ -62,7 +62,7 @@ public class TabuSearch<
 		super(search);
 		
 		setRuntime(search.getRuntime()) ;
-		setMinimumProgressionTime(search.getMinimumProgressionTime()) ;
+		setMinimumProgression(search.getMinimumProgression()) ;
 		setStuckTime(search.getStuckTime()) ;
 	}
 
@@ -87,16 +87,16 @@ public class TabuSearch<
 		}
   }
 
-	public final long getMinimumProgressionTime()
+	public final double getMinimumProgression()
   {
-  	return minimumProgressionTime;
+  	return minimumProgression;
   }
 
-	public final void setMinimumProgressionTime(long minimumProgressionTime) throws CoreHunterException
+	public final void setMinimumProgression(double minimumProgression) throws CoreHunterException
   {
-		if (this.minimumProgressionTime != minimumProgressionTime)
+		if (this.minimumProgression != minimumProgression)
 		{
-			this.minimumProgressionTime = minimumProgressionTime;
+			this.minimumProgression = minimumProgression;
 			
 			handleMinimumProgressionTimeSet() ;
 		}
@@ -143,11 +143,11 @@ public class TabuSearch<
 	
 	protected void handleMinimumProgressionTimeSet() throws CoreHunterException
   {
-	  if (minimumProgressionTime < 0)
-	  	throw new CoreHunterException("Minimum Progression Time can not be less than zero!") ;
+	  if (minimumProgression < 0)
+	  	throw new CoreHunterException("Minimum Progression can not be less than zero!") ;
 	  
 		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Minimum Progression Time can not be set while search in process") ;
+	  	throw new CoreHunterException("Minimum Progression can not be set while search in process") ;
   }
 	
 	protected void handleStuckTimeSet() throws CoreHunterException
@@ -186,9 +186,8 @@ public class TabuSearch<
 
 		Move<SolutionType> move;
 		continueSearch = true;
-		double lastImprTime = 0.0;
 
-		setEvaluation(getObjectiveFunction().calculate(getSolution(), getCacheIdentifier()));
+		setEvaluation(getObjectiveFunction().calculate(getSolution()));
 		handleNewBestSolution(getSolution(), getEvaluation());
 
 		while (continueSearch && getSearchTime() < runtime)
@@ -196,30 +195,26 @@ public class TabuSearch<
 			// run TABU search step
 
 			// ALWAYS accept new core, even it is not an improvement
-			move = getNeighbourhood().performBestMove(getSolution(), getObjectiveFunction(), tabuList, getBestSolutionEvaluation(), getCacheIdentifier());
-			evalution = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+			move = getNeighbourhood().performBestMove(getSolution(), getObjectiveFunction(), tabuList, getBestSolutionEvaluation());
+			evalution = getObjectiveFunction().calculate(getSolution());
 
 			// check if new best core was found
 			if (evalution > getBestSolutionEvaluation()
 			    || (evalution == getBestSolutionEvaluation() && getSolution().getSubsetSize() < getBestSolution().getSubsetSize()))
 			{
 				// check min progression
-				if (getSolution().getSubsetSize() >= getBestSolution().getSubsetSize() && evalution - getBestSolutionEvaluation() < minimumProgressionTime)
+				if (getSolution().getSubsetSize() >= getBestSolution().getSubsetSize() && evalution - getBestSolutionEvaluation() < minimumProgression)
 				{
 					continueSearch = false;
 				}
 				
-				lastImprTime = getBestSolutionTime() ;
 				// store new best core
 				handleNewBestSolution(getSolution(), evalution);
 			}
 			else
 			{
 				// check stuckTime
-				if (getSearchTime() - lastImprTime > stuckTime)
-				{
-					continueSearch = false;
-				}
+				continueSearch = continueSearch && stuckTime > getBestSolutionTime() ;
 			}
 
 			// finally, update tabu list

@@ -19,11 +19,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.neighbourhood.AbstractSubsetNeighbourhood;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.Move;
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * @author hermandebeukelaer
@@ -50,9 +49,9 @@ public abstract class SingleNeighbourhood<
 	@Override
 	public final Move<SolutionType> performBestMove(SolutionType solution,
 	    ObjectiveFunction<SolutionType> objectiveFunction, 
-	    double currentBestEvaluation, String cacheID)
+	    double currentBestEvaluation)
 	{
-		return performBestMove(solution, objectiveFunction, null, currentBestEvaluation, cacheID) ;
+		return performBestMove(solution, objectiveFunction, null, currentBestEvaluation) ;
 	}
 	
 	@Override

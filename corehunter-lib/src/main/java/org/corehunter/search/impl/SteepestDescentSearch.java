@@ -22,7 +22,7 @@ import org.corehunter.neighbourhood.Move;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * * Steepest Descent search. Always continue with the best of all neighbours, if
@@ -37,7 +37,7 @@ public class SteepestDescentSearch<
 	extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
 {
 	private long	              runtime;
-	private long	              minimumProgressionTime;
+	private double	            minimumProgression;
 	private boolean 						continueSearch ;
 
 	public SteepestDescentSearch()
@@ -50,7 +50,7 @@ public class SteepestDescentSearch<
 		super(search);
 		
 		setRuntime(search.getRuntime()) ;
-		setMinimumProgressionTime(search.getMinimumProgressionTime()) ;
+		setMinimumProgression(search.getMinimumProgression()) ;
 	}
 
 	@Override
@@ -74,16 +74,16 @@ public class SteepestDescentSearch<
 		}
   }
 
-	public final long getMinimumProgressionTime()
+	public final double getMinimumProgression()
   {
-  	return minimumProgressionTime;
+  	return minimumProgression;
   }
 
-	public final void setMinimumProgressionTime(long minimumProgressionTime) throws CoreHunterException
+	public final void setMinimumProgression(double minimumProgression) throws CoreHunterException
   {
-		if (this.minimumProgressionTime != minimumProgressionTime)
+		if (this.minimumProgression != minimumProgression)
 		{
-			this.minimumProgressionTime = minimumProgressionTime;
+			this.minimumProgression = minimumProgression;
 			
 			handleMinimumProgressionTimeSet() ;
 		}
@@ -100,7 +100,7 @@ public class SteepestDescentSearch<
 	
 	protected void handleMinimumProgressionTimeSet() throws CoreHunterException
   {
-	  if (minimumProgressionTime < 0)
+	  if (minimumProgression < 0)
 	  	throw new CoreHunterException("Minimum Progression Time can not be less than zero!") ;
 	  
 		if (SearchStatus.STARTED.equals(getStatus()))
@@ -115,7 +115,7 @@ public class SteepestDescentSearch<
 
 		size = getSolution().getSubsetSize() ;
 
-		evalution = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+		evalution = getObjectiveFunction().calculate(getSolution());
 		size = getSolution().getSubsetSize() ;
 
 		handleNewBestSolution(getSolution(), evalution);
@@ -127,14 +127,14 @@ public class SteepestDescentSearch<
 		while (continueSearch)
 		{
 			// run Steepest Descent search step
-			move = getNeighbourhood().performBestMove(getSolution(), getObjectiveFunction(), evalution, getCacheIdentifier());
-			newScore = getObjectiveFunction().calculate(getSolution(), getCacheIdentifier());
+			move = getNeighbourhood().performBestMove(getSolution(), getObjectiveFunction(), evalution);
+			newScore = getObjectiveFunction().calculate(getSolution());
 			newSize = getSolution().getSubsetSize() ;
 
 			if (newScore > evalution || (newScore == evalution && newSize < size))
 			{
 				// check minimum progression
-				if (newSize >= size && newScore - evalution < minimumProgressionTime)
+				if (newSize >= size && newScore - evalution < minimumProgression)
 				{
 					continueSearch = false;
 				}

@@ -16,7 +16,8 @@ package org.corehunter.ssr;
 
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -39,15 +40,20 @@ public final class CoverageSSR<IndexType> extends AbstractAccessionSSRObjectiveF
 		pn = new ProportionNonInformativeAllelesSSR<IndexType>();
 	}
 
+	protected CoverageSSR(CoverageSSR<IndexType> objectiveFunction) 
+	{
+		super(objectiveFunction) ;
+	}
+	
+	@Override
+  public ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  {
+	  return new CoverageSSR<IndexType>(this);
+  }
+
 	@Override
 	public final double calculate(SubsetSolution<IndexType> solution) throws CoreHunterException
 	{
-		return 1.0 - pn.calculate(null);
-	}
-
-	@Override
-	public final double calculate(SubsetSolution<IndexType> solution, String cacheId) throws CoreHunterException
-	{
-		return 1.0 - pn.calculate(solution, cacheId);
+		return 1.0 - pn.calculate(solution);
 	}
 }

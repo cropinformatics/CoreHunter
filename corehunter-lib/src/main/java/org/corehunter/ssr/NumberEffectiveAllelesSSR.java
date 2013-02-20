@@ -22,8 +22,9 @@ import java.util.Map;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.UnknownIndexException;
-import org.corehunter.objectivefunction.CachedResult;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.objectivefunction.impl.CachedResult;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -33,7 +34,7 @@ import org.corehunter.search.SubsetSolution;
  */
 public final class NumberEffectiveAllelesSSR<IndexType> extends AbstractAccessionSSRObjectiveFunction<IndexType>
 {
-	private Map<String, NECachedResult<IndexType>>	cachedResults;
+	private NECachedResult<IndexType>	cachedResults;
 
 	public NumberEffectiveAllelesSSR()
 	{
@@ -43,34 +44,28 @@ public final class NumberEffectiveAllelesSSR<IndexType> extends AbstractAccessio
 	public NumberEffectiveAllelesSSR(String name, String description)
 	{
 		super(name, description);
-		cachedResults = Collections
-		    .synchronizedMap(new HashMap<String, NECachedResult<IndexType>>());
 	}
+	
+	protected NumberEffectiveAllelesSSR(NumberEffectiveAllelesSSR<IndexType> objectiveFunction) 
+	{
+		super(objectiveFunction) ;
+	}
+	
+	@Override
+  public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  {
+	  return new NumberEffectiveAllelesSSR<IndexType>(this);
+  }
 
 	public double calculate(SubsetSolution<IndexType> solution) throws CoreHunterException, CoreHunterException
 	{
-		return calculate(solution, new NECachedResult<IndexType>(solution));
-	}
+		if (cachedResults == null)
+			cachedResults = new NECachedResult<IndexType>(solution) ;
 
-	public double calculate(SubsetSolution<IndexType> solution, String cacheId) throws CoreHunterException
-	{
-		NECachedResult<IndexType> cache = cachedResults.get(cacheId);
+		List<IndexType> aIndices = cachedResults.getAddedIndices(solution.getIndices());
+		List<IndexType> rIndices = cachedResults.getRemovedIndices(solution.getIndices());
 
-		if (cache == null)
-		{
-			cache = new NECachedResult<IndexType>(solution);
-			cachedResults.put(cacheId, cache);
-		}
-
-		return calculate(solution, cache);
-	}
-
-	protected double calculate(SubsetSolution<IndexType> solution, NECachedResult<IndexType> cache) throws CoreHunterException
-	{
-		List<IndexType> aIndices = cache.getAddedIndices(solution.getIndices());
-		List<IndexType> rIndices = cache.getRemovedIndices(solution.getIndices());
-
-		double markerAlleleTotals[][] = cache.getMarkerAlleleTotals();
+		double markerAlleleTotals[][] = cachedResults.getMarkerAlleleTotals();
 		double addTotals[][] = getData().getMarkerAlleleTotals(aIndices);
 		double remTotals[][] = getData().getMarkerAlleleTotals(rIndices);
 
@@ -105,8 +100,8 @@ public final class NumberEffectiveAllelesSSR<IndexType> extends AbstractAccessio
 		}
 
 		double score = (1.0 / (double) markerAlleleTotals.length) * diversityTotal;
-		// recache our results under this id
-		cache.setIndices(solution.getIndices());
+		// recache our results
+		cachedResults.setIndices(solution.getIndices());
 
 		return score;
 	}

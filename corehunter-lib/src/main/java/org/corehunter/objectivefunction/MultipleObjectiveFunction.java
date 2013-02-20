@@ -23,7 +23,7 @@ import java.util.Map;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Data;
 import org.corehunter.model.impl.EntityWithDescriptionImpl;
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
 
 /**
  * <<Class summary>>
@@ -45,11 +45,31 @@ public class MultipleObjectiveFunction<SolutionType extends Solution, DatasetTyp
 
 	public MultipleObjectiveFunction(String name, String description)
 	{
-		super(name) ;
+		super(name, description) ;
+		
 		objectiveFunctions = new ArrayList<ObjectiveFunction<SolutionType>>();
 		objectiveFunctionIndices = new HashMap<String, Integer>();
 		objectiveFunctionWeights = new ArrayList<Double>();
 	}
+	
+	public MultipleObjectiveFunction(MultipleObjectiveFunction<SolutionType, DatasetType> objectiveFunction) throws CoreHunterException
+	{
+		super(objectiveFunction.getName(), objectiveFunction.getDescription()) ;
+		
+		Iterator<ObjectiveFunction<SolutionType>> objectiveFunctions = objectiveFunction.getObjectiveFunctions().iterator() ;
+		Iterator<Double> weights = objectiveFunction.getObjectiveFunctionWeights().iterator() ;
+		
+		while (objectiveFunctions.hasNext() && weights.hasNext())
+		{
+			addObjectiveFunction(objectiveFunctions.next(), weights.next()) ;
+		}
+	}
+
+	@Override
+  public ObjectiveFunction<SolutionType> copy() throws CoreHunterException
+  {
+	  return new MultipleObjectiveFunction<SolutionType, DatasetType>(this) ;
+  }
 
 	@Override
   public boolean isMinimizing()
@@ -60,26 +80,12 @@ public class MultipleObjectiveFunction<SolutionType extends Solution, DatasetTyp
 	@Override
 	public final double calculate(SolutionType solution) throws CoreHunterException
 	{
-		return calculate(solution, null);
-	}
-
-	@Override
-	public final double calculate(SolutionType solution, String cacheId) throws CoreHunterException
-	{
 		double score = 0.0;
 
 		for (int i = 0; i < objectiveFunctions.size(); i++)
 		{
 			ObjectiveFunction<SolutionType> m = objectiveFunctions.get(i);
-			double s;
-			if (cacheId != null)
-			{
-				s = m.calculate(solution, cacheId);
-			}
-			else
-			{
-				s = m.calculate(null);
-			}
+			double s = m.calculate(solution);
 
 			if (m.isMinimizing())
 			{
@@ -106,15 +112,8 @@ public class MultipleObjectiveFunction<SolutionType extends Solution, DatasetTyp
 		for (int i = 0; i < objectiveFunctions.size(); i++)
 		{
 			ObjectiveFunction<SolutionType> m = objectiveFunctions.get(i);
-			double s;
-			if (cacheId != null)
-			{
-				s = m.calculate(solution, cacheId);
-			}
-			else
-			{
-				s = m.calculate(null);
-			}
+			double s = m.calculate(null);
+			
 			scores.put(m.getName(), new Double(s));
 		}
 		return scores;
@@ -146,6 +145,19 @@ public class MultipleObjectiveFunction<SolutionType extends Solution, DatasetTyp
 	  while (iterator.hasNext())
 	  	iterator.next().validate() ;
   }
-	
-	
+
+	public final List<ObjectiveFunction<SolutionType>> getObjectiveFunctions()
+	{
+		return objectiveFunctions;
+	}
+
+	public final Map<String, Integer> getObjectiveFunctionIndices()
+	{
+		return objectiveFunctionIndices;
+	}
+
+	public final List<Double> getObjectiveFunctionWeights()
+	{
+		return objectiveFunctionWeights;
+	}
 }

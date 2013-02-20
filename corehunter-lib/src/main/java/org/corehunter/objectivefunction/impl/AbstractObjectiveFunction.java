@@ -17,7 +17,8 @@ package org.corehunter.objectivefunction.impl;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Data;
 import org.corehunter.model.impl.EntityWithDescriptionImpl;
-import org.corehunter.search.Solution;
+import org.corehunter.search.solution.Solution;
+import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>
@@ -36,21 +37,17 @@ public abstract class AbstractObjectiveFunction<
 	{
 		super (name) ;
 	}
+	
+	protected AbstractObjectiveFunction(AbstractObjectiveFunction<SolutionType, DataType> objectiveFuncton)
+	{
+		super(objectiveFuncton) ;
+	}
 
 	/* (non-Javadoc)
    * @see org.corehunter.measures.ObjectiveFunction#isMinimizing()
    */
 	@Override
   public abstract boolean isMinimizing() ;
-
-	/* (non-Javadoc)
-   * @see org.corehunter.measures.ObjectiveFunction#calculate(SolutionType, java.lang.String)
-   */
-	@Override
-  public double calculate(SolutionType solution, String cacheId) throws CoreHunterException
-	{
-		return calculate(solution);
-	}
 
 	/* (non-Javadoc)
    * @see org.corehunter.measures.ObjectiveFunction#calculate(SolutionType)

@@ -23,6 +23,8 @@ public class Constants
 	public final static int INVALID_TIME = -2 ;
 	public final static int INVALID_NUMBER_OF_STEPS = -1 ;
 	
-	public final static long NANO_SECONDS_IN_MILLISECONDS = 1000000 ;
+	public final static long MILLISECOND = 10000000 ;
+	public final static long SECOND = 100 * MILLISECOND ;
+	public final static long MINUTE = 60 * SECOND ;
 	
 }

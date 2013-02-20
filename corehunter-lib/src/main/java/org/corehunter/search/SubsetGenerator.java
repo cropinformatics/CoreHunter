@@ -16,7 +16,7 @@ package org.corehunter.search;
 import java.util.List;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.Validatable;
+import org.corehunter.model.Validatable;
 
 public interface SubsetGenerator<IndexType> extends Validatable
 {

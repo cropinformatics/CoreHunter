@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.corehunter.search.solution;
+package org.corehunter.search.solution.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,9 +20,16 @@ import java.util.Random;
 
 import org.apache.commons.collections.set.ListOrderedSet;
 import org.corehunter.CoreHunterException;
-import org.corehunter.search.Solution;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.Solution;
+import org.corehunter.search.solution.SubsetSolution;
 
+/**
+ * Subset solution in which order of the indices in the subset are
+ * maintained in their natural order
+ * 
+ * @author daveneti
+ *
+ */
 public class UnorderedIntegerListSubsetSolution implements
     SubsetSolution<Integer>
 {
@@ -30,7 +37,7 @@ public class UnorderedIntegerListSubsetSolution implements
 	private ListOrderedSet subsetIndices;
 	private ListOrderedSet remainingIndices;
 	
-	public UnorderedIntegerListSubsetSolution(Collection<Integer> indices)
+	public UnorderedIntegerListSubsetSolution(Collection<Integer> indices, Collection<Integer> subsetIndices)
   {
 		this.indices = new ArrayList<Integer>(indices.size()) ;
 		this.subsetIndices = new ListOrderedSet() ;
@@ -38,6 +45,9 @@ public class UnorderedIntegerListSubsetSolution implements
 		
 		this.indices.addAll(indices) ;
 		this.remainingIndices.addAll(indices) ;
+		
+		this.subsetIndices.addAll(subsetIndices) ;
+		this.remainingIndices.removeAll(subsetIndices) ;
   }
 
 	private UnorderedIntegerListSubsetSolution(
@@ -61,8 +71,17 @@ public class UnorderedIntegerListSubsetSolution implements
 	@Override
   public final void validate() throws CoreHunterException
   {
-
+		if (indices.isEmpty())
+			throw new CoreHunterException("Set must contain at least one index!") ;
+		
+		if (subsetIndices.isEmpty())
+			throw new CoreHunterException("Subset must contain at least one index!") ;
+		
+		if (!indices.containsAll(subsetIndices))
+			throw new CoreHunterException("Subset indices must all be present in set!") ;
 	  
+		if (!indices.containsAll(remainingIndices))
+			throw new CoreHunterException("Remaining indices must all be present in set!") ;
   }
 
   @Override
@@ -213,4 +232,24 @@ public class UnorderedIntegerListSubsetSolution implements
 	  return subsetIndices.contains(index);
   }
 
+	@Override
+	public String toString()
+	{
+		return "indices =" + subsetIndices ;
+	}
+	
+	@SuppressWarnings("rawtypes")
+  @Override
+	public boolean equals(Object object)
+	{
+		if (object instanceof SubsetSolution)
+		{
+			// TODO does order matter?
+			return this.getSubsetIndices().equals(((SubsetSolution) object).getSubsetIndices()) ;
+		}
+		else
+		{
+			return super.equals(object) ;
+		}
+	}
 }

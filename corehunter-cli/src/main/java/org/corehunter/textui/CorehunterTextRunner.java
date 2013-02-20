@@ -37,10 +37,10 @@ import org.corehunter.objectivefunction.DuplicateMeasureException;
 import org.corehunter.objectivefunction.MultipleObjectiveFunction;
 import org.corehunter.objectivefunction.UnknownMeasureException;
 import org.corehunter.search.Search;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.ssr.MeasureFactorySSR;
 
-import static org.corehunter.Constants.NANO_SECONDS_IN_MILLISECONDS;
+import static org.corehunter.Constants.SECOND;
 
 /**
  * A simple text based driver for Core Hunter.
@@ -53,7 +53,7 @@ public final class CorehunterTextRunner
 	private final String[]	    measureNames	                         = { "MR",
 	    "MRmin", "CE", "CEmin", "SH", "HE", "NE", "PN", "CV", "EX"	   };
 
-	private final long	        DEFAULT_RUNTIME	                       = 60 * NANO_SECONDS_IN_MILLISECONDS; // TODO check this
+	private final long	        DEFAULT_RUNTIME	                       = 60 * SECOND; // TODO check this
 	private final long	        DEFAULT_MINPROG	                       = 0;
 	
 	private final double	      DEFAULT_SAMPLING_INTENSITY	           = 0.2 ;
@@ -71,7 +71,7 @@ public final class CorehunterTextRunner
 	private final int	          DEFAULT_MIXREP_BOOST_NR	               = 2;
 	private final long	        DEFAULT_MIXREP_BOOST_MIN_PROG	         = 1; // TODO check this
 	private final int	          DEFAULT_MIXREP_BOOST_TIME_FACTOR	     = 15;
-	private final long	        DEFAULT_MIXREP_MIN_BOOST_TIME	         = (long)0.25 * NANO_SECONDS_IN_MILLISECONDS ; // TODO check this
+	private final long	        DEFAULT_MIXREP_MIN_BOOST_TIME	         = (long)0.25 * SECOND ; // TODO check this
 	private final double	      DEFAULT_MIXREP_MIN_MC_TEMP	           = 50.0;
 	private final double	      DEFAULT_MIXREP_MAX_MC_TEMP	           = 100.0;
 
@@ -874,7 +874,7 @@ public final class CorehunterTextRunner
 			{
 				try
 				{
-					runtime = (long)(Double.parseDouble(cl.getOptionValue("runtime")) * Constants.NANO_SECONDS_IN_MILLISECONDS) ;
+					runtime = (long)(Double.parseDouble(cl.getOptionValue("runtime")) * Constants.MILLISECOND) ;
 					if (runtime <= 0.0)
 						throw new NumberFormatException();
 				}
@@ -890,7 +890,7 @@ public final class CorehunterTextRunner
 			{
 				try
 				{
-					minProg = (long)(Double.parseDouble(cl.getOptionValue("min_prog")) * Constants.NANO_SECONDS_IN_MILLISECONDS) ;
+					minProg = (long)(Double.parseDouble(cl.getOptionValue("min_prog")) * Constants.MILLISECOND) ;
 					if (minProg < 0.0)
 						throw new NumberFormatException();
 				}
@@ -906,7 +906,7 @@ public final class CorehunterTextRunner
 			{
 				try
 				{
-					stuckTime = (long)(Double.parseDouble(cl.getOptionValue("stuck_time")) * Constants.NANO_SECONDS_IN_MILLISECONDS) ;
+					stuckTime = (long)(Double.parseDouble(cl.getOptionValue("stuck_time")) * Constants.MILLISECOND) ;
 					if (stuckTime <= 0.0)
 						throw new NumberFormatException();
 					stuckTimeSpecified = true;
@@ -1207,7 +1207,7 @@ public final class CorehunterTextRunner
 				try
 				{
 					mixrepBoostMinProg = (long)(Double.parseDouble(cl
-					    .getOptionValue("boost_min_prog")) * Constants.NANO_SECONDS_IN_MILLISECONDS);
+					    .getOptionValue("boost_min_prog")) * Constants.MILLISECOND);
 					if (mixrepBoostMinProg <= 0.0)
 						throw new NumberFormatException();
 				}
@@ -1242,7 +1242,7 @@ public final class CorehunterTextRunner
 				try
 				{
 					mixrepMinBoostTime = (long)(Double.parseDouble(cl
-					    .getOptionValue("min_boost_time")) * Constants.NANO_SECONDS_IN_MILLISECONDS);
+					    .getOptionValue("min_boost_time")) * Constants.MILLISECOND);
 					if (mixrepMinBoostTime < 0.0)
 						throw new NumberFormatException();
 				}

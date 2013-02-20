@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 
 import org.corehunter.CoreHunterException;
@@ -32,8 +33,9 @@ import org.corehunter.search.SearchCallable;
 import org.corehunter.search.SearchListener;
 import org.corehunter.search.SearchListenerAdapter;
 import org.corehunter.search.SearchRunnable;
+import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;
-import org.corehunter.search.SubsetSolution;
+import org.corehunter.search.solution.SubsetSolution;
 
 public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 	IndexType,
@@ -47,6 +49,7 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 	private ExecutorService executorService ;
 	private Map<SubSearchType, Future<SubSearchType>> futures;
 	private ThreadFactory threadFactory;
+	private CoreHunterException cachedException;
 
 	public AbstractParallelSubsetNeighbourhoodSearch()
 	{
@@ -70,9 +73,11 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 
 			@Override
 			public void searchFailed(Search<SolutionType> search, CoreHunterException exception)
-			{
-				executorService.shutdownNow() ;
-				fireSearchFailed(exception) ;
+			{	
+				if (cachedException == null) // ignore subsequent errors
+				{
+					cachedException = new CoreHunterException("Sub search failed due to : " + exception.getLocalizedMessage(), exception) ;
+				}
 			}
 
 			@Override
@@ -107,13 +112,13 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 		futures = new HashMap<SubSearchType, Future<SubSearchType>>() ;
   }
 
-	protected final synchronized void checkForBestSolution(Search<SolutionType> search,
+	protected final void checkForBestSolution(Search<SolutionType> search,
       SolutionType bestSolution, double bestSolutionEvaluation)
   {
 	  if (isBetterSolution(bestSolutionEvaluation, getBestSolutionEvaluation()) || 
-	  		(bestSolutionEvaluation == getBestSolutionEvaluation() && bestSolution.getSubsetSize() < getBestSolution().getSubsetSize()))
+	  		(bestSolutionEvaluation == getBestSolutionEvaluation() && bestSolution.getSubsetSize() < getBestSolution().getSubsetSize())) // TODO should size matter?
 	  {
-	  	fireNewBestSolution(bestSolution, bestSolutionEvaluation) ;
+	  	handleNewBestSolution(bestSolution, bestSolutionEvaluation) ;
 	  }
   }
 	
@@ -129,8 +134,6 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 		{
 			subSearch = iterator.next() ;
 			
-			subSearch.addSearchListener(subSearchListener) ;
-			
 			callables.add(new SearchCallable<SolutionType, SubSearchType>(subSearch)) ;
 		}
 		
@@ -138,18 +141,16 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 		{
 			executorService.invokeAll(callables) ;
 		}
-		catch (InterruptedException ex)
-		{
-			throw new CoreHunterException("Error in thread pool: " + ex);
+		catch (RejectedExecutionException exception)
+		{		
+			if (cachedException != null)
+				throw cachedException ;
+			else
+				throw new CoreHunterException("Error in thread pool: " + exception.getLocalizedMessage());
 		}
-		
-		iterator = subSearches.iterator() ;
-		
-		while (iterator.hasNext())
+		catch (InterruptedException exception)
 		{
-			subSearch = iterator.next() ;
-			
-			subSearch.removeSearchListener(subSearchListener) ;
+			throw new CoreHunterException("Error in thread pool: " + exception.getLocalizedMessage());
 		}
   }
 	
@@ -185,6 +186,36 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 		lrThread.start();
   }
 	
+	protected final synchronized void removeCompletedSubSearches(List<SubSearchType> subSearches)
+  {
+		Iterator<SubSearchType> iterator = subSearches.iterator() ;
+		
+		while (iterator.hasNext())
+		{
+			removeCompletedSubSearch(iterator.next()) ;
+		}
+  }
+	
+	protected final synchronized Future<SubSearchType> removeCompletedSubSearch(SubSearchType subSearch)
+  {
+		return futures.remove(subSearch) ;
+  }
+	
+	protected final synchronized void registerSubSearches(List<SubSearchType> subSearches)
+  {
+		Iterator<SubSearchType> iterator = subSearches.iterator() ;
+		
+		while (iterator.hasNext())
+		{
+			registerSubSearch(iterator.next()) ;
+		}
+  }
+	
+	protected final synchronized void registerSubSearch(SubSearchType subSearch)
+  {
+		subSearch.addSearchListener(subSearchListener) ;
+  }
+	
 	protected final synchronized void unregisterSubSearches(List<SubSearchType> subSearches)
   {
 		Iterator<SubSearchType> iterator = subSearches.iterator() ;
@@ -198,7 +229,6 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 	protected final synchronized void unregisterSubSearch(SubSearchType subSearch)
   {
 		subSearch.removeSearchListener(subSearchListener) ;
-		futures.remove(subSearch) ;
   }
 	
 	protected final boolean tabuReplicasBusy(List<Future<SubSearchType>> tabuFutures)

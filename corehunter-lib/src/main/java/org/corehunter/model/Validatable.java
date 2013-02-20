@@ -1,4 +1,6 @@
-package org.corehunter;
+package org.corehunter.model;
+
+import org.corehunter.CoreHunterException;
 
 public interface Validatable
 {

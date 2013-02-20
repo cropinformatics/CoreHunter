@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.corehunter.objectivefunction;
+package org.corehunter.objectivefunction.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,31 +44,31 @@ public class CachedResult<IndexType>
 		return indices;
 	}
 
-	public final List<IndexType> getAddedIndices(List<IndexType> accessions)
+	public final List<IndexType> getAddedIndices(List<IndexType> indices)
 	{
-		List<IndexType> aIndices = new ArrayList<IndexType>(accessions);
+		List<IndexType> aIndices = new ArrayList<IndexType>(indices);
 		aIndices.removeAll(this.indices);
 		return aIndices;
 	}
 
-	public final List<IndexType> getRemovedIndices(List<IndexType> accessions)
+	public final List<IndexType> getRemovedIndices(List<IndexType> indices)
 	{
 		List<IndexType> rIndices = new ArrayList<IndexType>(this.indices);
-		rIndices.removeAll(accessions);
+		rIndices.removeAll(indices);
 		return rIndices;
 	}
 
-	public final List<IndexType> getCommonIndices(List<IndexType> accessions)
+	public final List<IndexType> getCommonIndices(List<IndexType> indices)
 	{
 		List<IndexType> cIndices = new ArrayList<IndexType>(this.indices);
-		ListIterator<IndexType> itr = cIndices.listIterator();
+		ListIterator<IndexType> iterator = cIndices.listIterator();
 
-		while (itr.hasNext())
+		while (iterator.hasNext())
 		{
-			IndexType a = itr.next();
-			if (!accessions.contains(a))
+			IndexType a = iterator.next();
+			if (!indices.contains(a))
 			{
-				itr.remove();
+				iterator.remove();
 			}
 		}
 

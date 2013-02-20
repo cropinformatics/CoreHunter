@@ -14,6 +14,7 @@
 package org.corehunter.search;
 
 import org.corehunter.CoreHunterException;
+import org.corehunter.search.solution.Solution;
 
 public class SearchRunnable<SolutionType extends Solution, SearchType extends Search<SolutionType>> implements Runnable
 {

@@ -32,6 +32,12 @@ public class EntityImpl implements Entity
 		 setUniqueIdentifier(uniqueIdentifier) ;
 		 setName(name) ;
   }
+	
+	public EntityImpl(Entity entity)
+  {
+		 setUniqueIdentifier(entity.getUniqueIdentifier()) ;
+		 setName(entity.getName()) ;
+  }
 
 	@Override
 	public final String getUniqueIdentifier()

@@ -14,6 +14,7 @@
 package org.corehunter.search;
 
 import org.corehunter.CoreHunterException;
+import org.corehunter.search.solution.SubsetSolution;
 
 public interface SubsetSearch<
 	IndexType,
