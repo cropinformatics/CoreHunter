@@ -155,7 +155,7 @@ public class UnorderedIntegerListSubsetSolution implements
   {
 		subsetIndices.clear() ;
 		remainingIndices.clear() ;
-		subsetIndices.addAll(subsetIndices) ;
+		subsetIndices.addAll(indices) ;
   }
 
 	@Override

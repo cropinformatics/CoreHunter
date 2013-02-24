@@ -25,9 +25,7 @@ import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.Search;
-import org.corehunter.search.SearchListenerAdapter;
 import org.corehunter.search.SearchStatus;
-import org.corehunter.search.solution.Solution;
 import org.corehunter.search.solution.SubsetSolution;
 
 public class REMCSearch<

@@ -16,9 +16,6 @@ package org.corehunter.search.impl;
 
 import static org.corehunter.Constants.INVALID_TIME;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.Move;

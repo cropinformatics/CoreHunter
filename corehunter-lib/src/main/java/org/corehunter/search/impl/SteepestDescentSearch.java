@@ -13,9 +13,6 @@
 
 package org.corehunter.search.impl;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.Move;

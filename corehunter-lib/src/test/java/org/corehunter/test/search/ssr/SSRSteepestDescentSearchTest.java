@@ -11,16 +11,15 @@ import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileRea
 import org.corehunter.neighbourhood.impl.RandomSingleNeighbourhood;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.IntegerSubsetGenerator;
-import org.corehunter.search.impl.LocalSearch;
 import org.corehunter.search.impl.SteepestDescentSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.UnorderedIntegerListSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.test.search.SearchTest;
+import org.corehunter.test.search.SubsetSearchTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SSRSteepestDescentSearchTest extends SearchTest<SubsetSolution<Integer>, ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>>
+public class SSRSteepestDescentSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>, ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>>
 {
 	private static final String SSR_DATA_NAME = "bul.csv";
 	private static AccessionSSRMarkerMatrix<Integer> data;
@@ -39,7 +38,7 @@ public class SSRSteepestDescentSearchTest extends SearchTest<SubsetSolution<Inte
 	}
 	
 	@Test
-	public void test()
+	public void testDefaults()
 	{	
 		SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>>> 
 			search = new SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>>>() ;

@@ -32,14 +32,32 @@ public class AdditionMove<
 		this.addedIndex = addedIndex;
 	}
 
+	@Override
 	public final IndexType getAddedIndex()
   {
   	return addedIndex;
   }
 
+	@Override
 	public void undo(SolutionType solution)
 	{
 		solution.removeIndex(getAddedIndex()) ;
 		// TODO this should update the tabu list internally!
 	}
+
+	@SuppressWarnings("rawtypes")
+  @Override
+  public boolean equals(Object object)
+  {
+		if (object instanceof AddedIndexMove)
+			return getAddedIndex().equals(((AddedIndexMove) object).getAddedIndex()) ;
+		else
+			return super.equals(object);
+  }
+
+	@Override
+  public String toString()
+  {
+	  return "Add index=" + addedIndex ;
+  }
 }

@@ -15,8 +15,8 @@
 package org.corehunter.search.impl;
 
 import static org.corehunter.Constants.INVALID_NUMBER_OF_STEPS;
-import static org.corehunter.Constants.INVALID_TIME;
 import static org.corehunter.Constants.INVALID_TEMPERATURE;
+import static org.corehunter.Constants.INVALID_TIME;
 
 import java.text.DecimalFormat;
 
@@ -172,7 +172,8 @@ public class MetropolisSearch<
 		int i = 0;
 		double newEvalution ;
 		boolean acceptMove = true ;
-		double size ;
+		boolean improvementMove = true ;
+		int size ;
 		Move<SolutionType> move ;
 
 		size = getSolution().getSubsetSize() ;
@@ -186,17 +187,17 @@ public class MetropolisSearch<
 			
 			double deltaScore = getDeltaScore(newEvalution, getEvaluation()) ;
 
-			if (deltaScore > 0)
+			if (deltaScore > 0 || (deltaScore == 0 && getSolution().getSubsetSize() < size)) // TODO should we always reject smaller solutions for equal evaluations!
 			{
 				// accept new solution!
-				improvements++;
+				improvementMove = true ;
 				acceptMove = true ;
 			}
 			else
 			{
-				double deltaSize = getSolution().getSubsetSize() - size;
+				int deltaSize = getSolution().getSubsetSize() - size;
 
-				if (deltaSize > 0) // TODO should we always reject large solutions or worst evaluations!
+				if (deltaSize > 0) // TODO should we always reject larger solutions for worst evaluations!
 				{
 					// new solution is bigger than old solution and has no better
 					// evaluation --> reject new solution, stick with old solution
@@ -205,7 +206,7 @@ public class MetropolisSearch<
 				}
 				else
 				{
-					// new solution is not bigger, but has worse evaluation
+					// new solution is smaller, but has worse or equal evaluation
 					// accept or reject new solution based on temperature
 					double P = Math.exp(deltaScore / (temperature * K_b));
 					double Q = getRandom().nextDouble();
@@ -224,7 +225,12 @@ public class MetropolisSearch<
 			
 			if (acceptMove)
 			{
-				handleNewBestSolution(getSolution(), getEvaluation()) ;
+				if (improvementMove)
+				{
+					handleNewBestSolution(getSolution(), getEvaluation()) ;
+					improvements++;
+				}
+				
 				setStuck(false) ;
 				setEvaluation(newEvalution) ;
 				size = getSolution().getSubsetSize() ;

@@ -63,13 +63,13 @@ public abstract class EntityMatrixListImpl<
 	@Override
   public List<Integer> getIndices()
   {
-	  return this.getColumnHeaders().getIndices();
+	  return this.getRowHeaders().getIndices();
   }
 	
 	@Override
   public int getSize()
   {
-	  return getColumnHeaders().getSize();
+	  return getRowHeaders().getSize();
   }
 
 	@Override

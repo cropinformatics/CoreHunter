@@ -8,19 +8,17 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.model.impl.AbstractFileUtility;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileReader;
-import org.corehunter.neighbourhood.impl.RandomSingleNeighbourhood;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.LRSearch;
-import org.corehunter.search.impl.LocalSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.UnorderedIntegerListSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.test.search.SearchTest;
+import org.corehunter.test.search.SubsetSearchTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SSRLRSearchTest extends SearchTest<SubsetSolution<Integer>, ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>>
+public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>, ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>>
 {
 	private static final String SSR_DATA_NAME = "bul.csv";
 	private static AccessionSSRMarkerMatrix<Integer> data;
@@ -39,7 +37,7 @@ public class SSRLRSearchTest extends SearchTest<SubsetSolution<Integer>, Exhaust
 	}
 	
 	@Test
-	public void test()
+	public void lr21SearchTestWithRandomSeed()
 	{	
 		LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> 
 			search = new LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>() ;
@@ -63,9 +61,36 @@ public class SSRLRSearchTest extends SearchTest<SubsetSolution<Integer>, Exhaust
 	    e.printStackTrace();
 	    fail(e.getLocalizedMessage()) ;
     }
+	}
+
+	@Test
+	public void lr21SearchTestWithExhaustiveSeed()
+	{	
+		LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> 
+			search = new LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>() ;
+	
+		try
+    {
+    	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
+    	integerSubsetGenerator.setSubsetSize(2) ;
+			 
+	    search.setSolution(new UnorderedIntegerListSubsetSolution(data.getIndices(), integerSubsetGenerator.first())) ;
+	
+	    search.setData(data) ;
+	    search.setObjectiveFunction(new ModifiedRogersDistanceSSR()) ;
+	    search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE) ;
+	    search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE) ;
+	    search.setL(2) ;
+	    search.setR(1) ;
+	    search.setExhaustiveSearch(SubsetSearchTest.getExhaustiveSubsetSearch(2, data)) ;
+	   
+    }
+    catch (CoreHunterException e)
+    {
+	    e.printStackTrace();
+	    fail(e.getLocalizedMessage()) ;
+    }
 		
 		testSearch(search) ;
 	}
-
-	
 }

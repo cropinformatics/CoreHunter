@@ -18,7 +18,6 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.model.Data;
 import org.corehunter.model.impl.EntityWithDescriptionImpl;
 import org.corehunter.search.solution.Solution;
-import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * <<Class summary>>

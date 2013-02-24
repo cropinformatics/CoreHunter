@@ -14,9 +14,7 @@
 
 package org.corehunter.objectivefunction.impl;
 
-import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
-import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.solution.SubsetSolution;
 
 /**

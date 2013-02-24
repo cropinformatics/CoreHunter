@@ -21,5 +21,5 @@ public interface RemovedIndexMove<
 	SolutionType extends SubsetSolution<IndexType>> extends
     IndexedMove<IndexType, SolutionType>
 {
-	IndexType getRemovedIndex() ;
+	public IndexType getRemovedIndex() ;
 }

@@ -20,5 +20,5 @@ public interface AddedIndexMove<
 	SolutionType extends SubsetSolution<IndexType>> extends
     IndexedMove<IndexType, SolutionType>
 {
-	IndexType getAddedIndex() ;
+	public IndexType getAddedIndex() ;
 }

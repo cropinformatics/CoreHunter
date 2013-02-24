@@ -33,7 +33,6 @@ import org.corehunter.search.SearchCallable;
 import org.corehunter.search.SearchListener;
 import org.corehunter.search.SearchListenerAdapter;
 import org.corehunter.search.SearchRunnable;
-import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;
 import org.corehunter.search.solution.SubsetSolution;
 

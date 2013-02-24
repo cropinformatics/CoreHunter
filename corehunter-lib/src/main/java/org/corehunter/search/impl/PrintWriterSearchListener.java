@@ -72,7 +72,7 @@ public class PrintWriterSearchListener<SolutionType extends Solution> implements
   public void newBestSolution(Search<SolutionType> search,
       SolutionType bestSolution, double bestSolutionEvaluation)
   {
-		printStream.println("New best solution for: " + search.getName() + " evaluation: " + bestSolutionEvaluation + " solution: " + bestSolution) ;
+		printStream.println("New best solution for: " + search.getName() + " evaluation: "  + bestSolutionEvaluation + " size: " + bestSolutionEvaluation + " solution: " + bestSolution) ;
   }
 
 	@Override
@@ -86,7 +86,12 @@ public class PrintWriterSearchListener<SolutionType extends Solution> implements
   {
 		printStream.println("Message from search : " + search.getName() + " meassage:" + message)  ;
   }
-	
+
+	public final PrintStream getPrintStream()
+	{
+		return printStream;
+	}
+
 	protected String formatProgress(double progress)
   {
 	  // TODO use formatted

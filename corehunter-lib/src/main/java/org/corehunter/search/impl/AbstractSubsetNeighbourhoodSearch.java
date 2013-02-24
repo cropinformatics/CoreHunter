@@ -80,15 +80,28 @@ public abstract class AbstractSubsetNeighbourhoodSearch<
 		int size = getSolution().getSubsetSize() ;
 		
 		// ensure initial solution is within maximum and minimum
-	  if (size < getNeighbourhood().getSubsetMinimumSize())
-	  	getSolution().addAllIndices() ;
-	  
-	  if (size > getNeighbourhood().getSubsetMaximumSize())
-	  {
-			for (int i = getNeighbourhood().getSubsetMaximumSize(); i < size; i++)
+		if (size - getNeighbourhood().getSubsetMaximumSize() < getNeighbourhood().getSubsetMinimumSize())
+		{
+			// randomly increase subset until it reaches minimum
+			for (int i = 0; i < getNeighbourhood().getSubsetMinimumSize(); i++)
 			{
-				getSolution().removeRandomIndex(getRandom()) ;
+				getSolution().addRandomIndex(getRandom()) ;
 			}
-	  }
+		}
+		else
+		{
+			// Add all then randomly decrease subset until it reaches maximum
+			
+		  if (size < getNeighbourhood().getSubsetMinimumSize())
+		  	getSolution().addAllIndices() ;
+		  
+		  if (size > getNeighbourhood().getSubsetMaximumSize())
+		  {
+				for (int i = size ; i > getNeighbourhood().getSubsetMaximumSize(); i--)
+				{
+					getSolution().removeRandomIndex(getRandom()) ;
+				}
+		  }
+		}
   }
 }

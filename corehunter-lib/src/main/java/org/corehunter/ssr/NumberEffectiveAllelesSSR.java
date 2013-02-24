@@ -14,11 +14,8 @@
 
 package org.corehunter.ssr;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.UnknownIndexException;

@@ -14,8 +14,6 @@
 
 package org.corehunter.search.impl;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 import java.util.LinkedList;
 
 import org.corehunter.CoreHunterException;

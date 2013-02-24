@@ -39,17 +39,36 @@ public class SwapMove<
   {
   	return addedIndex;
   }
-
+	
+	@Override
 	public final IndexType getRemovedIndex()
   {
   	return removedIndex;
   }
-
+	
+	@Override
 	public void undo(SolutionType solution)
 	{
 		// To undo a swap: swap again!
 		solution.swapIndices(removedIndex, addedIndex) ;
 		// TODO this should update the tabu list internally!
 	}
+	
+	@SuppressWarnings("rawtypes")
+  @Override
+  public boolean equals(Object object)
+  {
+		if (object instanceof AddedIndexMove && object instanceof RemovedIndexMove)
+			return getAddedIndex().equals(((AddedIndexMove) object).getAddedIndex()) &&
+					getRemovedIndex().equals(((RemovedIndexMove) object).getRemovedIndex()) ;
+		else
+			return super.equals(object);
+  }
+
+	@Override
+  public String toString()
+  {
+	  return "Swap index=" + removedIndex + " with index=" + addedIndex ;
+  }
 
 }

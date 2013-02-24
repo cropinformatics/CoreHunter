@@ -14,11 +14,11 @@ import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.UnorderedIntegerListSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.test.search.SearchTest;
+import org.corehunter.test.search.SubsetSearchTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SSRExhaustiveSearchTest extends SearchTest<SubsetSolution<Integer>, ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>>
+public class SSRExhaustiveSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>, ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>>
 {
 	private static final String SSR_DATA_NAME = "bul.csv";
 	private static AccessionSSRMarkerMatrix<Integer> data;
@@ -37,7 +37,7 @@ public class SSRExhaustiveSearchTest extends SearchTest<SubsetSolution<Integer>,
 	}
 	
 	@Test
-	public void test()
+	public void exhaustiveSerchTest()
 	{	
 		SubsetSolution<Integer> soluiton1 = test(2, 5) ;
 		SubsetSolution<Integer> soluiton2 = test(2, 5) ;
