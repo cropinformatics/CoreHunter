@@ -237,19 +237,37 @@ public class UnorderedIntegerListSubsetSolution implements
 	{
 		return "indices =" + subsetIndices ;
 	}
-	
-	@SuppressWarnings("rawtypes")
-  @Override
-	public boolean equals(Object object)
+
+	@Override
+	public int hashCode()
 	{
-		if (object instanceof SubsetSolution)
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+		    + ((subsetIndices == null) ? 0 : subsetIndices.hashCode());
+		return result;
+	}
+
+	@Override
+	// Only checks subset indices!
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UnorderedIntegerListSubsetSolution other = (UnorderedIntegerListSubsetSolution) obj;
+		if (subsetIndices == null)
 		{
-			// TODO does order matter?
-			return this.getSubsetIndices().equals(((SubsetSolution) object).getSubsetIndices()) ;
+			if (other.subsetIndices != null)
+				return false;
 		}
 		else
-		{
-			return super.equals(object) ;
-		}
+			if (!subsetIndices.equals(other.subsetIndices))
+				return false;
+		return true;
 	}
+
 }

@@ -114,6 +114,8 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 	protected final void checkForBestSolution(Search<SolutionType> search,
       SolutionType bestSolution, double bestSolutionEvaluation)
   {
+		// TODO perhaps should getBestSolutionEvaluation() and getBestSolutionEvaluation() need to be syncrhonise to 
+		// avoid them being changed by other replicas, the problem is that this results in the thread hanging!
 	  if (isBetterSolution(bestSolutionEvaluation, getBestSolutionEvaluation()) || 
 	  		(bestSolutionEvaluation == getBestSolutionEvaluation() && bestSolution.getSubsetSize() < getBestSolution().getSubsetSize())) // TODO should size matter?
 	  {

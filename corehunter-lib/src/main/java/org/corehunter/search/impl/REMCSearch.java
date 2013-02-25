@@ -283,8 +283,6 @@ public class REMCSearch<
 		{
 			startSubSearches(replicas) ; // returns when all are complete
 			
-			findBestSubSearch(replicas) ;
-			
 			if (minimumProgression > 0)
 			{
 				// All tasks are done, check minimum progression
@@ -356,7 +354,7 @@ public class REMCSearch<
 	}
 	
 	// this is temp method to double check the best solution
-	private void findBestSubSearch(
+	private void findBestSubSearch2(
       List<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> replicas)
   {
 		Iterator<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> iterator = replicas.iterator() ;
