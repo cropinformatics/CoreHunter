@@ -1,7 +1,11 @@
 */target
 */bin
-*/data/output/
+/data/output/
 .DS_Store
 */.settings
 */.classpath
 */.project
+*.aux
+*.log
+*.out
+*.synctex.gz
