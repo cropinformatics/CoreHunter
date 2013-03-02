@@ -26,6 +26,7 @@ import org.corehunter.model.EntityIndexedDataset;
 import org.corehunter.model.UnknownIndexException;
 import org.corehunter.model.accession.Accession;
 import org.corehunter.model.accession.impl.AccessionImpl;
+import org.corehunter.model.impl.AbstractFileUtility;
 import org.corehunter.model.impl.OrderedEntityDatasetListImpl;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.SSRMarker;
@@ -147,7 +148,7 @@ public class AccessionSSRMarkerMatrixDatasetListImplDataFileReaderTest extends D
 		{
 			case 0 :
 			default :
-				return new AccessionSSRMarkerMatrixListImplDataFileReader(new File(getClass().getResource("/" + SSR_DATA_NAME).getFile())) ;
+				return new AccessionSSRMarkerMatrixListImplDataFileReader(new File(getClass().getResource("/" + SSR_DATA_NAME).getFile()), AbstractFileUtility.COMMA_DELIMITER) ;
 		}
   }
 
