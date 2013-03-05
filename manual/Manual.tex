@@ -4,6 +4,7 @@
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{color}
+\usepackage[font=small,format=plain,labelfont=bf,up,textfont=it,up]{caption}
 
 \newcommand{\todo}[1]{
 	\textcolor{red}{[TO DO: #1]}
@@ -130,7 +131,13 @@ corehunter [options] [measures] <collection_file> <coresubset_file>
 \end{verbatim}
 \normalsize
 
-Three different stop criteria can be applied: a maximum runtime (60 seconds by default), a required minimum progression in the score of the current core (by default not used) or a maximum time without improvement (stuck time, by default also not used). For more information about these stop criteria look in the \emph{common advanced search options} section of the output of the help command.
+Three different stop criteria can be applied:
+\begin{itemize}
+	\item A maximum runtime (60 seconds by default). \textbf{Note:} It is strongly advised to increase this runtime limit for datasets larger than the example \texttt{bul.csv} dataset.
+	\item A required minimum progression in the score of the current core (by default not used)
+	\item A maximum time without improvement (stuck time, by default also not used)
+\end{itemize}
+For more information about these stop criteria look in the \emph{common advanced search options} section of the output of the help command.
 
 The Core Analyser tool can be applied using a similar command, e.g.:
 \small
@@ -155,7 +162,7 @@ Then load the script with
 \begin{verbatim}
     source("corehunter.R")
 \end{verbatim}
-and use the commands \texttt{corehunter.run} and \texttt{coreanalyser.run} to run the Core Hunter and Core Analyser tools, respectively. Both commands expect a single argument which is an option string similar to those used in the command-line interface. For example you can print the Core Hunter help information using
+and use the commands \texttt{corehunter.run} and \texttt{coreanalyser.run} to run the Core Hunter and Core Analyser tools, respectively. Both commands have a required \texttt{options} argument which is an option string similar to those used in the command-line interface. For example you can print the Core Hunter help information using
 \begin{verbatim}
     corehunter.run("-help")
 \end{verbatim}
@@ -167,6 +174,27 @@ which samples a core with the same parameters as the first example discussed in 
 \begin{verbatim}
     coreanalyser.run("data/examples/bul.csv")
 \end{verbatim}
+By default the R script assigns 512 megabytes of RAM memory to the Java virtual machine. However, when sampling from larger datasets this may not be sufficient and may result in a Java heap space error, indicating that the Java virtual machine ran out of memory. Therefore, if desired, the assigned amount of memory can be changed using the optional \texttt{mem} parameter which is available for both \texttt{corehunter.run} and \texttt{coreanalyser.run}. For example, the following command assigns 1 gigabyte of RAM to Core Hunter:
+\begin{verbatim}
+    corehunter.run("-MR 0.7 -SH 0.3 data/examples/bul.csv core.csv", mem="1g")
+\end{verbatim}
+The \texttt{mem} parameter should be a string consisting of an integer (e.g.\ 512, 1, 2, \ldots) followed by a unit indicator (e.g.\ m for megabytes, or g for gigabytes), similar to the specifications of the Java \texttt{-Xmx} and \texttt{-Xms} options used for memory management. See table~\ref{tab:mem} for some examples.
+
+\begin{table}
+	\centering
+	\begin{tabular}{c|c}
+		\texttt{mem} & assigned RAM memory\\[1ex]
+		\hline
+		\\[-1ex]
+		``256m" & 256 megabytes\\
+		``512m" & 512 megabytes\\
+		``1g" & 1 gigabyte\\
+		``2g" & 2 gigabytes
+	\end{tabular}
+	\caption{Some examples for the optional \texttt{mem} parameter of \texttt{corehunter.run} and \texttt{coreanalyser.run}. The default value is ``512m''.}
+	\label{tab:mem}
+\end{table}
+
 A more flexible R interface will be released in the future, please check the website for updates.
 
 \section{Dataset file format}

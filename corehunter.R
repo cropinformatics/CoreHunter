@@ -3,7 +3,7 @@
 ###########################
 
 # function to run Core Hunter
-corehunter.run <- function(options){
+corehunter.run <- function(options, mem="512m"){
     # set path to core hunter CLI
     cli = "corehunter.jar"
     if(!file.exists(cli)){
@@ -19,11 +19,12 @@ corehunter.run <- function(options){
         stop("Core Hunter CLI jar file not found.")
     }
     # run CLI
-    system(paste("java -Xmx2g -jar", cli, options))
+    mempar = paste("-Xmx", mem, sep="");
+    system(paste("java", mempar, "-jar", cli, options))
 }
 
 # function to run Core Analyser
-coreanalyser.run <- function(options){
+coreanalyser.run <- function(options, mem="512m"){
     # set path to core analyser CLI
     cli = "coreanalyser.jar"
     if(!file.exists(cli)){
@@ -39,5 +40,6 @@ coreanalyser.run <- function(options){
         stop("Core Analyser CLI jar file not found.")
     }
     # run CLI
-    system(paste("java -Xmx2g -jar", cli, options))
+    mempar = paste("-Xmx", mem, sep="");
+    system(paste("java", mempar, "-jar", cli, options))
 }
