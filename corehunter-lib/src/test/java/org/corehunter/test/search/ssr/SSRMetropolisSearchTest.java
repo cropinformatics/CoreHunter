@@ -15,7 +15,7 @@ import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.MetropolisSearch;
 import org.corehunter.search.impl.REMCSearch;
 import org.corehunter.search.solution.SubsetSolution;
-import org.corehunter.search.solution.impl.UnorderedIntegerListSubsetSolution;
+import org.corehunter.search.solution.impl.OrderedIntegerListSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.search.SubsetSearchTest;
 import org.corehunter.test.search.impl.CachedSolutionPrintWriterSubsetSearchListener;
@@ -35,7 +35,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
     	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
     	integerSubsetGenerator.setSubsetSize(2) ;
 			 
-	    search.setSolution(new UnorderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
+	    search.setSolution(new OrderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
 	
 	    search.setData(dataFull) ;
 	    search.setObjectiveFunction(new ModifiedRogersDistanceSSR()) ;
@@ -67,7 +67,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
     	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
     	integerSubsetGenerator.setSubsetSize(2) ;
 			 
-	    search.setSolution(new UnorderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
+	    search.setSolution(new OrderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
 	
 	    search.setData(dataFull) ;
 	    search.setObjectiveFunction(new ModifiedRogersDistanceSSR()) ;

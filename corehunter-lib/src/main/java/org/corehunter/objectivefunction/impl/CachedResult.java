@@ -15,6 +15,7 @@
 package org.corehunter.objectivefunction.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -33,32 +34,32 @@ public class CachedResult<IndexType>
 		indices = new ArrayList<IndexType>();
 	}
 
-	public final void setIndices(List<IndexType> indices)
+	public final void setIndices(Collection<IndexType> indices)
 	{
 		this.indices.clear();
 		this.indices.addAll(indices);
 	}
 
-	public final List<IndexType> getIndices()
+	public final Collection<IndexType> getIndices()
 	{
 		return indices;
 	}
 
-	public final List<IndexType> getAddedIndices(List<IndexType> indices)
+	public final List<IndexType> getAddedIndices(Collection<IndexType> indices)
 	{
 		List<IndexType> aIndices = new ArrayList<IndexType>(indices);
 		aIndices.removeAll(this.indices);
 		return aIndices;
 	}
 
-	public final List<IndexType> getRemovedIndices(List<IndexType> indices)
+	public final List<IndexType> getRemovedIndices(Collection<IndexType> indices)
 	{
 		List<IndexType> rIndices = new ArrayList<IndexType>(this.indices);
 		rIndices.removeAll(indices);
 		return rIndices;
 	}
 
-	public final List<IndexType> getCommonIndices(List<IndexType> indices)
+	public final List<IndexType> getCommonIndices(Collection<IndexType> indices)
 	{
 		List<IndexType> cIndices = new ArrayList<IndexType>(this.indices);
 		ListIterator<IndexType> iterator = cIndices.listIterator();

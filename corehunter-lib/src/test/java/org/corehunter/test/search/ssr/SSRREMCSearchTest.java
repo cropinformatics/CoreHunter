@@ -15,8 +15,9 @@ import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.PrintWriterSubsetSearchListener;
 import org.corehunter.search.impl.REMCSearch;
 import org.corehunter.search.solution.SubsetSolution;
-import org.corehunter.search.solution.impl.UnorderedIntegerListSubsetSolution;
+import org.corehunter.search.solution.impl.OrderedIntegerListSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
+import org.corehunter.test.UncachedModifiedRogersDistanceSSR;
 import org.corehunter.test.search.SubsetSearchTest;
 import org.corehunter.test.search.impl.CachedSolutionPrintWriterSubsetSearchListener;
 import org.junit.BeforeClass;
@@ -35,7 +36,7 @@ public class SSRREMCSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
     	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
     	integerSubsetGenerator.setSubsetSize(2) ;
 			 
-	    search.setSolution(new UnorderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
+	    search.setSolution(new OrderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
 	
 	    search.setData(dataFull) ;
 	    search.setObjectiveFunction(new ModifiedRogersDistanceSSR()) ;
@@ -72,10 +73,46 @@ public class SSRREMCSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
     	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
     	integerSubsetGenerator.setSubsetSize(2) ;
 			 
-	    search.setSolution(new UnorderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
+	    search.setSolution(new OrderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
 	
 	    search.setData(dataFull) ;
 	    search.setObjectiveFunction(new ModifiedRogersDistanceSSR()) ;
+	    RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>>() ;
+	    neighbourhood.setSubsetMinimumSize(2) ;
+	    neighbourhood.setSubsetMaximumSize(5) ;
+	    search.setNeighbourhood(neighbourhood) ;
+	    search.setRuntime(DEFAULT_RUNTIME) ;
+	    search.setStuckTime(DEFAULT_STUCKTIME) ;
+	    search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION) ;
+	    search.setMinimumTemperature(DEFAULT_MINIMUM_TEMPERATURE) ;
+	    search.setMaximumTemperature(DEFAULT_MAXIMUM_TEMPERATURE) ;
+	    search.setNumberOfSteps(10) ;
+	    search.setNumberOfReplicas(4) ;
+    }
+    catch (CoreHunterException e)
+    {
+	    e.printStackTrace();
+	    fail(e.getLocalizedMessage()) ;
+    }
+		
+		testSearch(search) ;
+	}
+	
+	@Test
+	public void testSmallSubsetNoCache()
+	{	
+		REMCSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>>> 
+			search = new REMCSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>>>() ;
+	
+		try
+    {
+    	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
+    	integerSubsetGenerator.setSubsetSize(2) ;
+			 
+	    search.setSolution(new OrderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
+	
+	    search.setData(dataFull) ;
+	    search.setObjectiveFunction(new UncachedModifiedRogersDistanceSSR()) ;
 	    RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>>() ;
 	    neighbourhood.setSubsetMinimumSize(2) ;
 	    neighbourhood.setSubsetMaximumSize(5) ;
@@ -102,4 +139,5 @@ public class SSRREMCSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
   {
 	  return new CachedSolutionPrintWriterSubsetSearchListener<Integer, SubsetSolution<Integer>>();
   }
+
 }

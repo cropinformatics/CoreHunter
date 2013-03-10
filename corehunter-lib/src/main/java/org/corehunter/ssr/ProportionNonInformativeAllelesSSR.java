@@ -125,7 +125,7 @@ public final class ProportionNonInformativeAllelesSSR<IndexType> extends Abstrac
 		public PNCachedResult(SubsetSolution<IndexType2> solution) throws UnknownIndexException
 		{
 			super();
-			IndexType2 index1 = solution.getIndices().get(0);
+			IndexType2 index1 = solution.getIndices().iterator().next();
 			@SuppressWarnings("unchecked")
       int alleleCnt = getData().getAlleleCount((IndexType) index1);
 

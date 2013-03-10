@@ -26,4 +26,9 @@ public class AccessionImpl extends EntityImpl implements Accession
 	{
 		super(name) ;
 	}	
+	
+	public AccessionImpl(String uniqueIdentifier, String name)
+	{
+		super(uniqueIdentifier, name) ;
+	}	
 }

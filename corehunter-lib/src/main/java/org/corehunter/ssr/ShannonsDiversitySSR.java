@@ -113,7 +113,7 @@ public final class ShannonsDiversitySSR<IndexType> extends AbstractAccessionSSRO
 		public SHCachedResult(SubsetSolution<IndexType2> solution) throws UnknownIndexException
 		{
 			super();
-			IndexType2 index1 = solution.getIndices().get(0);
+			IndexType2 index1 = solution.getIndices().iterator().next();
 			@SuppressWarnings("unchecked")
       int alleleCount = getData().getAlleleCount((IndexType) index1);
 

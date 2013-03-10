@@ -111,7 +111,7 @@ public final class NumberEffectiveAllelesSSR<IndexType> extends AbstractAccessio
 		{
 			super();
 
-			IndexType2 index1 = solution.getIndices().get(0);
+			IndexType2 index1 = solution.getIndices().iterator().next();
 			@SuppressWarnings("unchecked")
       int markerCnt = getData().getMarkerCount((IndexType)index1);
 			double markerAlleleTotals[][] = new double[markerCnt][];

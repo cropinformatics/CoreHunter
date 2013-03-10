@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.corehunter.search.solution;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -23,7 +24,7 @@ public interface SubsetSolution<IndexType> extends Solution
 	 * 
 	 * @return the list of indices in the full set
 	 */
-	public List<IndexType> getIndices() ;
+	public Collection<IndexType> getIndices() ;
 	
 	/**
 	 * Get the size of the full set 
@@ -41,7 +42,7 @@ public interface SubsetSolution<IndexType> extends Solution
 	 *  
 	 * @return a list cached of all the indices in the subset
 	 */
-	public List<IndexType> getSubsetIndices() ;
+	public Collection<IndexType> getSubsetIndices() ;
 	
 	/**
 	 * Sets the indices in the subset, replacing any existing indices. 
@@ -67,7 +68,7 @@ public interface SubsetSolution<IndexType> extends Solution
 	 *  
 	 * @return a list cached of all the indices NOT in the subset
 	 */
-	public List<IndexType> getRemainingIndices() ;
+	public Collection<IndexType> getRemainingIndices() ;
 
 	/**
 	 * Gets the current number of the indices not in the subset
@@ -149,7 +150,9 @@ public interface SubsetSolution<IndexType> extends Solution
 	 * 
 	 * @param index index with the subset
 	 * @return a position of given index with the subset
+	 * @Deprecated Try to remove
 	 */
+	@Deprecated
 	public int getPositionInSubset(IndexType position) ;
 	
 	/**
@@ -157,7 +160,9 @@ public interface SubsetSolution<IndexType> extends Solution
 	 * 
 	 * @param position a position with the subset
 	 * @return index at a given position with the subset
+	 * @Deprecated Try to remove
 	 */
+	@Deprecated
 	public IndexType getIndexInSubsetAt(int position) ;
 	
 	/**

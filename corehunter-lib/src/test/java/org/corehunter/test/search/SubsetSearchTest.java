@@ -21,7 +21,7 @@ import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.PrintWriterSubsetSearchListener;
 import org.corehunter.search.solution.SubsetSolution;
-import org.corehunter.search.solution.impl.UnorderedIntegerListSubsetSolution;
+import org.corehunter.search.solution.impl.OrderedIntegerListSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.search.ssr.SSRLRSearchTest;
 import org.corehunter.test.search.ssr.SSRLocalSearchTest;
@@ -134,7 +134,7 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
     	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
     	integerSubsetGenerator.setSubsetSize(2) ;
 			 
-	    search.setSolution(new UnorderedIntegerListSubsetSolution(data.getIndices(), integerSubsetGenerator.first())) ;
+	    search.setSolution(new OrderedIntegerListSubsetSolution(data.getIndices(), integerSubsetGenerator.first())) ;
 	    search.setData(data) ;
 	    search.setObjectiveFunction(new ModifiedRogersDistanceSSR()) ;
 	    search.setSubsetMinimumSize(size) ;
@@ -161,7 +161,7 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
     	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
     	integerSubsetGenerator.setSubsetSize(2) ;
 			 
-	    search.setSolution(new UnorderedIntegerListSubsetSolution(data.getIndices(), integerSubsetGenerator.first())) ;
+	    search.setSolution(new OrderedIntegerListSubsetSolution(data.getIndices(), integerSubsetGenerator.first())) ;
 	    search.setData(data) ;
 	    search.setObjectiveFunction(new ModifiedRogersDistanceSSR()) ;
 	    search.setSubsetMinimumSize(minimumSize) ;

@@ -25,19 +25,19 @@ import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * Subset solution in which order of the indices in the subset are
- * maintained in their natural order
+ * maintained in the order they were added
  * 
  * @author daveneti
  *
  */
-public class UnorderedIntegerListSubsetSolution implements
+public class OrderedIntegerListSubsetSolution implements
     SubsetSolution<Integer>
 {
 	private ArrayList<Integer> indices;
 	private ListOrderedSet subsetIndices;
 	private ListOrderedSet remainingIndices;
 	
-	public UnorderedIntegerListSubsetSolution(Collection<Integer> indices, Collection<Integer> subsetIndices)
+	public OrderedIntegerListSubsetSolution(Collection<Integer> indices, Collection<Integer> subsetIndices)
   {
 		this.indices = new ArrayList<Integer>(indices.size()) ;
 		this.subsetIndices = new ListOrderedSet() ;
@@ -50,7 +50,7 @@ public class UnorderedIntegerListSubsetSolution implements
 		this.remainingIndices.removeAll(subsetIndices) ;
   }
 
-	private UnorderedIntegerListSubsetSolution(
+	private OrderedIntegerListSubsetSolution(
 			SubsetSolution<Integer> subsetSolution)
   {
 		this.indices = new ArrayList<Integer>(subsetSolution.getSize()) ;
@@ -65,7 +65,7 @@ public class UnorderedIntegerListSubsetSolution implements
 	@Override
   public final synchronized Solution copy()
   {
-	  return new UnorderedIntegerListSubsetSolution(this) ;
+	  return new OrderedIntegerListSubsetSolution(this) ;
   }
 
 	@Override
@@ -85,7 +85,7 @@ public class UnorderedIntegerListSubsetSolution implements
   }
 
   @Override
-  public final List<Integer> getIndices()
+  public final Collection<Integer> getIndices()
   {
 	  return indices;
   }
@@ -98,9 +98,9 @@ public class UnorderedIntegerListSubsetSolution implements
 
 	@SuppressWarnings("unchecked")
   @Override
-  public final List<Integer> getSubsetIndices()
+  public final Collection<Integer> getSubsetIndices()
   {
-	  return subsetIndices.asList();
+	  return subsetIndices ;
   }
 
 	@Override
@@ -121,9 +121,9 @@ public class UnorderedIntegerListSubsetSolution implements
 
 	@SuppressWarnings("unchecked")
   @Override
-  public final List<Integer> getRemainingIndices()
+  public final Collection<Integer> getRemainingIndices()
   {
-	  return remainingIndices.asList();
+	  return remainingIndices ;
   }
 
 	@Override
@@ -258,7 +258,7 @@ public class UnorderedIntegerListSubsetSolution implements
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		UnorderedIntegerListSubsetSolution other = (UnorderedIntegerListSubsetSolution) obj;
+		OrderedIntegerListSubsetSolution other = (OrderedIntegerListSubsetSolution) obj;
 		if (subsetIndices == null)
 		{
 			if (other.subsetIndices != null)
