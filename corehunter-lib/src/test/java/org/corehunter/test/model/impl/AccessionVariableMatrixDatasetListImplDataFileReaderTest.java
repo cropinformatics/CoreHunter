@@ -30,17 +30,16 @@ import org.corehunter.model.accession.impl.AccessionImpl;
 import org.corehunter.model.impl.AbstractFileUtility;
 import org.corehunter.model.impl.EntityMatrixListImpl;
 import org.corehunter.model.impl.OrderedEntityDatasetListImpl;
-import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
-import org.corehunter.model.ssr.SSRMarker;
-import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImpl;
-import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileReader;
-import org.corehunter.model.ssr.impl.SSRAlleleImpl;
-import org.corehunter.model.ssr.impl.SSRMarkerImpl;
-import org.corehunter.model.variable.AccessionVariableMatrixListImplDataFileReader;
 import org.corehunter.model.variable.Variable;
 import org.corehunter.model.variable.VariableDataType;
-import org.corehunter.model.variable.VariableImpl;
 import org.corehunter.model.variable.VariableType;
+import org.corehunter.model.variable.impl.AccessionVariableMatrixListImplDataFileReader;
+import org.corehunter.model.variable.impl.BinaryVariable;
+import org.corehunter.model.variable.impl.VariableImpl;
+import org.corehunter.model.variable.interval.IntegerIntervalVariable;
+import org.corehunter.model.variable.nominal.ShortNominalVariable;
+import org.corehunter.model.variable.ordinal.LongOrdinalVariable;
+import org.corehunter.model.variable.ratio.DoubleRatioVariable;
 
 public class AccessionVariableMatrixDatasetListImplDataFileReaderTest extends DataReaderTest<Matrix<Integer, Object, Accession, Variable>>
 {
@@ -98,11 +97,15 @@ public class AccessionVariableMatrixDatasetListImplDataFileReaderTest extends Da
 			default :
 				variables = new ArrayList<Variable>(5) ;
 				
-				variables.add(new VariableImpl("v1", VariableType.BINARY, VariableDataType.BOOLEAN)) ;
-				variables.add(new VariableImpl("v2", VariableType.NOMINAL, VariableDataType.SHORT)) ;
-				variables.add(new VariableImpl("v3", VariableType.INTERVAL, VariableDataType.INTEGER)) ;
-				variables.add(new VariableImpl("v4", VariableType.ORDINAL, VariableDataType.LONG)) ;
-				variables.add(new VariableImpl("v5", VariableType.RATIO, VariableDataType.DOUBLE)) ;
+				variables.add(new BinaryVariable("v1")) ;
+				List<Short> shortValues = new ArrayList<Short>(1);
+				shortValues.add((short)1) ;
+				variables.add(new ShortNominalVariable("v2", shortValues)) ;
+				variables.add(new IntegerIntervalVariable("v3",1,1)) ;
+				List<Long> longValues = new ArrayList<Long>(1);
+				longValues.add(1l) ;
+				variables.add(new LongOrdinalVariable("v4", 1l, 1l, longValues)) ;
+				variables.add(new DoubleRatioVariable("v5", 1.0, 1.0)) ;
 		}
 		
 	  return variables ;
