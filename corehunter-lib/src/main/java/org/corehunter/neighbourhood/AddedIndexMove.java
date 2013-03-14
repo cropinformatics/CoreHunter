@@ -15,10 +15,9 @@ package org.corehunter.neighbourhood;
 
 import org.corehunter.search.solution.SubsetSolution;
 
-public interface AddedIndexMove<
-	IndexType, 
-	SolutionType extends SubsetSolution<IndexType>> extends
-    IndexedMove<IndexType, SolutionType>
-{
-	public IndexType getAddedIndex() ;
+public interface AddedIndexMove<IndexType, SolutionType extends SubsetSolution<IndexType>>
+        extends IndexedMove<IndexType, SolutionType> {
+
+    public IndexType getAddedIndex();
+    
 }

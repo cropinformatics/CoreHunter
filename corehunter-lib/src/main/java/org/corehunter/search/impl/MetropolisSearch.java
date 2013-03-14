@@ -14,259 +14,174 @@
 
 package org.corehunter.search.impl;
 
-import static org.corehunter.Constants.INVALID_NUMBER_OF_STEPS;
-import static org.corehunter.Constants.INVALID_TEMPERATURE;
-import static org.corehunter.Constants.INVALID_TIME;
-
 import java.text.DecimalFormat;
-
+import static org.corehunter.Constants.INVALID_TEMPERATURE;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
-import org.corehunter.neighbourhood.Move;
+import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.SubsetSolution;
 
 /**
- * @author hermandebeukelaer
+ * 
  */
 public class MetropolisSearch<
 	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>,
-	NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>> 
-	extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
-{
-	private final static double	K_b	= 7.213475e-7;
+        SolutionType extends SubsetSolution<IndexType>,
+        DatasetType extends IndexedData<IndexType>,
+        NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> {
 
-	private double temperature = INVALID_TEMPERATURE ;
+    private final static double K_b = 7.213475e-7;
+    private double temperature = INVALID_TEMPERATURE;
+    private int accepts;
+    private int rejects;
+    private int improvements;
+    private int totalSteps;
 
-	private int numberOfSteps = INVALID_NUMBER_OF_STEPS ;
+    public MetropolisSearch() {
+        accepts = 0;
+        rejects = 0;
+        improvements = 0;
+        totalSteps = 0;
+    }
 
-	private long runtime = INVALID_TIME ;
+    protected MetropolisSearch(MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+        super(search);
+        accepts = 0;
+        rejects = 0;
+        improvements = 0;
+        totalSteps = 0;
+        setTemperature(search.getTemperature());
+    }
 
-	private int	accepts;
-	private int	rejects;
-	private int	improvements;
-	private int	totalSteps;
-	
-	private boolean continueSearch ;
+    @Override
+    public Search<SolutionType> copy() throws CoreHunterException {
+        return new MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+    }
 
-	public MetropolisSearch()
-	{
-		accepts = 0 ;
-		rejects = 0 ;
-		improvements = 0 ;
-		totalSteps = 0;
-	}
+    public final double getTemperature() {
+        return temperature;
+    }
 
-	protected MetropolisSearch(MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException
-  {
-  	super(search) ;
-  	
-		accepts = 0 ;
-		rejects = 0 ;
-		improvements = 0 ;
-		totalSteps = 0;
-  	
-		setTemperature(search.getTemperature()) ;
-		setNumberOfSteps(search.getNumberOfSteps()) ;
-		setRuntime(search.getRuntime()) ;
-  }
-	
-	@Override
-  public Search<SolutionType> copy() throws CoreHunterException
-  {
-	  return new MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
-  }
+    public final void setTemperature(double temperature) throws CoreHunterException {
+        if (this.temperature != temperature) {
+            this.temperature = temperature;
+            handleTemperatureSet();
+        }
+    }
+    
+    protected void handleTemperatureSet() throws CoreHunterException {
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Temperature can not be set while search in process");
+        }
+        if (temperature < 0) {
+            throw new CoreHunterException("Temperature can not be less than zero!");
+        }
+    }
 
-	public final double getTemperature()
-	{
-		return temperature;
-	}
+    @Override
+    protected void validate() throws CoreHunterException {
+        super.validate();
+        if (temperature < 0) {
+            throw new CoreHunterException("Temperature can not be less than zero!");
+        }
+    }
 
-	public final void setTemperature(double temperature) throws CoreHunterException
-	{
-		if (this.temperature != temperature)
-		{
-			this.temperature = temperature;
-			
-			handleTemperatureSet() ;
-		}
-	}
+    @Override
+    public String toString() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return " (T = " + df.format(temperature) + ")";
+    }
 
-	public final int getNumberOfSteps()
-  {
-  	return numberOfSteps;
-  }
+    @Override
+    protected void runSearch() throws CoreHunterException {
+        
+        double evaluation, newEvaluation;
+        boolean acceptMove;
+        int size, newSize;
+        IndexedMove<IndexType, SolutionType> move;
 
-	public final void setNumberOfSteps(int numberOfSteps) throws CoreHunterException
-  {
-		if (this.numberOfSteps != numberOfSteps)
-		{
-			this.numberOfSteps = numberOfSteps;
-			
-			handleNumberOfStepsSet() ;
-		}
-  }
+        setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
+        handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        
+        long curStep = 1;
+        while (canContinue(curStep)) {
+            
+            size = getCurrentSolution().getSubsetSize();
+            evaluation = getCurrentSolutionEvaluation();
+            
+            move = getNeighbourhood().performRandomMove(getCurrentSolution());
+            if(move != null){
+                newSize = getCurrentSolution().getSubsetSize();
+                newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
 
-	public final long getRuntime()
-  {
-  	return runtime;
-  }
+                double deltaScore = getDeltaScore(newEvaluation, evaluation);
 
-	public final void setRuntime(long runtime) throws CoreHunterException
-  {
-		if (this.runtime != runtime)
-		{
-			this.runtime = runtime;
-			
-			handleRuntimeSet() ;
-		}
-  }
-	
-	@Override
-  protected void validate() throws CoreHunterException
-  {
-	  super.validate();
-	  
-	  if (temperature < 0)
-	  	throw new CoreHunterException("Temperature can not be less than zero!") ;
-  }
+                // check for improvement w.r.t current solution
+                if (deltaScore > 0 || (deltaScore == 0 && newSize < size)) // TODO should we always accept smaller solutions for equal evaluations?
+                {
+                    // accept new solution!
+                    acceptMove = true;
+                } else {
 
-	@Override
-	public String toString()
-	{
-		DecimalFormat df = new DecimalFormat("#.##");
-		return " (T = " + df.format(temperature) + ")";
-	}
-	
-	protected void handleTemperatureSet() throws CoreHunterException
-  {
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Temperature can not be set while search in process") ;
-		
-	  if (temperature < 0)
-	  	throw new CoreHunterException("Temperature can not be less than zero!") ;
-  }
+                    // no improvement -- annealing criterion used to decide whether
+                    // to accept the new solution
 
-	protected void handleNumberOfStepsSet() throws CoreHunterException
-  {
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Number Of Steps can not be set while search in process") ;
-  }
+                    int deltaSize = newSize - size;
 
-	protected void handleRuntimeSet() throws CoreHunterException
-  {
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Runtime can not be set while search in process") ;
-  }
-	
-	@Override
-	protected void runSearch() throws CoreHunterException
-	{
-		continueSearch = true ;
-		setStuck(true) ;
-		
-		int i = 0;
-		double newEvalution ;
-		boolean acceptMove = true ;
-		boolean improvementMove = true ;
-		int size ;
-		Move<SolutionType> move ;
+                    if (deltaSize > 0) // TODO should we always reject larger solutions for worst evaluations?
+                    {
+                        // new solution is bigger than old solution and has no better
+                        // evaluation --> reject new solution, stick with old solution
 
-		size = getSolution().getSubsetSize() ;
-		
-		setEvaluation(getObjectiveFunction().calculate(getSolution()));
+                        acceptMove = false;
+                    } else {
+                        // new solution is smaller, but has worse or equal evaluation
+                        // accept or reject new solution based on temperature
+                        double P = Math.exp(deltaScore / (temperature * K_b));
+                        double Q = getRandom().nextDouble();
 
-		while (continueSearch)
-		{
-			move = getNeighbourhood().performRandomMove(getSolution());
-			newEvalution = getObjectiveFunction().calculate(getSolution());
-			
-			double deltaScore = getDeltaScore(newEvalution, getEvaluation()) ;
+                        if (Q > P) {
+                            acceptMove = false;
+                        } else {
+                            // accept new solution!
+                            acceptMove = true;
+                        }
+                    }
+                }
 
-			if (deltaScore > 0 || (deltaScore == 0 && getSolution().getSubsetSize() < size)) // TODO should we always reject smaller solutions for equal evaluations!
-			{
-				// accept new solution!
-				improvementMove = true ;
-				acceptMove = true ;
-			}
-			else
-			{
-				int deltaSize = getSolution().getSubsetSize() - size;
+                if (acceptMove) {
+                    // accept solution
+                    setCurrentSolutionEvaluation(newEvaluation);
+                    // check for improvement w.r.t *best* solution
+                    double deltaScoreBest = getDeltaScore(newEvaluation, getBestSolutionEvaluation());
+                    if (deltaScoreBest > 0 || (deltaScoreBest == 0 && newSize < getBestSolution().getSubsetSize())) {
+                        // new best solution!
+                        handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+                        improvements++;
+                    }
+                    accepts++;
+                } else {
+                    // reject solution: undo move
+                    move.undo(getCurrentSolution());
+                    rejects++;
+                }
+            } else {
+                // no neighbour found
+                stop();
+            }
+            totalSteps++;
+            curStep++;
+        }
+    }
 
-				if (deltaSize > 0) // TODO should we always reject larger solutions for worst evaluations!
-				{
-					// new solution is bigger than old solution and has no better
-					// evaluation --> reject new solution, stick with old solution
-					
-					acceptMove = false ;
-				}
-				else
-				{
-					// new solution is smaller, but has worse or equal evaluation
-					// accept or reject new solution based on temperature
-					double P = Math.exp(deltaScore / (temperature * K_b));
-					double Q = getRandom().nextDouble();
-					
-					if (Q > P)
-					{
-						acceptMove = false ;
-					}
-					else
-					{
-						// accept new solution!
-						acceptMove = true ;
-					}
-				}
-			}
-			
-			if (acceptMove)
-			{
-				if (improvementMove)
-				{
-					handleNewBestSolution(getSolution(), getEvaluation()) ;
-					improvements++;
-				}
-				
-				setStuck(false) ;
-				setEvaluation(newEvalution) ;
-				size = getSolution().getSubsetSize() ;
-	
-				accepts++;
-			}
-			else
-			{
-				getNeighbourhood().undoMove(move, getSolution()) ;
-				rejects++;
-			}
-
-			totalSteps++;
-			i++;
-			
-			if (continueSearch)
-			{
-				if (numberOfSteps > 0)
-					continueSearch = continueSearch && i < numberOfSteps ;
-				
-				if (runtime > 0)
-					continueSearch = continueSearch && getSearchTime() < runtime ;
-			}
-		}
-	}
-
-	public void swapTemperature(MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> other) throws CoreHunterException
-	{
-		double temperature = getTemperature();
-		setTemperature(other.getTemperature()) ;
-		other.setTemperature(temperature) ;
-	}
-	
-	@Override
-  protected void stopSearch() throws CoreHunterException
-  {
-		continueSearch = false ;
-  }
+    public void swapTemperature(MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> other) throws CoreHunterException {
+        double myTemp = getTemperature();
+        setTemperature(other.getTemperature());
+        other.setTemperature(myTemp);
+    }
+    
 }

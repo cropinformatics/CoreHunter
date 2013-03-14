@@ -75,6 +75,4 @@ public interface Search<SolutionType extends Solution> extends Entity
 	 */
 	public long getSearchTime();
 
-	public boolean isStuck();
-
 }

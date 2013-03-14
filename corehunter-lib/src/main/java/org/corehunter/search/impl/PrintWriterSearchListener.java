@@ -17,84 +17,69 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchListener;
 import org.corehunter.search.solution.Solution;
 
-public class PrintWriterSearchListener<SolutionType extends Solution> implements SearchListener<SolutionType>
-{
-	private PrintStream printStream ;
-	
-	public PrintWriterSearchListener()
-  {
-	  this(System.out);
-  }
+public class PrintWriterSearchListener<SolutionType extends Solution> implements SearchListener<SolutionType> {
 
-	public PrintWriterSearchListener(PrintStream printStream)
-  {
-	  super();
-	  this.printStream = printStream;
-  }
-	
-	public PrintWriterSearchListener(File file) throws FileNotFoundException
-  {
-		this(new PrintStream(new FileOutputStream(file)));
-  }
+    private PrintStream printStream;
 
-	@Override
-  public void searchStarted(Search<SolutionType> search)
-  {
-		printStream.println("Search Started : " + search.getName()) ;
-  }
+    public PrintWriterSearchListener() {
+        this(System.out);
+    }
 
-	@Override
-  public void searchCompleted(Search<SolutionType> search)
-  {
-		printStream.println("Search Completed : " + search.getName()) ;
-  }
+    public PrintWriterSearchListener(PrintStream printStream) {
+        super();
+        this.printStream = printStream;
+    }
 
-	@Override
-  public void searchStopped(Search<SolutionType> search)
-  {
-		printStream.println("Search Stopped : " + search.getName()) ;
-  }
+    public PrintWriterSearchListener(File file) throws FileNotFoundException {
+        this(new PrintStream(new FileOutputStream(file)));
+    }
 
-	@Override
-  public void searchFailed(Search<SolutionType> search,
-      CoreHunterException exception)
-  {
-		printStream.println("Search failed : " + search.getName()) ;
-  }
+    @Override
+    public void searchStarted(Search<SolutionType> search) {
+        printStream.println("Search Started : " + search.getName());
+    }
 
-	@Override
-  public void newBestSolution(Search<SolutionType> search,
-      SolutionType bestSolution, double bestSolutionEvaluation)
-  {
-		printStream.println("New best solution for: " + search.getName() + " evaluation: "  + bestSolutionEvaluation + " size: " + bestSolutionEvaluation + " solution: " + bestSolution) ;
-  }
+    @Override
+    public void searchCompleted(Search<SolutionType> search) {
+        printStream.println("Search Completed : " + search.getName());
+    }
 
-	@Override
-  public void searchProgress(Search<SolutionType> search, double progress)
-  {
-		printStream.println("Search progress for search : " + search.getName() + " progress: " + formatProgress(progress)) ;
-  }
+    @Override
+    public void searchStopped(Search<SolutionType> search) {
+        printStream.println("Search Stopped : " + search.getName());
+    }
 
-	@Override
-  public void searchMessage(Search<SolutionType> search, String message)
-  {
-		printStream.println("Message from search : " + search.getName() + " meassage:" + message)  ;
-  }
+    @Override
+    public void searchFailed(Search<SolutionType> search, CoreHunterException exception) {
+        printStream.println("Search failed : " + search.getName());
+    }
 
-	public final PrintStream getPrintStream()
-	{
-		return printStream;
-	}
+    @Override
+    public void newBestSolution(Search<SolutionType> search, SolutionType bestSolution, double bestSolutionEvaluation) {
+        printStream.println("New best solution for: " + search.getName() + " evaluation: " + bestSolutionEvaluation + " solution: " + bestSolution);
+    }
 
-	protected String formatProgress(double progress)
-  {
-	  // TODO use formatted
-	  return "" + progress;
-  }
+    @Override
+    public void searchProgress(Search<SolutionType> search, double progress) {
+        printStream.println("Search progress for search : " + search.getName() + " progress: " + formatProgress(progress));
+    }
+
+    @Override
+    public void searchMessage(Search<SolutionType> search, String message) {
+        printStream.println("Message from search : " + search.getName() + " meassage:" + message);
+    }
+
+    public final PrintStream getPrintStream() {
+        return printStream;
+    }
+
+    protected String formatProgress(double progress) {
+        // TODO use formatted
+        return "" + progress;
+    }
 }

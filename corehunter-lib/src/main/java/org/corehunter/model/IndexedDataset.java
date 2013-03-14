@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public interface IndexedDataset<IndexType, ValueType> 
-	extends IndexedData<IndexType>, Dataset<ValueType>
+public interface IndexedDataset<IndexType, ValueType> extends IndexedData<IndexType>, Dataset<ValueType>
 {
 	public ValueType getElement(IndexType index) throws UnknownEntityException ;
 	

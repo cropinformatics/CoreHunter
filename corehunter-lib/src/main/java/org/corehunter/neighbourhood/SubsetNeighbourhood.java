@@ -13,49 +13,34 @@
 // limitations under the License.
 package org.corehunter.neighbourhood;
 
-import java.util.List;
-
 import org.corehunter.CoreHunterException;
+import org.corehunter.neighbourhood.impl.IndexedTabuManager;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.solution.SubsetSolution;
 
-public interface SubsetNeighbourhood<
-	IndexType,
-	SolutionType extends SubsetSolution<IndexType>> 
-	extends Neighbourhood<SolutionType>
-{
-	/**
-	 * Change the given solution into its best neighbour. If neighbourhood contains
-	 * multiple solution with exactly the same solution, one of these is randomly
-	 * selected. This method also accepts a tabu list of indices in the core set
-	 * which are currently tabu.
-	 * 
-	 * @param solution
-	 *          The current solution
-	 * @param objectiveFunction
-	 *          The objectiveFunction used to evaluate the solutions
-	 * @param tabuList
-	 *          List of indices which are tabu, meaning that the elements in the
-	 *          core set at these indices cannot be removed for constructing the
-	 *          'best' neighbour, these neighbours themselves are tabu and must be
-	 *          avoided! If tabu list contains null value(s), only adding an
-	 *          element is tabu. Implementation should ensure that tabu list is
-	 *          kept consistent in case of reordering of elements in the core,
-	 *          e.g. in case of the deletion of an element.
-	 * @param currentBestEvaluation
-	 * 					The current best evaluation
-	 * @return The move the that was made
-	 */
-	public Move<SolutionType> performBestMove(SolutionType solution,
-	    ObjectiveFunction<SolutionType> objectiveFunction, List<IndexType> tabu, 
-	    double currentBestEvaluation);
+public interface SubsetNeighbourhood<IndexType, SolutionType extends SubsetSolution<IndexType>>
+        extends Neighbourhood<SolutionType, IndexedMove<IndexType, SolutionType>> {
 
-	public int getSubsetMinimumSize();
+    /**
+     * Change the given solution into its best neighbour. If neighbourhood
+     * contains multiple solution with exactly the same score, one of these is
+     * arbitrarily selected. This method also accepts a tabu manager.
+     *
+     * @param solution The current solution
+     * @param objectiveFunction The objectiveFunction used to evaluate the
+     * solutions
+     * @param tabuManager The tabu manager used to check if moves are tabu 
+     * @param currentBestEvaluation The current best evaluation
+     * @return The move the that was made, or null if no non-tabu neighbours were found
+     */
+    public IndexedMove<IndexType, SolutionType> performBestMove(SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
+                IndexedTabuManager<IndexType> tabuManager, double currentBestEvaluation) throws CoreHunterException;
 
-	public void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException;
+    public int getSubsetMinimumSize();
 
-	public int getSubsetMaximumSize();
+    public void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException;
 
-	public void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException;	
-	
+    public int getSubsetMaximumSize();
+
+    public void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException;
 }

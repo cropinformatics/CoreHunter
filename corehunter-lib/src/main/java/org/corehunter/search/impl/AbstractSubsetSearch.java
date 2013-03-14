@@ -15,106 +15,96 @@
 package org.corehunter.search.impl;
 
 import static org.corehunter.Constants.INVALID_SIZE;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;
 import org.corehunter.search.solution.SubsetSolution;
 
-public abstract class AbstractSubsetSearch<
-	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>> 
-	extends AbstractObjectiveSearch<SolutionType, DatasetType>
-	implements SubsetSearch<IndexType, SolutionType>
-{
-	private int	subsetMinimumSize = INVALID_SIZE;
-	private int	subsetMaximumSize = INVALID_SIZE;
+public abstract class AbstractSubsetSearch<IndexType, SolutionType extends SubsetSolution<IndexType>, DatasetType extends IndexedData<IndexType>>
+        extends AbstractObjectiveSearch<SolutionType, DatasetType>
+        implements SubsetSearch<IndexType, SolutionType> {
 
-	public AbstractSubsetSearch()
-	{
-		super();
-	}
-	
-	protected AbstractSubsetSearch(
-			AbstractSubsetSearch<IndexType, SolutionType, DatasetType> search) throws CoreHunterException
-  {
-		super(search);
-		
-		setSubsetMinimumSize(search.getSubsetMinimumSize()) ;
-		setSubsetMaximumSize(search.getSubsetMaximumSize()) ;
-  }
+    private int subsetMinimumSize = INVALID_SIZE;
+    private int subsetMaximumSize = INVALID_SIZE;
 
-	@Override
-	public final int getSubsetMinimumSize()
-  {
-  	return subsetMinimumSize;
-  }
+    public AbstractSubsetSearch() {
+        super();
+    }
 
-	@Override
-	public final void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException
-  {
-		if (this.subsetMinimumSize != subsetMinimumSize)
-  	{
-			this.subsetMinimumSize = subsetMinimumSize;
-		
-			handleSubsetMinimumSizeSet() ;
-  	}
-  }
+    protected AbstractSubsetSearch(AbstractSubsetSearch<IndexType, SolutionType, DatasetType> search) throws CoreHunterException {
+        super(search);
+        setSubsetMinimumSize(search.getSubsetMinimumSize());
+        setSubsetMaximumSize(search.getSubsetMaximumSize());
+    }
 
-	@Override
-	public final int getSubsetMaximumSize()
-  {
-  	return subsetMaximumSize;
-  }
+    @Override
+    public final int getSubsetMinimumSize() {
+        return subsetMinimumSize;
+    }
 
-	@Override
-	public final void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException
-  {
-		if (this.subsetMaximumSize != subsetMaximumSize)
-  	{
-			this.subsetMaximumSize = subsetMaximumSize;
-		
-			handleSubsetMaximumSizeSet() ;
-  	}
-  }
+    @Override
+    public final void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException {
+        if (this.subsetMinimumSize != subsetMinimumSize) {
+            this.subsetMinimumSize = subsetMinimumSize;
+            handleSubsetMinimumSizeSet();
+        }
+    }
 
-	@Override
-  protected void validate() throws CoreHunterException
-  {
-	  super.validate();
-	  
-		if (subsetMinimumSize < 1)
-	  	throw new CoreHunterException("Subset minimum size must be greater than zero!") ;
-	  
-		if (subsetMaximumSize < 1)
-	  	throw new CoreHunterException("Subset maximum size must be greater than zero!") ;
-	  
-		if (subsetMinimumSize > getData().getSize())
-	  	throw new CoreHunterException("Subset minimum size must be less than the dataset size!") ;
-	  
-		if (subsetMaximumSize > getData().getSize())
-	  	throw new CoreHunterException("Subset maximum size must be less than the dataset size!") ;
-		
-		if (subsetMaximumSize < subsetMinimumSize)
-	  	throw new CoreHunterException("Subset maximum size must be greater then or equal to minimum size!") ; 
-  }
+    @Override
+    public final int getSubsetMaximumSize() {
+        return subsetMaximumSize;
+    }
 
-	protected void handleSubsetMinimumSizeSet() throws CoreHunterException
-  {
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Subset minimum size can not be set while search in process") ;
-  }
-	
-	protected void handleSubsetMaximumSizeSet() throws CoreHunterException
-  {
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Subset maximum size can not be set while search in process") ;
-  }
-	
-	protected boolean isBetterSolution(double newEvaluation, int newSubsetSize, double oldEvaluation, int oldSubsetSize)
-  {
-	  return newEvaluation < oldEvaluation || (newSubsetSize < oldSubsetSize && newEvaluation == oldEvaluation);
-  }	
+    @Override
+    public final void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException {
+        if (this.subsetMaximumSize != subsetMaximumSize) {
+            this.subsetMaximumSize = subsetMaximumSize;
+            handleSubsetMaximumSizeSet();
+        }
+    }
+
+    @Override
+    protected void validate() throws CoreHunterException {
+        super.validate();
+
+        if (subsetMinimumSize <= 0) {
+            throw new CoreHunterException("Subset minimum size must be greater than zero!");
+        }
+
+        if (subsetMaximumSize <= 0) {
+            throw new CoreHunterException("Subset maximum size must be greater than zero!");
+        }
+
+        if (subsetMinimumSize > getData().getSize()) {
+            throw new CoreHunterException("Subset minimum size must be less than the dataset size!");
+        }
+
+        if (subsetMaximumSize > getData().getSize()) {
+            throw new CoreHunterException("Subset maximum size must be less than the dataset size!");
+        }
+
+        if (subsetMaximumSize < subsetMinimumSize) {
+            throw new CoreHunterException("Subset maximum size must be greater then or equal to minimum size!");
+        }
+    }
+
+    protected void handleSubsetMinimumSizeSet() throws CoreHunterException {
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Subset minimum size can not be set while search in process");
+        }
+        if (subsetMinimumSize <= 0) {
+            throw new CoreHunterException("Subset minimum size must be greater than zero!");
+        }
+    }
+
+    protected void handleSubsetMaximumSizeSet() throws CoreHunterException {
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Subset maximum size can not be set while search in process");
+        }
+        if (subsetMaximumSize <= 0) {
+            throw new CoreHunterException("Subset maximum size must be greater than zero!");
+        }
+    }
+
 }

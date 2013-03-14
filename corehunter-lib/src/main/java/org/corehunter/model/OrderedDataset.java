@@ -19,5 +19,5 @@ public interface OrderedDataset<IndexType, ValueType> extends IndexedDataset<Ind
 {
 	public List<ValueType> getElementsAsList();
 	
-	public List<ValueType> getElementsAsList(List<Integer> indices);
+	public List<ValueType> getElementsAsList(List<IndexType> indices);
 }

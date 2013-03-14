@@ -14,9 +14,7 @@
 package org.corehunter.search.solution.impl;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.solution.Solution;
 import org.corehunter.search.solution.SubsetSolution;
@@ -26,7 +24,7 @@ import org.corehunter.search.solution.SubsetSolution;
  * maintained in their natural order
  * 
  * @author daveneti
- *
+ * @deprecated Implementation incomplete
  */
 public class SortedIntegerSubsetSolution implements SubsetSolution<Integer>
 {
@@ -77,7 +75,7 @@ public class SortedIntegerSubsetSolution implements SubsetSolution<Integer>
   }
 
 	@Override
-  public void setSubsetIndices(List<Integer> subsetIndices)
+  public void setSubsetIndices(Collection<Integer> subsetIndices)
   {
 		this.subsetIndices.clear() ;
 		this.subsetIndices.addAll(subsetIndices) ;
@@ -169,22 +167,6 @@ public class SortedIntegerSubsetSolution implements SubsetSolution<Integer>
 
 	@Override
   public Integer[] swapRandomIndices(Random random)
-  {
-	  // TODO Auto-generated method stub
-	  return null;
-  }
-
-	@Override
-  @Deprecated
-  public int getPositionInSubset(Integer position)
-  {
-	  // TODO Auto-generated method stub
-	  return 0;
-  }
-
-	@Override
-  @Deprecated
-  public Integer getIndexInSubsetAt(int position)
   {
 	  // TODO Auto-generated method stub
 	  return null;

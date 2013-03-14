@@ -22,98 +22,74 @@ import org.corehunter.search.ObjectiveSearch;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.Solution;
 
-public abstract class AbstractObjectiveSearch<
-	SolutionType extends Solution, 
-	DataType extends Data> 
-	extends AbstractSearch<SolutionType, DataType> implements ObjectiveSearch<SolutionType>
-{
-	private ObjectiveFunction<SolutionType> objectiveFunction ;
-	private double evaluation;
-	
-	public AbstractObjectiveSearch()
-  {
+public abstract class AbstractObjectiveSearch<SolutionType extends Solution, DataType extends Data>
+        extends AbstractSearch<SolutionType, DataType>
+        implements ObjectiveSearch<SolutionType> {
 
-  }
-	
-	protected AbstractObjectiveSearch(
-			AbstractObjectiveSearch<SolutionType, DataType> search) throws CoreHunterException
-  {
-	  super(search) ;
-	  
-	  setObjectiveFunction(search.getObjectiveFunction()) ;
-  }
+    private ObjectiveFunction<SolutionType> objectiveFunction;    
 
-	@Override
-	public final ObjectiveFunction<SolutionType> getObjectiveFunction()
-  {
-  	return objectiveFunction;
-  }
+    public AbstractObjectiveSearch() {
+        super();
+    }
 
-	public final void setObjectiveFunction(
-      ObjectiveFunction<SolutionType> objectiveFunction) throws CoreHunterException
-  {
-		if (this.objectiveFunction != objectiveFunction)
-		{
-			this.objectiveFunction = objectiveFunction;
-			
-			handleObjectiveFunctionSet() ;
-		}
-  }
+    protected AbstractObjectiveSearch(AbstractObjectiveSearch<SolutionType, DataType> search) throws CoreHunterException {
+        super(search);
+        setObjectiveFunction(search.getObjectiveFunction());        
+    }
+    
+    @Override
+    public final ObjectiveFunction<SolutionType> getObjectiveFunction() {
+        return objectiveFunction;
+    }
 
-	public final double getEvaluation()
-  {
-  	return evaluation;
-  }
+    public final void setObjectiveFunction(ObjectiveFunction<SolutionType> objectiveFunction) throws CoreHunterException {
+        if (this.objectiveFunction != objectiveFunction) {
+            this.objectiveFunction = objectiveFunction;
+            handleObjectiveFunctionSet();
+        }
+    }
+    
+    /**
+     * Positive delta for a better solution, negative for a worse solution.
+     */
+    @Override
+    protected double getDeltaScore(double newEvalution, double oldEvalution) {
+        return getObjectiveFunction().isMinimizing() ? oldEvalution - newEvalution : newEvalution - oldEvalution;
+    }
 
-	protected final void setEvaluation(double evaluation)
-  {
-  	this.evaluation = evaluation;
-  }
+    @Override
+    protected boolean isBetterSolution(double newEvaluation, double oldEvaluation) {
+        return getObjectiveFunction().isMinimizing() ? newEvaluation < oldEvaluation : newEvaluation > oldEvaluation;
+    }
 
-	@Override
-	protected boolean isBetterSolution(double newEvaluation, double oldEvaluation)
-  {
-	  return getObjectiveFunction().isMinimizing() ? newEvaluation < oldEvaluation : newEvaluation > oldEvaluation ;
-  }
+    @Override
+    protected double getWorstEvaluation() {
+        return getObjectiveFunction().isMinimizing() ? Double.MAX_VALUE : Double.MIN_VALUE;
+    }
 
-	@Override
-	protected double getWorstEvaluation()
-  {
-	  return getObjectiveFunction().isMinimizing() ? Double.MAX_VALUE: Double.MIN_VALUE;
-  }
+    protected void handleObjectiveFunctionSet() throws CoreHunterException {
+        if (objectiveFunction == null) {
+            throw new CoreHunterException("No objective function defined!");
+        }
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Objective function can not be set while search in process");
+        }
+    }
 
-	@Override
-	/**
-	 * Positive for a better solution and negative for a worst solution
-	 */
-	protected double getDeltaScore(double newEvalution, double oldEvalution)
-  {
-	  return getObjectiveFunction().isMinimizing() ? oldEvalution - newEvalution : newEvalution - oldEvalution ;
-  }
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Override
+    protected void validate() throws CoreHunterException {
+        super.validate();
 
-	protected void handleObjectiveFunctionSet() throws CoreHunterException
-  {
-	  if (objectiveFunction == null)
-	  	throw new CoreHunterException("No objective function defined!") ;
-	  
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Objective function can not be set while search in process") ;
-  }
+        if (objectiveFunction == null) {
+            throw new CoreHunterException("No objective function defined!");
+        }
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-  protected void validate() throws CoreHunterException
-  {
-		super.validate() ;
-		
-	  if (objectiveFunction == null)
-	  	throw new CoreHunterException("No objective function defined!") ;
-	  
-	  if (objectiveFunction instanceof ObjectiveFunctionWithData)
-	  	((ObjectiveFunctionWithData)objectiveFunction).setData(getData()) ;
-	  
-	  objectiveFunction.validate() ;
+        if (objectiveFunction instanceof ObjectiveFunctionWithData) {
+            ((ObjectiveFunctionWithData) objectiveFunction).setData(getData());
+        }
 
-	  if (getBestSolution() != null)
-	  	setBestSolutionEvalution(objectiveFunction.calculate(getBestSolution())) ;
-  }
+        objectiveFunction.validate();
+        
+    }
 }

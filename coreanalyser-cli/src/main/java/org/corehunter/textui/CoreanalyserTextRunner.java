@@ -33,7 +33,7 @@ import org.corehunter.objectivefunction.MultipleObjectiveFunction;
 import org.corehunter.objectivefunction.UnknownMeasureException;
 import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.solution.SubsetSolution;
-import org.corehunter.search.solution.impl.OrderedIntegerListSubsetSolution;
+import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.ssr.MeasureFactorySSR;
 
 /**
@@ -130,7 +130,7 @@ public final class CoreanalyserTextRunner
 	    	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
 	    	integerSubsetGenerator.setSubsetSize(2) ;
 
-	    	SubsetSolution<Integer> solution = new OrderedIntegerListSubsetSolution(dataset.getIndices(), integerSubsetGenerator.first()) ;
+	    	SubsetSolution<Integer> solution = new IntegerSubsetSolution(dataset.getIndices(), integerSubsetGenerator.first()) ;
 
 	    	Map<String, Double> scores = objectiveFunction.componentScores(solution);
 

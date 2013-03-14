@@ -67,14 +67,9 @@ public class RandomSearch<
 			    && (subsetIndices.size() < getSubsetMinimumSize() || getRandom().nextDouble() > 1.0 / (getSubsetMaximumSize() - getSubsetMinimumSize()));
 		}
 		
-		getSolution().setSubsetIndices(subsetIndices) ;
+		getCurrentSolution().setSubsetIndices(subsetIndices) ;
 		// register solution
-		handleNewBestSolution(getSolution(), getObjectiveFunction().calculate(getSolution()));
+		handleNewBestSolution(getCurrentSolution(), getObjectiveFunction().calculate(getCurrentSolution()));
 	}
 	
-	@Override
-  protected void stopSearch() throws CoreHunterException
-  {
-		continueSearch = false;
-  }
 }

@@ -18,25 +18,17 @@ import org.corehunter.model.ssr.SSRAllele;
 import org.corehunter.model.ssr.SSRMarker;
 
 
-public class SSRAlleleImpl extends EntityImpl implements SSRAllele
-{
-	private SSRMarker marker ;
-	
-	/**
-  * 
-  */
-	public SSRAlleleImpl(String name, SSRMarker marker)
-	{
-		super(name) ;
-		
-		this.marker = marker ;
-	}
+public class SSRAlleleImpl extends EntityImpl implements SSRAllele {
 
-	@Override
-	public final SSRMarker getMarker()
-  {
-  	return marker;
-  }
-	
-	
+    private SSRMarker marker;
+
+    public SSRAlleleImpl(String name, SSRMarker marker) {
+        super(name);
+        this.marker = marker;
+    }
+
+    @Override
+    public final SSRMarker getMarker() {
+        return marker;
+    }
 }

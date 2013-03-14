@@ -15,7 +15,6 @@ package org.corehunter.model.ssr.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.model.DuplicateEntityException;
 import org.corehunter.model.UnknownEntityException;
@@ -25,77 +24,75 @@ import org.corehunter.model.ssr.SSRMarker;
 import org.corehunter.utils.EntityUtils;
 
 
-public class SSRMarkerImpl extends EntityImpl implements SSRMarker
-{
-	private List<SSRAllele> alleles ;
-	
-	/**
-  * 
-  */
-	public SSRMarkerImpl(String name)
-	{
-		super(name) ;
-		
-		alleles = new ArrayList<SSRAllele>() ;
-	}
+public class SSRMarkerImpl extends EntityImpl implements SSRMarker {
 
-	@Override
-  public List<SSRAllele> getAlleles()
-  {
-	  return alleles ;
-  }
-	
-	@Override
-  public boolean hasAllele(SSRAllele allele)
-  {
-		return alleles.contains(allele) ;
-  }
+    private List<SSRAllele> alleles;
 
-	@Override
-  public void addAllele(SSRAllele allele) throws DuplicateEntityException
-  {
-		if (!alleles.contains(allele))
-			alleles.add(allele) ;
-		else
-			throw new DuplicateEntityException("Allele already present :" + allele.getName()) ;
-  }
+    public SSRMarkerImpl(String name) {
+        super(name);
+        alleles = new ArrayList<SSRAllele>();
+    }
 
-	@Override
-  public void removeAllele(SSRAllele allele) throws UnknownEntityException
-  {
-		if (alleles.contains(allele))
-			alleles.remove(allele) ;
-		else
-			throw new UnknownEntityException("Unknown allele :" + allele.getName()) ;
-  }
-	
-	@Override
-  public int indexOfAllele(SSRAllele allele) throws UnknownEntityException 
-  {
-	  int index = alleles.indexOf(allele);
-	  
-		if (index >= 0)
-			return index ;
-		else
-			if (allele != null)
-				throw new UnknownEntityException("Unknown allele :" + allele.getName()) ;
-			else
-				throw new UnknownEntityException("Undefined allele!") ;
+    @Override
+    public List<SSRAllele> getAlleles() {
+        return alleles;
+    }
 
-  }
-	
-	@Override
-  public SSRAllele getAlleleByName(String name)
-  {
-	  return (SSRAllele)EntityUtils.findByName(name, alleles);
-  }
-	
-	@Override
-  public boolean equals(Object object)
-  {
-		if (object instanceof SSRMarker)
-			return super.equals(object) && ObjectUtils.equals(getAlleles(), ((SSRMarker)object).getAlleles());
-		else
-			return super.equals(object) ;
-  }
+    @Override
+    public boolean hasAllele(SSRAllele allele) {
+        return alleles.contains(allele);
+    }
+
+    @Override
+    public void addAllele(SSRAllele allele) throws DuplicateEntityException {
+        if (!alleles.contains(allele)) {
+            alleles.add(allele);
+        } else {
+            throw new DuplicateEntityException("Allele already present :" + allele.getName());
+        }
+    }
+
+    @Override
+    public void removeAllele(SSRAllele allele) throws UnknownEntityException {
+        if (alleles.contains(allele)) {
+            alleles.remove(allele);
+        } else {
+            throw new UnknownEntityException("Unknown allele :" + allele.getName());
+        }
+    }
+
+    @Override
+    public int indexOfAllele(SSRAllele allele) throws UnknownEntityException {
+        int index = alleles.indexOf(allele);
+
+        if (index >= 0) {
+            return index;
+        } else if (allele != null) {
+            throw new UnknownEntityException("Unknown allele :" + allele.getName());
+        } else {
+            throw new UnknownEntityException("Undefined allele!");
+        }
+
+    }
+
+    @Override
+    public SSRAllele getAlleleByName(String name) {
+        return (SSRAllele) EntityUtils.findByName(name, alleles);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof SSRMarker) {
+            return super.equals(object) && ObjectUtils.equals(getAlleles(), ((SSRMarker) object).getAlleles());
+        } else {
+            return super.equals(object);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 67 * hash + (getAlleles() != null ? getAlleles().hashCode() : 0);
+        return hash;
+    }
 }

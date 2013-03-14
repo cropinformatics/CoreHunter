@@ -14,34 +14,28 @@
 package org.corehunter.model.impl;
 
 import java.io.File;
-
 import org.corehunter.model.Data;
 import org.corehunter.model.DataReader;
 
-public abstract class AbstractDataFileReader<DataType extends Data> extends AbstractFileUtility<DataType> implements DataReader<DataType>
-{
-	private String dataName ;
-	
-	public AbstractDataFileReader(File file)
-  {
-	  super(file);
-  }
-	
-	public AbstractDataFileReader(String dataName, File file)
-  {
-	  super(file);
-	  
-	  setDatasetName(dataName) ;
-  }
+public abstract class AbstractDataFileReader<DataType extends Data> extends AbstractFileUtility<DataType> implements DataReader<DataType> {
 
-	public final String getDataName()
-  {
-  	return dataName;
-  }
+    private String dataName;
 
-	public final void setDatasetName(String dataName)
-  {
-  	this.dataName = dataName;
-  }
-	
+    public AbstractDataFileReader(File file) {
+        super(file);
+    }
+
+    public AbstractDataFileReader(String dataName, File file) {
+        super(file);
+        setDatasetName(dataName);
+    }
+
+    public final String getDataName() {
+        return dataName;
+    }
+
+    public final void setDatasetName(String dataName) {
+        this.dataName = dataName;
+    }
+    
 }

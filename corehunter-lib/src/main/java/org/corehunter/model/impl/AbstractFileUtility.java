@@ -14,30 +14,27 @@
 package org.corehunter.model.impl;
 
 import java.io.File;
-
 import org.corehunter.model.Data;
 
-public abstract class AbstractFileUtility<DataType extends Data>
-{
-	public static final char COMMA_DELIMITER = ',';
-	public static final char TAB_DELIMITER = '\t';
-	public static final char SPACE_DELIMITER = ' ';
-	
-	private File file;
+public abstract class AbstractFileUtility<DataType extends Data> {
 
-	public AbstractFileUtility(File file)
-  {
-	  super();
-	  this.file = file;
-  }
+    public static final char COMMA_DELIMITER = ',';
+    public static final char TAB_DELIMITER = '\t';
+    public static final char SPACE_DELIMITER = ' ';
+    
+    private File file;
 
-	public final File getFile()
-  {
-  	return file;
-  }
+    public AbstractFileUtility(File file) {
+        super();
+        this.file = file;
+    }
 
-	public final void setFile(File file)
-  {
-  	this.file = file;
-  }
+    public final File getFile() {
+        return file;
+    }
+
+    public final void setFile(File file) {
+        this.file = file;
+    }
+    
 }

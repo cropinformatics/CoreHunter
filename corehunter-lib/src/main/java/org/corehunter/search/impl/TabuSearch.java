@@ -14,225 +14,109 @@
 
 package org.corehunter.search.impl;
 
-import java.util.LinkedList;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
-import org.corehunter.neighbourhood.AddedIndexMove;
-import org.corehunter.neighbourhood.Move;
+import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
+import org.corehunter.neighbourhood.TabuManager;
+import org.corehunter.neighbourhood.impl.IndexedTabuManager;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.SubsetSolution;
 
 /**
- * TABU Search. Tabu list is a list of indices at which the current core set
- * cannot be perturbed (delete, swap) to form a new core set as long as the
- * index is contained in the tabu list. After each perturbation step, the index
- * of the newly added accession (if it exists) is added to the tabu list, to
- * ensure this accesion is not again removed from the core set (or replaced)
- * during the next few rounds. If no new accession was added (pure deletion), a
- * value "-1" is added to the tabu list. As long as such values are contained in
- * the tabu list, adding a new accesion without removing one (pure addition) is
- * considered tabu, to prevent immediately re-adding the accession which was
- * removed in the previous step.
+ * TABU Search.
  */
 public class TabuSearch<
-	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>,
-	NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-	extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
-{
-	private long	              runtime;
-	private double	            minimumProgression;
-	private long	              stuckTime;
-	private int	                tabuListSize;
-	private boolean 						continueSearch ;
-	
-	public TabuSearch()
-	{
-		super();
-	}
-	
-	protected TabuSearch(TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException
-	{
-		super(search);
-		
-		setRuntime(search.getRuntime()) ;
-		setMinimumProgression(search.getMinimumProgression()) ;
-		setStuckTime(search.getStuckTime()) ;
-	}
+        IndexType,
+        SolutionType extends SubsetSolution<IndexType>,
+        DatasetType extends IndexedData<IndexType>,
+        NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> {
 
-	@Override
-  public Search<SolutionType> copy() throws CoreHunterException
-  {
-	  return new TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
-  }
-	
-	public final long getRuntime()
-  {
-  	return runtime;
-  }
+    // tabu manager
+    private IndexedTabuManager<IndexType> tabuManager = null;
 
-	public final void setRuntime(long runtime) throws CoreHunterException
-  {
-		if (this.runtime != runtime)
-		{
-			this.runtime = runtime;
-			
-			handleRuntimeSet() ;
-		}
-  }
+    public TabuSearch() {
+        super();
+    }
 
-	public final double getMinimumProgression()
-  {
-  	return minimumProgression;
-  }
+    protected TabuSearch(TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+        super(search);
+        setTabuManager(search.getTabuManager());
+    }
 
-	public final void setMinimumProgression(double minimumProgression) throws CoreHunterException
-  {
-		if (this.minimumProgression != minimumProgression)
-		{
-			this.minimumProgression = minimumProgression;
-			
-			handleMinimumProgressionTimeSet() ;
-		}
-  }
+    @Override
+    public Search<SolutionType> copy() throws CoreHunterException {
+        return new TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+    }
 
-	public final long getStuckTime()
-  {
-  	return stuckTime;
-  }
+    public final IndexedTabuManager<IndexType> getTabuManager() {
+        return tabuManager;
+    }
 
-	public final void setStuckTime(long stuckTime) throws CoreHunterException
-  {
-		if (this.stuckTime != stuckTime)
-		{
-			this.stuckTime = stuckTime;
-			
-			handleStuckTimeSet() ;
-		}
-  }
+    public final void setTabuManager(IndexedTabuManager<IndexType> tabuManager) throws CoreHunterException {
+        if (this.tabuManager != tabuManager) {
+            this.tabuManager = tabuManager;
+            handleTabuManagerSet();
+        }
+    }
 
-	public final int getTabuListSize()
-  {
-  	return tabuListSize;
-  }
+    protected void handleTabuManagerSet() throws CoreHunterException {
+        if (tabuManager != null && tabuManager.getTabuHistorySize() < 0) {
+            throw new CoreHunterException("Tabu Manager's history size can not be less than zero!");
+        }
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Tabu Manager can not be set while search in process");
+        }
+    }
+    
+    @Override
+    protected void validate() throws CoreHunterException {
+        super.validate();
+        if (tabuManager != null && tabuManager.getTabuHistorySize() < 0) {
+            throw new CoreHunterException("Tabu Manager's history size can not be less than zero!");
+        }
+    }
 
-	public final void setTabuListSize(int tabuListSize) throws CoreHunterException
-  {
-		if (this.tabuListSize != tabuListSize)
-		{
-			this.tabuListSize = tabuListSize;
-			
-			handleTabuListSizeSet() ;
-		}
-  }
-	
-	protected void handleRuntimeSet() throws CoreHunterException
-  {
-	  if (runtime < 0)
-	  	throw new CoreHunterException("Runtime can not be less than zero!") ;
-	  
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Runtime can not be set while search in process") ;
-  }
-	
-	protected void handleMinimumProgressionTimeSet() throws CoreHunterException
-  {
-	  if (minimumProgression < 0)
-	  	throw new CoreHunterException("Minimum Progression can not be less than zero!") ;
-	  
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Minimum Progression can not be set while search in process") ;
-  }
-	
-	protected void handleStuckTimeSet() throws CoreHunterException
-  {
-	  if (stuckTime < 0)
-	  	throw new CoreHunterException("Stuck Time can not be less than zero!") ;
-	  
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Stuck Time can not be set can not be set while search in process") ;
-  }
+    @Override
+    protected void runSearch() throws CoreHunterException {
+        
+        IndexedMove<IndexType, SolutionType> move;
+        double newEvaluation;
+        int newSize;
 
-	protected void handleTabuListSizeSet() throws CoreHunterException
-  {
-	  if (tabuListSize < 0)
-	  	throw new CoreHunterException("Tabu List Size can not be less than zero!") ;
-	  
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Tabu List Size can not be set while search in process") ;
-  }
-	
-	
-	
-	@SuppressWarnings("unchecked")
-  @Override
-	protected void runSearch() throws CoreHunterException
-	{
-		double evalution ;
-		int size, newSize;
+        setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
+        handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        
+        long step = 1;
+        while (canContinue(step)) {
+            
+            // run TABU search step
 
-		LinkedList<IndexType> tabuList;
-		
-		size = getSolution().getSubsetSize() ;
-		
-		// initialize tabu list
-		tabuList = new LinkedList<IndexType>();
-
-		Move<SolutionType> move;
-		continueSearch = true;
-
-		setEvaluation(getObjectiveFunction().calculate(getSolution()));
-		handleNewBestSolution(getSolution(), getEvaluation());
-
-		while (continueSearch && getSearchTime() < runtime)
-		{
-			// run TABU search step
-
-			// ALWAYS accept new core, even it is not an improvement
-			move = getNeighbourhood().performBestMove(getSolution(), getObjectiveFunction(), tabuList, getBestSolutionEvaluation());
-			evalution = getObjectiveFunction().calculate(getSolution());
-
-			// check if new best core was found
-			if (evalution > getBestSolutionEvaluation()
-			    || (evalution == getBestSolutionEvaluation() && getSolution().getSubsetSize() < getBestSolution().getSubsetSize()))
-			{
-				// check min progression
-				if (getSolution().getSubsetSize() >= getBestSolution().getSubsetSize() && evalution - getBestSolutionEvaluation() < minimumProgression)
-				{
-					continueSearch = false;
-				}
-				
-				// store new best core
-				handleNewBestSolution(getSolution(), evalution);
-			}
-			else
-			{
-				// check stuckTime
-				continueSearch = continueSearch && stuckTime > getBestSolutionTime() ;
-			}
-
-			// finally, update tabu list
-			if (tabuList.size() == tabuListSize)
-			{
-				// capacity reached, remove oldest tabu index
-				tabuList.poll();
-			}
-			
-			// add new tabu index
-			if (move instanceof AddedIndexMove)
-				tabuList.offer(((AddedIndexMove<IndexType, SolutionType>)move).getAddedIndex());
-			else
-				tabuList.offer(null) ;
-		}
-	}
-	
-	@Override
-  protected void stopSearch() throws CoreHunterException
-  {
-		continueSearch = false;
-  }
+            move = getNeighbourhood().performBestMove(getCurrentSolution(), getObjectiveFunction(), tabuManager, getBestSolutionEvaluation());
+            if(move != null){
+                // evaluate new solution
+                newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
+                newSize = getCurrentSolution().getSubsetSize();
+                // ALWAYS accept new solution, even it is not an improvement
+                setCurrentSolutionEvaluation(newEvaluation);
+                // check if new best solution was found
+                if (isBetterSolution(newEvaluation, getBestSolutionEvaluation())
+                        || (newEvaluation == getBestSolutionEvaluation() && newSize < getBestSolution().getSubsetSize())) // TODO assumes smaller cores are better
+                {
+                    // handle new best solution
+                    handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+                }
+                // register last move in tabu manager
+                tabuManager.registerMoveTaken(move);
+            } else {
+                // no non-tabu neighbour found
+                stop();
+            }
+            step++;
+        }
+         
+    }
+    
 }

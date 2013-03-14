@@ -16,45 +16,37 @@ package org.corehunter.model.impl;
 
 import org.corehunter.model.EntityWithDescription;
 
-public class EntityWithDescriptionImpl extends EntityImpl implements EntityWithDescription
-{
-	private String description ;
-	
-	public EntityWithDescriptionImpl(String name)
-  {
-		 super(name) ;
-  }
-	
-	public EntityWithDescriptionImpl(String name, String description)
-  {
-		 super(name, name) ;
-		 
-		 setDescription(description) ;
-  }
-	
-	public EntityWithDescriptionImpl(String uniqueIdentifier, String name, String description)
-  {
-		 super(uniqueIdentifier, name) ;
-		 
-		 setDescription(description) ;
-  }
-	
-	protected EntityWithDescriptionImpl(EntityWithDescriptionImpl entityWithDescription)
-  {
-		 super(entityWithDescription) ;
-		 
-		 setDescription(entityWithDescription.getDescription()) ;
-  }
+public class EntityWithDescriptionImpl extends EntityImpl implements EntityWithDescription {
 
-	@Override
-	public final String getDescription()
-  {
-  	return description;
-  }
-	
-	@Override
-	public final void setDescription(String description)
-  {
-  	this.description = description;
-  }	
+    private String description;
+
+    public EntityWithDescriptionImpl(String name) {
+        super(name);
+    }
+
+    public EntityWithDescriptionImpl(String name, String description) {
+        super(name, name);
+        setDescription(description);
+    }
+
+    public EntityWithDescriptionImpl(String uniqueIdentifier, String name, String description) {
+        super(uniqueIdentifier, name);
+        setDescription(description);
+    }
+
+    protected EntityWithDescriptionImpl(EntityWithDescriptionImpl entityWithDescription) {
+        super(entityWithDescription);
+        setDescription(entityWithDescription.getDescription());
+    }
+
+    @Override
+    public final String getDescription() {
+        return description;
+    }
+
+    @Override
+    public final void setDescription(String description) {
+        this.description = description;
+    }
+    
 }

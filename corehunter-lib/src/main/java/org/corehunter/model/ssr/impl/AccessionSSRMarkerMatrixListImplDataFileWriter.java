@@ -13,12 +13,12 @@
 // limitations under the License.
 package org.corehunter.model.ssr.impl;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.DataWriter;
 import org.corehunter.model.accession.Accession;
@@ -28,132 +28,122 @@ import org.corehunter.model.ssr.SSRAllele;
 import org.corehunter.model.ssr.SSRMarker;
 import org.corehunter.utils.EntityUtils;
 
-import au.com.bytecode.opencsv.CSVWriter;
-
 /**
- * SSRAccessionMatrixDataset reader that reads the complete matrix into memory before
- * creating the Dataset. Not suitable for big datasets.
+ * SSRAccessionMatrixDataset writer that writes the complete matrix from memory
+ * to a file. Not suitable for big datasets.
  *  
  * @author daveneti
  *
  */
-public class AccessionSSRMarkerMatrixListImplDataFileWriter 
-extends AbstractDataFileWriter<AccessionSSRMarkerMatrix<Integer>> 
-implements DataWriter<AccessionSSRMarkerMatrix<Integer>>
-{
-	private List<Integer> indices = null ;
+public class AccessionSSRMarkerMatrixListImplDataFileWriter
+        extends AbstractDataFileWriter<AccessionSSRMarkerMatrix<Integer>>
+        implements DataWriter<AccessionSSRMarkerMatrix<Integer>> {
 
-	public AccessionSSRMarkerMatrixListImplDataFileWriter(String datasetName, File file)
-  {
-	  super(file);
-  }
+    private List<Integer> indices = null;
 
-	public final List<Integer> getIndices()
-	{
-		return indices;
-	}
+    public AccessionSSRMarkerMatrixListImplDataFileWriter(String datasetName, File file) {
+        super(file);
+    }
 
-	public final void setIndices(List<Integer> indices)
-	{
-		this.indices = indices;
-	}
+    public final List<Integer> getIndices() {
+        return indices;
+    }
 
-	@Override
-	public void writeData(AccessionSSRMarkerMatrix<Integer> dataset)
-			throws CoreHunterException
-	{
-		if (indices != null)
-		{
-			writeData(dataset, indices) ;
-		}
-		else
-		{
-			writeData(dataset, dataset.getIndices()) ;
-		}
-	}
+    public final void setIndices(List<Integer> indices) {
+        this.indices = indices;
+    }
 
-	protected void writeData(AccessionSSRMarkerMatrix<Integer> dataset, List<Integer> indices)
-			throws CoreHunterException
-	{
-		try
-		{
-			CSVWriter writer = new CSVWriter(new FileWriter(getFile()), ',',
-					CSVWriter.NO_QUOTE_CHARACTER);
+    @Override
+    public void writeData(AccessionSSRMarkerMatrix<Integer> dataset) throws CoreHunterException {
+        if (indices != null) {
+            writeData(dataset, indices);
+        } else {
+            writeData(dataset, dataset.getIndices());
+        }
+    }
 
-			String[] line = new String[indices.size() + 2];
-			line[0] = "Marker";
-			line[1] = "Allele";
+    protected void writeData(AccessionSSRMarkerMatrix<Integer> dataset, List<Integer> indices) throws CoreHunterException {
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter(getFile()), ',', CSVWriter.NO_QUOTE_CHARACTER);
 
-			writer.writeNext(getLabels(dataset.getRowHeaders().getElements(indices)));
+            String[] line = new String[indices.size() + 2];
+            line[0] = "Marker";
+            line[1] = "Allele";
+            String[] accessionNames = getLabels(dataset.getRowHeaders().getElements(indices));
+            System.arraycopy(accessionNames, 0, line, 2, accessionNames.length);
 
-			Iterator<SSRMarker> markers = dataset.getColumnHeaders().getElements().iterator() ;
-			Iterator<SSRAllele> alleles ;
-			Iterator<Integer> iterator ;
-			SSRMarker marker ;
-			SSRAllele allele ;
+            writer.writeNext(line);
+            
+            // write external distances line if specified
+            if(dataset.externalDistancesSpecified()){
+                line[0] = "DIST";
+                line[1] = "";
+                for(int i=0; i<indices.size(); i++){
+                    line[2+i] = String.valueOf(dataset.getExternalDistance(i));
+                }
+                writer.writeNext(line);
+            }
+            
+            Iterator<SSRMarker> markers = dataset.getColumnHeaders().getElements().iterator();
+            Iterator<SSRAllele> alleles;
+            Iterator<Integer> iterator;
+            SSRMarker marker;
+            SSRAllele allele;
 
-			List<Double> values ;
-			int i ;
-			int j ;
+            List<Double> values;
+            int i;
+            int a;
+            int m;
 
-			while (markers.hasNext())
-			{
-				marker = markers.next() ;
+            m=0;
+            while (markers.hasNext()) {
+                marker = markers.next();
 
-				alleles = marker.getAlleles().iterator() ;
-				line[0] = getLabel(marker) ;
+                alleles = marker.getAlleles().iterator();
+                line[0] = getLabel(marker);
 
-				j = 0 ;
+                a = 0;
 
-				while (alleles.hasNext())
-				{
-					allele =  alleles.next() ;
-					line[1] = getLabel(allele) ;
+                while (alleles.hasNext()) {
+                    allele = alleles.next();
+                    line[1] = getLabel(allele);
 
-					iterator = indices.iterator() ;
-					i = 2 ;
+                    iterator = indices.iterator();
+                    i = 2;
 
-					while (iterator.hasNext())
-					{
-						values = dataset.getElement(iterator.next(), j) ;
-						line[i] = getLabel(values.get(j)) ;
+                    while (iterator.hasNext()) {
+                        values = dataset.getElement(iterator.next(), m);
+                        line[i] = getLabel(values.get(a));
 
-						++i ;
-					}
+                        ++i;
+                    }
 
-					++j ;
-				}
+                    writer.writeNext(line);
+                    ++a;
+                }
+                
+                m++;
+            }
 
-				writer.writeNext(line);
+        } catch (Exception e) {
+            System.err.println("");
+            System.err.println(e.getMessage());
+        }
+    }
 
+    private String[] getLabels(Set<Accession> elementsAsList) {
+        return EntityUtils.getNames(elementsAsList);
+    }
 
-			}
+    private String getLabel(Double value) {
+        return String.valueOf(value);
+    }
 
-		}
-		catch (Exception e)
-		{
-			System.err.println("");
-			System.err.println(e.getMessage());
-		}
-	}
+    private String getLabel(SSRAllele allele) {
+        return allele.getName();
+    }
 
-	private String[] getLabels(Set<Accession> elementsAsList)
-	{
-		return 	EntityUtils.getNames(elementsAsList);
-	}
-
-	private String getLabel(Double value)
-	{
-		return String.valueOf(value);
-	}
-
-	private String getLabel(SSRAllele allele)
-	{
-		return allele.getName() ;
-	}
-
-	private String getLabel(SSRMarker marker)
-	{
-		return marker.getName() ;
-	}
+    private String getLabel(SSRMarker marker) {
+        return marker.getName();
+    }
 }

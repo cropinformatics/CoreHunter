@@ -14,7 +14,6 @@
 package org.corehunter.search.solution;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
 public interface SubsetSolution<IndexType> extends Solution
@@ -34,11 +33,7 @@ public interface SubsetSolution<IndexType> extends Solution
 	public int getSize();
 	
 	/**
-	 * Gets a list of all the indices in the subset, by default
-	 * a cached list should be returned. After any updates to the
-	 * solution the cache is renewed, thus any changes to the solution
-	 * will not affect the list returned by this method. Call this method
-	 * again to get an updated cache.
+	 * Gets a list of all the indices in the subset.
 	 *  
 	 * @return a list cached of all the indices in the subset
 	 */
@@ -51,7 +46,7 @@ public interface SubsetSolution<IndexType> extends Solution
 	 *  
 	 * @param sets the indices in the subset
 	 */
-	public void setSubsetIndices(List<IndexType> subsetIndices) ;
+	public void setSubsetIndices(Collection<IndexType> subsetIndices) ;
 
 	/**
 	 * Gets the current size of the subset
@@ -60,11 +55,7 @@ public interface SubsetSolution<IndexType> extends Solution
 	public int getSubsetSize();
 	
 	/**
-	 * Gets a list of all the indices NOT in the subset, by default
-	 * a cached list should be returned. After any updates to the
-	 * solution the cache is renewed, thus any changes to the solution
-	 * will not affect the list returned by this method. Call this method
-	 * again to get an updated cache.
+	 * Gets a list of all the indices NOT in the subset.
 	 *  
 	 * @return a list cached of all the indices NOT in the subset
 	 */
@@ -144,26 +135,6 @@ public interface SubsetSolution<IndexType> extends Solution
 	 * the first being the index added and second the index removed
 	 */
 	public IndexType[] swapRandomIndices(Random random) ;
-	
-	/**
-	 * Gets a position of given index with the subset
-	 * 
-	 * @param index index with the subset
-	 * @return a position of given index with the subset
-	 * @Deprecated Try to remove
-	 */
-	@Deprecated
-	public int getPositionInSubset(IndexType position) ;
-	
-	/**
-	 * Gets an index at a given position with the subset
-	 * 
-	 * @param position a position with the subset
-	 * @return index at a given position with the subset
-	 * @Deprecated Try to remove
-	 */
-	@Deprecated
-	public IndexType getIndexInSubsetAt(int position) ;
 	
 	/**
 	 * Contains a given index 

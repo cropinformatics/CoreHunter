@@ -14,15 +14,13 @@
 package org.corehunter.model.impl;
 
 import java.io.File;
-
 import org.corehunter.model.Data;
 import org.corehunter.model.DataWriter;
 
-public abstract class AbstractDataFileWriter<DataType extends Data> extends AbstractFileUtility<DataType> implements DataWriter<DataType>
-{
-	public AbstractDataFileWriter(File file)
-  {
-	  super(file);
-  }
+public abstract class AbstractDataFileWriter<DataType extends Data> extends AbstractFileUtility<DataType> implements DataWriter<DataType> {
 
+    public AbstractDataFileWriter(File file) {
+        super(file);
+    }
+    
 }

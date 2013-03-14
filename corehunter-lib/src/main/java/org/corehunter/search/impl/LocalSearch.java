@@ -14,179 +14,69 @@
 
 package org.corehunter.search.impl;
 
-import static org.corehunter.Constants.INVALID_TIME;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
-import org.corehunter.neighbourhood.Move;
+import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
-import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.SubsetSolution;
 
 public class LocalSearch<
 	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>,
-	NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>> 
-	extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
-{
-	private long runtime = INVALID_TIME ;
-	private double minimumProgression = 0 ;
-	private long stuckTime = INVALID_TIME ;
-	
-	private boolean continueSearch ;
+        SolutionType extends SubsetSolution<IndexType>,
+        DatasetType extends IndexedData<IndexType>,
+        NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> {
 
-	public LocalSearch()
-	{
-		super();
-	}
-	
-	protected LocalSearch(LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException
-	{
-		super(search);
-		
-		setRuntime(search.getRuntime()) ;
-		setMinimumProgression(search.getMinimumProgression()) ;
-		setStuckTime(search.getStuckTime()) ;
-	}
+    public LocalSearch() {
+        super();
+    }
 
-	@Override
-  public Search<SolutionType> copy() throws CoreHunterException
-  {
-	  return new LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
-  }
+    protected LocalSearch(LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+        super(search);
+    }
 
-	public final long getRuntime()
-  {
-  	return runtime;
-  }
+    @Override
+    public Search<SolutionType> copy() throws CoreHunterException {
+        return new LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+    }
 
-	public final void setRuntime(long runtime) throws CoreHunterException
-  {
-		if (this.runtime != runtime)
-		{
-			this.runtime = runtime;
-			
-			handleRuntimeSet() ;
-		}
-  }
+    @Override
+    protected void runSearch() throws CoreHunterException {
+        
+        double newEvaluation;
+        int newSize;
 
-	public final double getMinimumProgression()
-  {
-  	return minimumProgression;
-  }
+        setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
+        handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
 
-	public final void setMinimumProgression(double minimumProgression) throws CoreHunterException
-  {
-		if (this.minimumProgression != minimumProgression)
-		{
-			this.minimumProgression = minimumProgression;
-			
-			handleMinimumProgressionSet() ;
-		}
-  }
+        IndexedMove<IndexType, SolutionType> move;
+        long step = 1;
 
-	public final long getStuckTime()
-  {
-  	return stuckTime;
-  }
+        while (canContinue(step)) {
+            // run Local Search step
+            move = getNeighbourhood().performRandomMove(getCurrentSolution());
+            if(move != null){
+                newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
+                newSize = getCurrentSolution().getSubsetSize();
+                // check if improvement
+                if (isBetterSolution(newEvaluation, getBestSolutionEvaluation())
+                        || (newEvaluation == getBestSolutionEvaluation() && newSize < getBestSolution().getSubsetSize())) // TODO assumes smaller cores are better
+                {
+                    // handle new best solution
+                    handleNewBestSolution(getCurrentSolution(), newEvaluation);
+                    // set current solution evaluation
+                    setCurrentSolutionEvaluation(newEvaluation);
+                } else {
+                    // reject new solution (undo move)
+                    move.undo(getCurrentSolution());
+                }
+            } else {
+                stop();
+            }
+            step++;
+        }
+        
+    }
 
-	public final void setStuckTime(long stuckTime) throws CoreHunterException
-  {
-		if (this.stuckTime != stuckTime)
-		{
-			this.stuckTime = stuckTime;
-			
-			handleStuckTimeSet() ;
-		}
-  }
-
-	@Override
-  protected void validate() throws CoreHunterException
-  {
-	  super.validate();
-	  
-	  if (runtime <= 0)
-	  	throw new CoreHunterException("Runtime can not be less than or equal to zero!") ;
-	  
-	  if (minimumProgression < 0)
-	  	throw new CoreHunterException("Minimum Progression can not be less than zero!") ;
-	  
-	  if (stuckTime <= 0)
-	  	throw new CoreHunterException("Stuck Time can not be less than or equal to zero!") ;
-  }
-
-	protected void handleRuntimeSet() throws CoreHunterException
-  {
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Runtime can not be set while search in process") ;
-		
-	  if (runtime <= 0)
-	  	throw new CoreHunterException("Runtime can not be less than or equal to zero!") ;
-  }
-	
-	protected void handleMinimumProgressionSet() throws CoreHunterException
-  {
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Minimum Progression can not be set while search in process") ;
-		
-	  if (minimumProgression < 0)
-	  	throw new CoreHunterException("Minimum Progression can not be less than zero!") ;
-  }
-	
-	protected void handleStuckTimeSet() throws CoreHunterException
-  {
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Stuck Time can not be set can not be set while search in process") ;
-		
-	  if (stuckTime <= 0)
-	  	throw new CoreHunterException("Stuck Time can not be less than or equal to zero!") ;
-  }
-	
-	@Override
-	protected void runSearch() throws CoreHunterException
-	{
-		continueSearch = true;
-		
-		double newEvaluation;
-		int newSize;
-
-		handleNewBestSolution(getSolution(), getObjectiveFunction().calculate(getSolution()));
-		
-		Move<SolutionType> move ;
-		
-		while (continueSearch && getSearchTime() < runtime)
-		{
-			// run Local Search step
-			move = getNeighbourhood().performRandomMove(getSolution());
-			newEvaluation = getObjectiveFunction().calculate(getSolution());
-			newSize = getSolution().getSubsetSize();
-
-			if (isBetterSolution(newEvaluation, getBestSolutionEvaluation()) || 
-					(newEvaluation == getBestSolutionEvaluation() && newSize < getBestSolution().getSubsetSize())) // TODO assumes smaller cores are better
-			{
-				// check min progression
-				if (newSize >= getBestSolution().getSubsetSize() && getDeltaScore(newEvaluation, getBestSolutionEvaluation()) < minimumProgression) // TODO assumes minimisation
-				{
-					continueSearch = false;
-				}
-
-				handleNewBestSolution(getSolution(), newEvaluation);
-			}
-			else
-			{
-				// Reject new core
-				getNeighbourhood().undoMove(move, getSolution());
-				// check stuckTime
-				continueSearch = continueSearch && stuckTime > getBestSolutionTime() ;
-			}
-		}
-	}
-
-	@Override
-  protected void stopSearch() throws CoreHunterException
-  {
-		continueSearch = false;
-  }
 }

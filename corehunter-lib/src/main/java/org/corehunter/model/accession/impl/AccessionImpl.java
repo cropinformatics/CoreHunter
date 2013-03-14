@@ -19,9 +19,7 @@ import org.corehunter.model.impl.EntityImpl;
 
 public class AccessionImpl extends EntityImpl implements Accession
 {
-	/**
-     * 
-     */
+    
 	public AccessionImpl(String name)
 	{
 		super(name) ;
@@ -31,4 +29,5 @@ public class AccessionImpl extends EntityImpl implements Accession
 	{
 		super(uniqueIdentifier, name) ;
 	}	
+        
 }

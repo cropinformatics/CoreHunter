@@ -18,7 +18,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -28,6 +27,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.corehunter.Constants;
+import static org.corehunter.Constants.SECOND;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileReader;
@@ -39,8 +39,6 @@ import org.corehunter.objectivefunction.UnknownMeasureException;
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.ssr.MeasureFactorySSR;
-
-import static org.corehunter.Constants.SECOND;
 
 /**
  * A simple text based driver for Core Hunter.
@@ -221,15 +219,6 @@ public final class CorehunterTextRunner
 	    	System.err
 	    	    .println("\nSpecified core size is larger than collection size.  ");
 	    	System.err.println("Assuming max size is collection size.");
-	    }
-
-	    if (tabuListSizeSpecified && tabuListSize >= sampleMax)
-	    {
-	    	tabuListSize = sampleMax - 1;
-	    	System.err
-	    	    .println("\nSpecified tabu list size is larger than or equal to max core size.");
-	    	System.err.println("List size was changed to 'max core size - 1' = "
-	    	    + (sampleMax - 1) + ", to ensure at least one non-tabu neighbour.");
 	    }
 
 	    if (!tabuListSizeSpecified)

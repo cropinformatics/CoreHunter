@@ -128,14 +128,14 @@ public class ExhaustiveSubsetSearch<
 					progress = newProgress;
 				}
 	
-				getSolution().setSubsetIndices(subsetIndices);
+				getCurrentSolution().setSubsetIndices(subsetIndices);
 	
-				score = getObjectiveFunction().calculate(getSolution());
+				score = getObjectiveFunction().calculate(getCurrentSolution());
 				
 				if (isBetterSolution(score, bestScore))
 				{
 					bestScore = score;
-					handleNewBestSolution(getSolution(), bestScore);
+					handleNewBestSolution(getCurrentSolution(), bestScore);
 				}
 				
 				subsetGenerator.next(subsetIndices);
@@ -153,9 +153,4 @@ public class ExhaustiveSubsetSearch<
 	  return numberOfSubsets ;
   }
 
-	@Override
-  protected void stopSearch() throws CoreHunterException
-  {
-
-  }
 }

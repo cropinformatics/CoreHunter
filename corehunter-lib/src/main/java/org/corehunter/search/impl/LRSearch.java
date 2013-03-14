@@ -153,38 +153,38 @@ public class LRSearch<
 				// Because distance measures require at least two accessions to
 				// be
 				// computable, exhaustively select the best core set of size 2
-				executeExhaustiveSearch(getSolution(), getObjectiveFunction());
+				executeExhaustiveSearch(getCurrentSolution(), getObjectiveFunction());
 			}
 			else
 			{
 				// Random first pair, to save computational cost: this
 				// transforms the
 				// deterministic lr search into a semi-random method
-				executeRandomSearch(getSolution(), getObjectiveFunction());
+				executeRandomSearch(getCurrentSolution(), getObjectiveFunction());
 			}
 		}
 		else
 		{
 			// Start with full set, stepwise decrease size
-			getSolution().addAllIndices() ;
+			getCurrentSolution().addAllIndices() ;
 			skipadd = true;
 		}
 		
-		evaluation = getObjectiveFunction().calculate(getSolution());
+		evaluation = getObjectiveFunction().calculate(getCurrentSolution());
 		bestNewEvaluation = evaluation;
-		handleNewBestSolution(getSolution(), bestNewEvaluation);
+		handleNewBestSolution(getCurrentSolution(), bestNewEvaluation);
 		
 		// Determine whether to continue search
 		if (l > r)
 		{
 			// Increasing core size
-			if (getSolution().getSubsetSize() >= getSubsetMinimumSize())
+			if (getCurrentSolution().getSubsetSize() >= getSubsetMinimumSize())
 			{
 				continueSearch = false; // Equal or worse evaluation and size increased
 			}
 			else
 			{
-				if (getSolution().getSubsetSize() + l - r > getSubsetMaximumSize())
+				if (getCurrentSolution().getSubsetSize() + l - r > getSubsetMaximumSize())
 				{
 					continueSearch = false; // Maximum size reached
 				}
@@ -193,13 +193,13 @@ public class LRSearch<
 		else
 		{
 			// Decreasing core size
-			if (getSolution().getSubsetSize() <= getSubsetMaximumSize())
+			if (getCurrentSolution().getSubsetSize() <= getSubsetMaximumSize())
 			{
 				continueSearch = false; // Worse evaluation
 			}
 			else
 			{
-				if (getSolution().getSubsetSize() + l - r < getSubsetMinimumSize())
+				if (getCurrentSolution().getSubsetSize() + l - r < getSubsetMinimumSize())
 				{
 					continueSearch = false; // Minimum size reached
 				}
@@ -213,7 +213,7 @@ public class LRSearch<
 			{
 				for (int i = 0; i < l; i++)
 				{
-					List<IndexType> unselected = new ArrayList<IndexType>(getSolution().getRemainingIndices()) ;
+					List<IndexType> unselected = new ArrayList<IndexType>(getCurrentSolution().getRemainingIndices()) ;
 
 					// Search for best new accession
 					bestNewEvaluation = getWorstEvaluation() ; 
@@ -224,8 +224,8 @@ public class LRSearch<
 					while (iterator.hasNext())
 					{
 						index = iterator.next() ;
-						getSolution().addIndex(index) ;
-						newEvaluation = getObjectiveFunction().calculate(getSolution());
+						getCurrentSolution().addIndex(index) ;
+						newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
 						
 						if (isBetterSolution(newEvaluation, bestNewEvaluation))
 						{
@@ -233,10 +233,10 @@ public class LRSearch<
 							bestAddIndex = index ;
 						}
 						
-						getSolution().removeIndex(index);
+						getCurrentSolution().removeIndex(index);
 					}
 					// Add best new accession
-					getSolution().addIndex(bestAddIndex) ;
+					getCurrentSolution().addIndex(bestAddIndex) ;
 					history.add(new AdditionMove<IndexType, SolutionType>(bestAddIndex));
 				}
 				skipadd = false;
@@ -247,7 +247,7 @@ public class LRSearch<
 				// Search for worst accession
 				bestNewEvaluation = getWorstEvaluation() ; 
 				
-				List<IndexType> selected = new ArrayList<IndexType>(getSolution().getSubsetIndices()) ;
+				List<IndexType> selected = new ArrayList<IndexType>(getCurrentSolution().getSubsetIndices()) ;
 				
 				Iterator<IndexType> iterator = selected.iterator() ;
 				IndexType index ;
@@ -255,8 +255,8 @@ public class LRSearch<
 				while (iterator.hasNext())
 				{
 					index = iterator.next() ;
-					getSolution().removeIndex(index) ;
-					newEvaluation = getObjectiveFunction().calculate(getSolution());
+					getCurrentSolution().removeIndex(index) ;
+					newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
 					
 					if (isBetterSolution(newEvaluation, bestNewEvaluation))
 					{
@@ -264,11 +264,11 @@ public class LRSearch<
 						bestRemIndex = index ;
 					}
 					
-					getSolution().addIndex(index);
+					getCurrentSolution().addIndex(index);
 				}
 
 				// Remove worst accession
-				getSolution().removeIndex(bestAddIndex) ;
+				getCurrentSolution().removeIndex(bestAddIndex) ;
 				history.add(new DeletionMove<IndexType, SolutionType>(bestAddIndex));
 			}
 
@@ -279,18 +279,18 @@ public class LRSearch<
 			if (l > r)
 			{
 				// Increasing core size
-				if (getSolution().getSubsetSize() >= getSubsetMinimumSize() && deltaEvaluation <= 0)
+				if (getCurrentSolution().getSubsetSize() >= getSubsetMinimumSize() && deltaEvaluation <= 0)
 				{
 					continueSearch = false; // Equal or worse evaluation and size increased
 					// Restore previous core
 					for (int i = 0; i < l + r; i++)
 					{
-						history.pop().undo(getSolution());
+						history.pop().undo(getCurrentSolution());
 					}
 				}
 				else
 				{
-					if (getSolution().getSubsetSize() + l - r > getSubsetMaximumSize())
+					if (getCurrentSolution().getSubsetSize() + l - r > getSubsetMaximumSize())
 					{
 						continueSearch = false; // Maximum size reached
 					}
@@ -299,33 +299,28 @@ public class LRSearch<
 			else
 			{
 				// Decreasing core size
-				if (getSolution().getSubsetSize() <= getSubsetMaximumSize() && deltaEvaluation < 0)
+				if (getCurrentSolution().getSubsetSize() <= getSubsetMaximumSize() && deltaEvaluation < 0)
 				{
 					continueSearch = false; // Worse evaluation
 					// Restore previous core
 					for (int i = 0; i < l + r; i++)
 					{
-						history.pop().undo(getSolution());
+						history.pop().undo(getCurrentSolution());
 					}
 				}
 				else
 				{
-					if (getSolution().getSubsetSize() + l - r < getSubsetMinimumSize())
+					if (getCurrentSolution().getSubsetSize() + l - r < getSubsetMinimumSize())
 					{
 						continueSearch = false; // Minimum size reached
 					}
 				}
 			}
 
-			handleNewBestSolution(getSolution(), evaluation) ;
+			handleNewBestSolution(getCurrentSolution(), evaluation) ;
 		}
 	}
 	
-	@Override
-  protected void stopSearch() throws CoreHunterException
-  {
-		continueSearch = false;
-  }
 
 	private void executeExhaustiveSearch(SolutionType solution,
       ObjectiveFunction<SolutionType> objectiveFunction) throws CoreHunterException
@@ -346,7 +341,7 @@ public class LRSearch<
 		RandomSearch<IndexType, SolutionType, DatasetType> search = new RandomSearch<IndexType, SolutionType, DatasetType>() ;
 		
 		search.setObjectiveFunction(objectiveFunction) ;
-		search.setSolution(getSolution()) ;
+		search.setInitialSolution(getCurrentSolution()) ;
 		search.setData(getData()) ;
 		search.setSubsetMinimumSize(2) ;
 		search.setSubsetMaximumSize(2) ;

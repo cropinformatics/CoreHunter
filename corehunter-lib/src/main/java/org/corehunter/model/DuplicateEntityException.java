@@ -1,4 +1,4 @@
-// Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
+// Copyright 2012 Guy Davenport, Herman De Beukelaer
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,19 @@ package org.corehunter.model;
 
 import org.corehunter.CoreHunterException;
 
-/**
- * <<Class summary>>
- * 
- * @author Chris Thachuk <chris.thachuk@gmail.com>;
- */
 public final class DuplicateEntityException extends CoreHunterException
 {
-	/**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
 
-	public DuplicateEntityException(String message)
-	{
-		super(message);
-	}
+    private static final long serialVersionUID = 1L;
 
-	public DuplicateEntityException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
+    public DuplicateEntityException(String message)
+    {
+            super(message);
+    }
+
+    public DuplicateEntityException(String message, Throwable cause)
+    {
+            super(message, cause);
+    }
+    
 }

@@ -15,156 +15,119 @@
 package org.corehunter.neighbourhood.impl;
 
 import java.util.Random;
-
 import org.corehunter.CoreHunterException;
-import org.corehunter.neighbourhood.Neighbourhood;
+import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
+import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.solution.SubsetSolution;
 
 /**
  * Implements an abstract neighbourhood which defines the neighbours of a given
- * core subset. Depending on the chosen algorithm that uses the neighbourhood,
- * one can generate a random neighbour or the one with the highest value.
- * 
- * @author hermandebeukelaer
+ * solution. Depending on the chosen algorithm that uses the neighbourhood,
+ * one can generate a random neighbour or the best one.
  */
-public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extends SubsetSolution<IndexType>> implements SubsetNeighbourhood<IndexType, SolutionType> 
-{
+public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extends SubsetSolution<IndexType>> implements SubsetNeighbourhood<IndexType, SolutionType> {
 
-	private Random	random = new Random();
-	protected static final double	MIN_TABU_ASPIRATION_PROG	= 10e-9;
+    private Random random = new Random();
+    private int subsetMinimumSize;
+    private int subsetMaximumSize;
 
-	private int	subsetMinimumSize;
-	private int	subsetMaximumSize;
-  // nr of previous states that can be recovered using undo
-  protected int historySize = 1;
+    public AbstractSubsetNeighbourhood() {
+    }
 
-	public AbstractSubsetNeighbourhood()
-	{
+    protected AbstractSubsetNeighbourhood(AbstractSubsetNeighbourhood<IndexType, SolutionType> singleneighbourhood) throws CoreHunterException {
+        setSubsetMinimumSize(singleneighbourhood.getSubsetMinimumSize());
+        setSubsetMaximumSize(singleneighbourhood.getSubsetMaximumSize());
+    }
+    
+    /**
+     * Default: no tabu manager specified.
+     */
+    @Override
+    public final IndexedMove<IndexType, SolutionType> performBestMove(SolutionType solution,
+            ObjectiveFunction<SolutionType> objectiveFunction, double currentBestEvaluation) throws CoreHunterException {
+        
+        return performBestMove(solution, objectiveFunction, null, currentBestEvaluation);
+        
+    }
 
-	}
-	
-	protected AbstractSubsetNeighbourhood(
-			AbstractSubsetNeighbourhood<IndexType, SolutionType> singleneighbourhood) throws CoreHunterException
-  {
-		setSubsetMinimumSize(singleneighbourhood.getSubsetMinimumSize()) ;
-		setSubsetMaximumSize(singleneighbourhood.getSubsetMaximumSize()) ;
-		setHistorySize(singleneighbourhood.getHistorySize()) ;
-  }
+    @Override
+    public final int getSubsetMinimumSize() {
+        return subsetMinimumSize;
+    }
 
-	@Override
-	public final int getSubsetMinimumSize()
-  {
-  	return subsetMinimumSize;
-  }
+    @Override
+    public final void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException {
+        if (this.subsetMinimumSize != subsetMinimumSize) {
+            this.subsetMinimumSize = subsetMinimumSize;
+            handleSubsetMinimumSizeSet();
+        }
+    }
 
-	@Override
-	public final void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException
-  {
-		if (this.subsetMinimumSize != subsetMinimumSize)
-  	{
-			this.subsetMinimumSize = subsetMinimumSize;
-		
-			handleSubsetMinimumSizeSet() ;
-  	}
-  }
+    @Override
+    public final int getSubsetMaximumSize() {
+        return subsetMaximumSize;
+    }
 
-	@Override
-	public final int getSubsetMaximumSize()
-  {
-  	return subsetMaximumSize;
-  }
+    @Override
+    public synchronized final void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException {
+        if (this.subsetMaximumSize != subsetMaximumSize) {
+            this.subsetMaximumSize = subsetMaximumSize;
+            handleSubsetMaximumSizeSet();
+        }
+    }
 
-	@Override
-	public synchronized final void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException
-  {
-		if (this.subsetMaximumSize != subsetMaximumSize)
-  	{
-			this.subsetMaximumSize = subsetMaximumSize;
-		
-			handleSubsetMaximumSizeSet() ;
-  	}
-  }
-	
-	public final int getHistorySize()
-  {
-  	return subsetMaximumSize;
-  }
+    @Override
+    public void validate() throws CoreHunterException {
+        if (subsetMinimumSize <= 0) {
+            throw new CoreHunterException("Subset minimum size must be greater than zero!");
+        }
 
-	public synchronized final void setHistorySize(int historySize) throws CoreHunterException
-  {
-		if (this.historySize != historySize)
-  	{
-			this.historySize = historySize;
-		
-			handleHistorySizeSet() ;
-  	}
-  }
+        if (subsetMaximumSize <= 0) {
+            throw new CoreHunterException("Subset maximum size must be greater than zero!");
+        }
+        
+        if (subsetMaximumSize < subsetMinimumSize) {
+            throw new CoreHunterException("Subset maximum size must be greater then or equal to minimum size!");
+        }
 
-	@Override
-  public void validate() throws CoreHunterException
-  {
-		if (subsetMinimumSize <= 0)
-	  	throw new CoreHunterException("Subset minimum size must be greater than zero!") ;
-	  
-		if (subsetMaximumSize <= 0)
-	  	throw new CoreHunterException("Subset maximum size must be greater than zero!") ;
-	  
-		// TODO
-		//if (subsetMinimumSize <= getDataset().getSize())
-	  //	throw new CoreHunterException("Subset minimum size must be less than or equal to dataset size!") ;
-	  
-		//if (subsetMaximumSize <= getDataset().getSize())
-	  //	throw new CoreHunterException("Subset maximum size must be less than or equal to dataset size!") ;
-		
-		if (subsetMaximumSize < subsetMinimumSize)
-	  	throw new CoreHunterException("Subset maximum size must be greater then or equal to minimum size!") ; 
-		
-		if (historySize < 0)
-	  	throw new CoreHunterException("History size must be greater than or equal to zero!") ;
-  }
-	
-	public final void setRandom(Random random)
-  {
-  	this.random = random;
-  }
+        // TODO
+//        if (subsetMinimumSize <= getDataset().getSize()) {
+//            throw new CoreHunterException("Subset minimum size must be less than or equal to dataset size!") ;
+//        }
+//
+//        if (subsetMaximumSize <= getDataset().getSize()) {
+//            throw new CoreHunterException("Subset maximum size must be less than or equal to dataset size!") ;
+//        }
+        
+    }
 
-	public final Random getRandom()
-  {
-  	return random;
-  }
+    public final void setRandom(Random random) {
+        this.random = random;
+    }
 
-	protected void handleSubsetMinimumSizeSet() throws CoreHunterException
-  {
-		if (subsetMinimumSize <= 0)
-	  	throw new CoreHunterException("Subset minimum size must be greater than zero!") ;
-  }
+    public final Random getRandom() {
+        return random;
+    }
 
-	protected void handleSubsetMaximumSizeSet() throws CoreHunterException
-  {
-		if (subsetMaximumSize <= 0)
-	  	throw new CoreHunterException("Subset maximum size must be greater than zero!") ;
-  }
-	
-	protected void handleHistorySizeSet() throws CoreHunterException
-  {
-		if (historySize < 0)
-	  	throw new CoreHunterException("History size must be greater than or equal to zero!") ;
-  }
-	
-	protected boolean isBetterScore(boolean isMinimizing, double newScore, double bestNewScore)
-  {
-	  return isMinimizing ? newScore < bestNewScore : newScore > bestNewScore ;
-  }
+    protected void handleSubsetMinimumSizeSet() throws CoreHunterException {
+        if (subsetMinimumSize <= 0) {
+            throw new CoreHunterException("Subset minimum size must be greater than zero!");
+        }
+    }
 
-	protected double getWorstScore(boolean isMinimizing)
-  {
-	  return isMinimizing ? Double.MAX_VALUE: Double.MIN_VALUE ;
-  }
+    protected void handleSubsetMaximumSizeSet() throws CoreHunterException {
+        if (subsetMaximumSize <= 0) {
+            throw new CoreHunterException("Subset maximum size must be greater than zero!");
+        }
+    }
 
-	/* (non-Javadoc)
-   * @see org.corehunter.search.Neighbourhood#copy()
-   */
-	@Override        
-	public abstract Neighbourhood<SolutionType> copy();
+    protected boolean isBetterNeighbour(boolean isMinimizing, double neighbourEvaluation, double curBestNeighbourEvaluation) {
+        return isMinimizing ? neighbourEvaluation < curBestNeighbourEvaluation : neighbourEvaluation > curBestNeighbourEvaluation;
+    }
+
+    protected double getWorstEvaluation(boolean isMinimizing) {
+        return isMinimizing ? Double.MAX_VALUE : Double.MIN_VALUE;
+    }
+
 }

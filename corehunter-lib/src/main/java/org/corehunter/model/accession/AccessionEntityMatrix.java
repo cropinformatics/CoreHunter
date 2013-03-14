@@ -19,9 +19,10 @@ import org.corehunter.model.Matrix;
 
 public interface AccessionEntityMatrix<
 	IndexType,
-	DataType extends Object,
+	DataType,
 	ColumnHeaderType extends Entity> 
 	extends Matrix<IndexType, DataType, Accession, ColumnHeaderType>
 {
+        public boolean externalDistancesSpecified();
 	public double getExternalDistance(IndexType index);
 }

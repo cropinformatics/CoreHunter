@@ -52,7 +52,5 @@ public interface AccessionSSRMarkerMatrix<IndexType>
 	public List<Double> getValues(Accession accession, SSRMarker marker) throws UnknownEntityException ;
 	
 	public void setValues(Accession accession, SSRMarker marker, List<Double> values) throws UnknownEntityException;
-	
-	// TODO what does this do?
-	public void normalize() ;
+        
 }

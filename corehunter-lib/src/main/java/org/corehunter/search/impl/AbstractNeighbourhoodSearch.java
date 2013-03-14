@@ -16,65 +16,60 @@ package org.corehunter.search.impl;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Data;
+import org.corehunter.neighbourhood.Move;
 import org.corehunter.neighbourhood.Neighbourhood;
 import org.corehunter.search.NeighbourhoodSearch;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.Solution;
 
 public abstract class AbstractNeighbourhoodSearch<
-	SolutionType extends Solution, 
-	DataType extends Data,
-	NeighbourhoodType extends Neighbourhood<SolutionType>>
-	extends AbstractObjectiveSearch<SolutionType, DataType> implements NeighbourhoodSearch<SolutionType, 	NeighbourhoodType>
-{
-	private NeighbourhoodType neighbourhood ;
-	
-	public AbstractNeighbourhoodSearch()
-  {
+        SolutionType extends Solution,
+        DataType extends Data,
+        MoveType extends Move<SolutionType>,
+        NeighbourhoodType extends Neighbourhood<SolutionType, MoveType>>
+            extends AbstractObjectiveSearch<SolutionType, DataType>
+            implements NeighbourhoodSearch<SolutionType, MoveType, NeighbourhoodType> {
 
-  }
-	
-	protected AbstractNeighbourhoodSearch(
-      AbstractNeighbourhoodSearch<SolutionType, DataType, NeighbourhoodType> search) throws CoreHunterException
-  {
-		super(search) ;
-		
-		setNeighbourhood(search.getNeighbourhood()) ;
-  }
+    private NeighbourhoodType neighbourhood;
 
-	@Override
-	public final NeighbourhoodType getNeighbourhood()
-  {
-  	return neighbourhood;
-  }
+    public AbstractNeighbourhoodSearch() {
+        super();
+    }
 
-	public final void setNeighbourhood(NeighbourhoodType neighbourhood) throws CoreHunterException
-  {
-		if (this.neighbourhood != neighbourhood)
-		{
-			this.neighbourhood = neighbourhood;
-			
-			handleNeighbourhoodSet() ;
-		}
-  }
+    protected AbstractNeighbourhoodSearch(AbstractNeighbourhoodSearch<SolutionType, DataType, MoveType, NeighbourhoodType> search) throws CoreHunterException {
+        super(search);
+        setNeighbourhood(search.getNeighbourhood());
+    }
 
-	protected void handleNeighbourhoodSet() throws CoreHunterException
-  {
-	  if (neighbourhood == null)
-	  	throw new CoreHunterException("No neighbourhood defined!") ;
-	  
-		if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Neighbourhood can not be set while search in process") ;
-  }
+    @Override
+    public final NeighbourhoodType getNeighbourhood() {
+        return neighbourhood;
+    }
 
-	@Override
-	protected void validate() throws CoreHunterException
-  {
-		super.validate() ;
-		
-	  if (neighbourhood == null)
-	  	throw new CoreHunterException("No neighbourhood defined!") ;
-	  
-	  neighbourhood.validate() ;
-  }
+    public final void setNeighbourhood(NeighbourhoodType neighbourhood) throws CoreHunterException {
+        if (this.neighbourhood != neighbourhood) {
+            this.neighbourhood = neighbourhood;
+            handleNeighbourhoodSet();
+        }
+    }
+
+    protected void handleNeighbourhoodSet() throws CoreHunterException {
+        if (neighbourhood == null) {
+            throw new CoreHunterException("No neighbourhood defined!");
+        }
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Neighbourhood can not be set while search in process");
+        }
+    }
+
+    @Override
+    protected void validate() throws CoreHunterException {
+        super.validate();
+
+        if (neighbourhood == null) {
+            throw new CoreHunterException("No neighbourhood defined!");
+        }
+
+        neighbourhood.validate();
+    }
 }

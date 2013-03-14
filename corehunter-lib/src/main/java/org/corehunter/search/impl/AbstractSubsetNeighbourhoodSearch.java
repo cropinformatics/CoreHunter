@@ -15,93 +15,76 @@
 package org.corehunter.search.impl;
 
 import static org.corehunter.Constants.INVALID_SIZE;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
+import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.SubsetSearch;
 import org.corehunter.search.solution.SubsetSolution;
 
 public abstract class AbstractSubsetNeighbourhoodSearch<
 	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>,
-	NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-	extends AbstractNeighbourhoodSearch<SolutionType, DatasetType, NeighbourhoodType> implements SubsetSearch<IndexType, SolutionType>
+        SolutionType extends SubsetSolution<IndexType>,
+        DatasetType extends IndexedData<IndexType>,
+        NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
+            extends AbstractNeighbourhoodSearch<SolutionType, DatasetType, IndexedMove<IndexType, SolutionType>, NeighbourhoodType>
+            implements SubsetSearch<IndexType, SolutionType>
 {
-	public AbstractSubsetNeighbourhoodSearch()
-	{
-		super();
-	}
 
-	@Override
-  public final int getSubsetMinimumSize()
-  {
-		return getNeighbourhood() != null ? getNeighbourhood().getSubsetMinimumSize() : INVALID_SIZE ;
-  }
+    public AbstractSubsetNeighbourhoodSearch() {
+        super();
+    }
+    
+    protected AbstractSubsetNeighbourhoodSearch(AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+        super(search);
+    }
 
-	@Override
-  public final void setSubsetMinimumSize(int subsetMinimumSize)
-      throws CoreHunterException
-  {
-		if (getNeighbourhood() != null)
-			getNeighbourhood().setSubsetMinimumSize(subsetMinimumSize) ;
-		else
-			throw new CoreHunterException("Neighbourhood undefined!") ;
-  }
+    @Override
+    public final int getSubsetMinimumSize() {
+        return getNeighbourhood() != null ? getNeighbourhood().getSubsetMinimumSize() : INVALID_SIZE;
+    }
 
-	@Override
-  public final int getSubsetMaximumSize()
-  {
-		return getNeighbourhood() != null ? getNeighbourhood().getSubsetMaximumSize() : INVALID_SIZE ;
-  }
+    @Override
+    public final void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException {
+        if (getNeighbourhood() != null) {
+            getNeighbourhood().setSubsetMinimumSize(subsetMinimumSize);
+        } else {
+            throw new CoreHunterException("Neighbourhood undefined!");
+        }
+    }
 
-	@Override
-  public final void setSubsetMaximumSize(int subsetMaximumSize)
-      throws CoreHunterException
-  {
-		if (getNeighbourhood() != null)
-			getNeighbourhood().setSubsetMaximumSize(subsetMaximumSize) ;
-		else
-			throw new CoreHunterException("Neighbourhood undefined!") ;
-  }
+    @Override
+    public final int getSubsetMaximumSize() {
+        return getNeighbourhood() != null ? getNeighbourhood().getSubsetMaximumSize() : INVALID_SIZE;
+    }
 
-	protected AbstractSubsetNeighbourhoodSearch(
-      AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException
-  {
-		super(search) ;
-  }
+    @Override
+    public final void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException {
+        if (getNeighbourhood() != null) {
+            getNeighbourhood().setSubsetMaximumSize(subsetMaximumSize);
+        } else {
+            throw new CoreHunterException("Neighbourhood undefined!");
+        }
+    }
 
-	@Override
-  protected void validate() throws CoreHunterException
-  {
-	  super.validate();
-	  
-		int size = getSolution().getSubsetSize() ;
-		
-		// ensure initial solution is within maximum and minimum
-		if (size - getNeighbourhood().getSubsetMaximumSize() < getNeighbourhood().getSubsetMinimumSize())
-		{
-			// randomly increase subset until it reaches minimum
-			for (int i = 0; i < getNeighbourhood().getSubsetMinimumSize(); i++)
-			{
-				getSolution().addRandomIndex(getRandom()) ;
-			}
-		}
-		else
-		{
-			// Add all then randomly decrease subset until it reaches maximum
-			
-		  if (size < getNeighbourhood().getSubsetMinimumSize())
-		  	getSolution().addAllIndices() ;
-		  
-		  if (size > getNeighbourhood().getSubsetMaximumSize())
-		  {
-				for (int i = size ; i > getNeighbourhood().getSubsetMaximumSize(); i--)
-				{
-					getSolution().removeRandomIndex(getRandom()) ;
-				}
-		  }
-		}
-  }
+    @Override
+    protected void validate() throws CoreHunterException {
+        
+        super.validate();
+        
+        int size = getCurrentSolution().getSubsetSize();
+
+        // ensure initial solution is within maximum and minimum
+        if (size < getNeighbourhood().getSubsetMinimumSize()) {
+            // randomly increase subset until it reaches minimum
+            for (int i = 0; i < getNeighbourhood().getSubsetMinimumSize()-size; i++) {
+                getCurrentSolution().addRandomIndex(getRandom());
+            }
+        } else if (size > getNeighbourhood().getSubsetMaximumSize()) {
+            // randomly decrease subset until it reaches maximum
+            for (int i = 0; i < size - getNeighbourhood().getSubsetMaximumSize(); i++) {
+                getCurrentSolution().removeRandomIndex(getRandom());
+            }
+        }
+    }
 }

@@ -141,12 +141,13 @@ public final class TestSSRDataset
 		ssrData.setValue("A1", "M1", "allele100", 1.0);
 	}
 
-	@Test
-	public void verifyNormilizeScalesData() throws Exception
-	{
-		ssrData.normalize();
-		assertEquals(0.3 / 0.9, ssrData.getValue("A1", "M1", "allele1"), precision);
-		assertEquals(0.6 / 0.9, ssrData.getValue("A1", "M1", "allele2"), precision);
-		assertEquals(0.0 / 0.9, ssrData.getValue("A1", "M1", "allele3"), precision);
-	}
+//	@Test
+//	public void verifyNormilizeScalesData() throws Exception
+//	{
+//		ssrData.normalize();
+//		assertEquals(0.3 / 0.9, ssrData.getValue("A1", "M1", "allele1"), precision);
+//		assertEquals(0.6 / 0.9, ssrData.getValue("A1", "M1", "allele2"), precision);
+//		assertEquals(0.0 / 0.9, ssrData.getValue("A1", "M1", "allele3"), precision);
+//	}
+        
 }

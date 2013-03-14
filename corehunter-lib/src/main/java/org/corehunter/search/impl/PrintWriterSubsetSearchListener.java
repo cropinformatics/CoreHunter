@@ -16,31 +16,25 @@ package org.corehunter.search.impl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;
 
-public class PrintWriterSubsetSearchListener<IndexType, SolutionType extends SubsetSolution<IndexType>> extends PrintWriterSearchListener<SolutionType>
-{
-	public PrintWriterSubsetSearchListener()
-  {
-		super();
-  }
+public class PrintWriterSubsetSearchListener<IndexType, SolutionType extends SubsetSolution<IndexType>> extends PrintWriterSearchListener<SolutionType> {
 
-	public PrintWriterSubsetSearchListener(PrintStream printStream)
-  {
-	  super(printStream);
-  }
-	
-	public PrintWriterSubsetSearchListener(File file) throws FileNotFoundException
-  {
-		super(file);
-  }
+    public PrintWriterSubsetSearchListener() {
+        super();
+    }
 
-	@Override
-  public void newBestSolution(Search<SolutionType> search,
-      SolutionType bestSolution, double bestSolutionEvaluation)
-  {
-		getPrintStream().println("New best solution for: " + search.getName() + " evaluation: "  + bestSolutionEvaluation + " size: " + bestSolution.getSubsetSize() + " solution: " + bestSolution) ;
-  }
+    public PrintWriterSubsetSearchListener(PrintStream printStream) {
+        super(printStream);
+    }
+
+    public PrintWriterSubsetSearchListener(File file) throws FileNotFoundException {
+        super(file);
+    }
+
+    @Override
+    public void newBestSolution(Search<SolutionType> search, SolutionType bestSolution, double bestSolutionEvaluation) {
+        getPrintStream().println("New best solution for: " + search.getName() + " evaluation: " + bestSolutionEvaluation + " size: " + bestSolution.getSubsetSize() + " solution: " + bestSolution);
+    }
 }

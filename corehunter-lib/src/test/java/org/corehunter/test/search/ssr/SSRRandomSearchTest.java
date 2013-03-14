@@ -1,52 +1,52 @@
+// Copyright 2012 Herman De Beukelaer, Guy Davenport
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.corehunter.test.search.ssr;
 
-import static org.junit.Assert.fail;
-
-import java.io.File;
-
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.impl.AbstractFileUtility;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
-import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileReader;
-import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.RandomSearch;
 import org.corehunter.search.solution.SubsetSolution;
-import org.corehunter.search.solution.impl.OrderedIntegerListSubsetSolution;
+import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.search.SubsetSearchTest;
-import org.junit.BeforeClass;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 
-public class SSRRandomSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>, ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>>
-{	
-	@Test
-	public void testDefaults()
-	{	
-		RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> 
-			search = new RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>() ;
-		
-		try
-    {
-    	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
-    	integerSubsetGenerator.setSubsetSize(2) ;
-			 
-	    search.setSolution(new OrderedIntegerListSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first())) ;
-	
-	    search.setData(dataFull) ;
-	    search.setObjectiveFunction(new ModifiedRogersDistanceSSR()) ;
-	    search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE) ;
-	    search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE) ;
-	    
-    }
-    catch (CoreHunterException e)
-    {
-	    e.printStackTrace();
-	    fail(e.getLocalizedMessage()) ;
-    }
-		
-		testSearch(search) ;
-	}
+public class SSRRandomSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>> {
 
-	
+    @Test
+    public void testDefaults() {
+        RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+
+        try {
+            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            integerSubsetGenerator.setSubsetSize(2);
+
+            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
+
+            search.setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
+            search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
+
+        } catch (CoreHunterException e) {
+            e.printStackTrace();
+            fail(e.getLocalizedMessage());
+        }
+
+        testSearch(search);
+    }
 }

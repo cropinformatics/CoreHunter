@@ -21,10 +21,12 @@ public class Constants
 	public final static int INVALID_SIZE = -1 ;
 	public final static int INVALID_TEMPERATURE = -1 ;
 	public final static int INVALID_TIME = -2 ;
-	public final static int INVALID_NUMBER_OF_STEPS = -1 ;
+	public final static long INVALID_NUMBER_OF_STEPS = -1 ;
+        
+        public final static double INVALID_EVALUATION = -1.0;
 	
-	public final static long MILLISECOND = 10000000 ;
-	public final static long SECOND = 100 * MILLISECOND ;
+	public final static long MILLISECOND = 1000000 ;
+	public final static long SECOND = 1000 * MILLISECOND ;
 	public final static long MINUTE = 60 * SECOND ;
 	
 }

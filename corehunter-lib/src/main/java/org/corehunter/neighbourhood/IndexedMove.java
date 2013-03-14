@@ -1,4 +1,4 @@
-// Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
+// Copyright 2012 Herman De Beukelaer, Guy Davenport
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,17 +14,20 @@
 
 package org.corehunter.neighbourhood;
 
+import java.util.Collection;
 import org.corehunter.search.solution.SubsetSolution;
 
 
 
 /**
- * @author hermandebeukelaer
+ *
  */
-public interface IndexedMove<
-	IndexType, 
-	SolutionType extends SubsetSolution<IndexType>> 
-	extends Move<SolutionType>
+public interface IndexedMove<IndexType, SolutionType extends SubsetSolution<IndexType>> extends Move<SolutionType>
 {
-
+    /**
+     * Returns a collection containing all indices involved in this indexed move. E.g.
+     * for an addition the collection should contain the added index, for a swap it should
+     * contain the added and the removed index, etc.
+     */
+    public Collection<IndexType> getInvolvedIndices();
 }

@@ -17,7 +17,7 @@ import java.util.List;
 
 public interface Matrix<
 	IndexType,
-	DataType extends Object,
+	DataType,
 	RowHeaderType extends Entity, 
 	ColumnHeaderType extends Entity> extends Data, IndexedData<IndexType>
 {

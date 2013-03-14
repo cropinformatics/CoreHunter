@@ -17,8 +17,8 @@ package org.corehunter.textui;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
-import org.corehunter.neighbourhood.impl.HeuristicSingleNeighbourhood;
-import org.corehunter.neighbourhood.impl.RandomSingleNeighbourhood;
+import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
+import org.corehunter.neighbourhood.impl.MSTRATHeuristicSingleNeighbourhood;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.LRSearch;
@@ -32,10 +32,7 @@ import org.corehunter.search.impl.TabuSearch;
 import org.corehunter.search.solution.SubsetSolution;
 
 /**
- * <<Class summary>>
  * 
- * @author Chris Thachuk &lt;&gt;
- * @version $Rev$
  */
 public final class CoreSubsetSearch
 {
@@ -61,13 +58,13 @@ public final class CoreSubsetSearch
 		search.setNeighbourhood(neighbourhood);
 		search.setObjectiveFunction(objectiveFunction);
 		search.setSubsetMaximumSize(sampleMaximum);
-		search.setRuntime(runtime);
+		search.setRuntimeLimit(runtime);
 		search.setMinimumProgression(minimumProgression);
-		search.setStuckTime(stuckTime);
+		search.setMaxTimeWithoutImprovement(stuckTime);
 		search.setNumberOfReplicas(numberOfReplicas);
 		search.setMinimumTemperature(minimumTemperature);
 		search.setMaximumTemperature(maximumTemperature);
-		search.setNumberOfSteps(steps);
+		search.setNumberOfMetropolisStepsPerRound(steps);
 
 		search.start();
 
@@ -87,8 +84,8 @@ public final class CoreSubsetSearch
 		search.setData(data);
 		search.setNeighbourhood(neighbourhood);
 		search.setObjectiveFunction(objectiveFunction);
-		search.setRuntime(runtime);
-		search.setNumberOfSteps(numberOfSteps) ;
+		search.setRuntimeLimit(runtime);
+		search.setMaxNumberOfSteps(numberOfSteps) ;
 
 		search.start();
 
@@ -122,9 +119,9 @@ public final class CoreSubsetSearch
 		search.setData(data);
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
-		search.setRuntime(runtime);
+		search.setRuntimeLimit(runtime);
 		search.setMinimumProgression(minimumProgressionTime);
-		search.setStuckTime(stuckTime);
+		search.setMaxTimeWithoutImprovement(stuckTime);
 
 		return search;
 	}
@@ -156,7 +153,7 @@ public final class CoreSubsetSearch
 		search.setData(data);
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
-		search.setRuntime(runtime);
+		search.setRuntimeLimit(runtime);
 		search.setMinimumProgression(minimumProgressionTime);
 
 		return search;
@@ -198,7 +195,7 @@ public final class CoreSubsetSearch
 		search.setData(data);
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
-		search.setRuntime(runtime);
+		search.setRuntimeLimit(runtime);
 		search.setMinimumProgression(minimumProgressionTime);
 
 		return search;
@@ -220,22 +217,20 @@ public final class CoreSubsetSearch
 		search.setObjectiveFunction(objectiveFunction);
 		search.setSubsetMinimumSize(subsetMinimumSize);
 		search.setSubsetMaximumSize(subsetMaximumSize);
-		search.setRuntime(runtime);
+		search.setRuntimeLimit(runtime);
 		search.setMinimumProgression(minimumProgressionTime) ;
-		search.setStuckTime(stuckTime) ;
+		search.setMaxTimeWithoutImprovement(stuckTime) ;
 		search.setNumberOfTabuReplicas(numberOfTabuReplicas);
 		search.setNumberOfNonTabuReplicas(numberOfNonTabuReplicas);
 		search.setRoundsWithoutTabu(roundsWithoutTabu);
-		search.setNumberOfTabuSteps(numberOfTabuSteps);
 		search.setTournamentSize(tournamentSize);
-		search.setTabuListSize(tabuListSize);
 		search.setBoostNumber(boostNumber);
 		search.setBoostMinimumProgressionTime(boostMinimumProgressionTime);
 		search.setBoostTimeFactor(boostTimeFactor);
 
 		// TODO set defaults for sub searches
 		search.setLrSearchTemplate(lrSearch(null, null, boostTimeFactor,
-		    boostTimeFactor, boostTimeFactor, boostTimeFactor));
+		  boostTimeFactor, boostTimeFactor, boostTimeFactor));
 		search.setLocalSearchTemplate(localSearch(data, null, objectiveFunction, runtime, minimumProgressionTime, stuckTime));
 		search.setMetropolisSearchTemplate(metropolisSearch(data, null, objectiveFunction, boostTimeFactor, boostTimeFactor));
 		search.setTabuSearchTemplate(tabuSearch(data, null, objectiveFunction, runtime, minimumProgressionTime, stuckTime, boostTimeFactor));
@@ -335,10 +330,10 @@ public final class CoreSubsetSearch
 		    subsetMaximumSize, 0, 1);
 	}
 
-	public static RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>> randomSingleNeighbourhood(
+	public static ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> randomSingleNeighbourhood(
       int sampleMin, int sampleMax) throws CoreHunterException
   {
-		RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new RandomSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
+		ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
 		
 		neighbourhood.setSubsetMinimumSize(sampleMin) ;
 		neighbourhood.setSubsetMaximumSize(sampleMax) ;
@@ -346,10 +341,10 @@ public final class CoreSubsetSearch
 	  return neighbourhood;
   }
 	
-	public static HeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>> heuristicSingleNeighbourhood(
+	public static MSTRATHeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>> heuristicSingleNeighbourhood(
       int sampleMin, int sampleMax) throws CoreHunterException
   {
-		HeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new HeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
+		MSTRATHeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new MSTRATHeuristicSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
 		
 		neighbourhood.setSubsetMinimumSize(sampleMin) ;
 		neighbourhood.setSubsetMaximumSize(sampleMax) ;

@@ -16,10 +16,9 @@ package org.corehunter.neighbourhood;
 import org.corehunter.search.solution.SubsetSolution;
 
 
-public interface RemovedIndexMove<
-	IndexType, 
-	SolutionType extends SubsetSolution<IndexType>> extends
-    IndexedMove<IndexType, SolutionType>
-{
-	public IndexType getRemovedIndex() ;
+public interface RemovedIndexMove<IndexType, SolutionType extends SubsetSolution<IndexType>>
+        extends IndexedMove<IndexType, SolutionType> {
+
+    public IndexType getRemovedIndex();
+    
 }

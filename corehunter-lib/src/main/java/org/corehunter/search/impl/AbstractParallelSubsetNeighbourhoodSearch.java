@@ -24,7 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
@@ -38,213 +37,174 @@ import org.corehunter.search.solution.SubsetSolution;
 
 public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>,
-	NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>,
-	SubSearchType extends SubsetSearch<IndexType, SolutionType>>
-	extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
+        SolutionType extends SubsetSolution<IndexType>,
+        DatasetType extends IndexedData<IndexType>,
+        NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>,
+        SubSearchType extends SubsetSearch<IndexType, SolutionType>>
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
 {
-	private SearchListener<SolutionType> subSearchListener;
-	private ExecutorService executorService ;
-	private Map<SubSearchType, Future<SubSearchType>> futures;
-	private ThreadFactory threadFactory;
-	private CoreHunterException cachedException;
 
-	public AbstractParallelSubsetNeighbourhoodSearch()
-	{
-		super();
+    private SearchListener<SolutionType> subSearchListener;
+    private ExecutorService executorService;
+    private Map<SubSearchType, Future<SubSearchType>> futures;
+    private ThreadFactory threadFactory;
+    private CoreHunterException cachedException;
 
-		initialise() ;
-	}
+    public AbstractParallelSubsetNeighbourhoodSearch() {
+        super();
+        initialise();
+    }
 
-	protected AbstractParallelSubsetNeighbourhoodSearch(
-      AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType, SubSearchType> search) throws CoreHunterException
-  {
-		super(search);
+    protected AbstractParallelSubsetNeighbourhoodSearch(AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType, SubSearchType> search) throws CoreHunterException {
+        super(search);
+        initialise();
+    }
 
-		initialise() ;
-  }
+    private void initialise() {
+        subSearchListener = new SearchListenerAdapter<SolutionType>() {
+            @Override
+            public void searchFailed(Search<SolutionType> search, CoreHunterException exception) {
+                if (cachedException == null) // ignore subsequent errors
+                {
+                    cachedException = new CoreHunterException("Sub search failed due to : " + exception.getLocalizedMessage(), exception);
+                }
+            }
 
-	private void initialise()
-  {
-		subSearchListener = new SearchListenerAdapter<SolutionType>()
-		{
+            @Override
+            public void newBestSolution(Search<SolutionType> search, SolutionType bestSolution, double bestSolutionEvaluation) {
+                checkForBestSolution(search, bestSolution, bestSolutionEvaluation);
+            }
 
-			@Override
-			public void searchFailed(Search<SolutionType> search, CoreHunterException exception)
-			{	
-				if (cachedException == null) // ignore subsequent errors
-				{
-					cachedException = new CoreHunterException("Sub search failed due to : " + exception.getLocalizedMessage(), exception) ;
-				}
-			}
+            @Override
+            public void searchMessage(Search<SolutionType> search, String message) {
+                fireSearchMessage(message);
+            }
+        };
 
-			@Override
-			public void newBestSolution(Search<SolutionType> search,
-					SolutionType bestSolution, double bestSolutionEvaluation)
-			{
-				checkForBestSolution(search, bestSolution, bestSolutionEvaluation) ;
-			}
+        // create thread pool
+        final ThreadGroup threadGroup = new ThreadGroup("replicaThreadGroup");
 
-			@Override
-			public void searchMessage(Search<SolutionType> search, String message)
-			{
-				fireSearchMessage(message) ;
-			}
+        threadFactory = new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+                Thread thr = new Thread(threadGroup, r);
+                thr.setPriority(Thread.MIN_PRIORITY);
+                return thr;
+            }
+        };
 
-		} ;
-		
-		// create thread pool
-		final ThreadGroup threadGroup = new ThreadGroup("replicaThreadGroup");
+        executorService = Executors.newCachedThreadPool(threadFactory);
+        futures = new HashMap<SubSearchType, Future<SubSearchType>>();
+    }
 
-		threadFactory = new ThreadFactory()
-		{
-			public Thread newThread(Runnable r)
-			{
-				Thread thr = new Thread(threadGroup, r);
-				thr.setPriority(Thread.MIN_PRIORITY);
-				return thr;
-			}
-		};
-		
-		executorService = Executors.newCachedThreadPool(threadFactory);
-		futures = new HashMap<SubSearchType, Future<SubSearchType>>() ;
-  }
+    protected final void checkForBestSolution(Search<SolutionType> search, SolutionType bestSolution, double bestSolutionEvaluation) {
+        // TODO perhaps should getBestSolutionEvaluation() and getBestSolutionEvaluation() need to be syncrhonise to 
+        // avoid them being changed by other replicas, the problem is that this results in the thread hanging!
+        if (isBetterSolution(bestSolutionEvaluation, getBestSolutionEvaluation())
+                || (bestSolutionEvaluation == getBestSolutionEvaluation() && bestSolution.getSubsetSize() < getBestSolution().getSubsetSize())) // TODO should size matter?
+        {
+            handleNewBestSolution(bestSolution, bestSolutionEvaluation);
+        }
+    }
 
-	protected final void checkForBestSolution(Search<SolutionType> search,
-      SolutionType bestSolution, double bestSolutionEvaluation)
-  {
-		// TODO perhaps should getBestSolutionEvaluation() and getBestSolutionEvaluation() need to be syncrhonise to 
-		// avoid them being changed by other replicas, the problem is that this results in the thread hanging!
-	  if (isBetterSolution(bestSolutionEvaluation, getBestSolutionEvaluation()) || 
-	  		(bestSolutionEvaluation == getBestSolutionEvaluation() && bestSolution.getSubsetSize() < getBestSolution().getSubsetSize())) // TODO should size matter?
-	  {
-	  	handleNewBestSolution(bestSolution, bestSolutionEvaluation) ;
-	  }
-  }
-	
-	protected final synchronized void startSubSearches(List<SubSearchType> subSearches) throws CoreHunterException
-  {
-		List<SearchCallable<SolutionType, SubSearchType>> callables = new ArrayList<SearchCallable<SolutionType, SubSearchType>>() ;
-		
-		Iterator<SubSearchType> iterator = subSearches.iterator() ;
-		
-		SubSearchType subSearch ;
-		
-		while (iterator.hasNext())
-		{
-			subSearch = iterator.next() ;
-			
-			callables.add(new SearchCallable<SolutionType, SubSearchType>(subSearch)) ;
-		}
-		
-		try
-		{
-			executorService.invokeAll(callables) ;
-		}
-		catch (RejectedExecutionException exception)
-		{		
-			if (cachedException != null)
-				throw cachedException ;
-			else
-				throw new CoreHunterException("Error in thread pool: " + exception.getLocalizedMessage());
-		}
-		catch (InterruptedException exception)
-		{
-			throw new CoreHunterException("Error in thread pool: " + exception.getLocalizedMessage());
-		}
-  }
-	
-	protected final synchronized List<Future<SubSearchType>> submitSubSearches(List<SubSearchType> subSearches)
-  {
-		List<Future<SubSearchType>> futures = new ArrayList<Future<SubSearchType>>() ;
-		
-		Iterator<SubSearchType> iterator = subSearches.iterator() ;
-		
-		while (iterator.hasNext())
-		{
-			futures.add(submitSubSearch(iterator.next())) ;
-		}
-		
-		return futures ;
-  }
-	
-	protected final synchronized Future<SubSearchType> submitSubSearch(SubSearchType subSearch)
-  {
-		subSearch.addSearchListener(subSearchListener) ;
-		
-		Future<SubSearchType> future = executorService.submit(new SearchCallable<SolutionType, SubSearchType>(subSearch));
-		
-		futures.put(subSearch, future);
-		
-		return future ;
-  }
-	
-	protected final synchronized void submitSubSearch(SubSearchType lrrep, int priority)
-  {
-		Thread lrThread = threadFactory.newThread(new SearchRunnable<SolutionType, SubSearchType>(lrrep));
-		lrThread.setPriority(Thread.MAX_PRIORITY);
-		lrThread.start();
-  }
-	
-	protected final synchronized void removeCompletedSubSearches(List<SubSearchType> subSearches)
-  {
-		Iterator<SubSearchType> iterator = subSearches.iterator() ;
-		
-		while (iterator.hasNext())
-		{
-			removeCompletedSubSearch(iterator.next()) ;
-		}
-  }
-	
-	protected final synchronized Future<SubSearchType> removeCompletedSubSearch(SubSearchType subSearch)
-  {
-		return futures.remove(subSearch) ;
-  }
-	
-	protected final synchronized void registerSubSearches(List<SubSearchType> subSearches)
-  {
-		Iterator<SubSearchType> iterator = subSearches.iterator() ;
-		
-		while (iterator.hasNext())
-		{
-			registerSubSearch(iterator.next()) ;
-		}
-  }
-	
-	protected final synchronized void registerSubSearch(SubSearchType subSearch)
-  {
-		subSearch.addSearchListener(subSearchListener) ;
-  }
-	
-	protected final synchronized void unregisterSubSearches(List<SubSearchType> subSearches)
-  {
-		Iterator<SubSearchType> iterator = subSearches.iterator() ;
-		
-		while (iterator.hasNext())
-		{
-			unregisterSubSearch(iterator.next()) ;
-		}
-  }
-	
-	protected final synchronized void unregisterSubSearch(SubSearchType subSearch)
-  {
-		subSearch.removeSearchListener(subSearchListener) ;
-  }
-	
-	protected final boolean tabuReplicasBusy(List<Future<SubSearchType>> tabuFutures)
-	{
-		// remove all tabu replica futures which are already done
-		Iterator<Future<SubSearchType>> itr = tabuFutures.iterator();
-		while (itr.hasNext())
-		{
-			if (itr.next().isDone())
-			{
-				itr.remove();
-			}
-		}
-		// if busy futures remain, return true
-		return tabuFutures.size() > 0;
-	}
+    protected final synchronized void startSubSearches(List<SubSearchType> subSearches) throws CoreHunterException {
+        List<SearchCallable<SolutionType, SubSearchType>> callables = new ArrayList<SearchCallable<SolutionType, SubSearchType>>();
 
+        Iterator<SubSearchType> iterator = subSearches.iterator();
+
+        SubSearchType subSearch;
+
+        while (iterator.hasNext()) {
+            subSearch = iterator.next();
+
+            callables.add(new SearchCallable<SolutionType, SubSearchType>(subSearch));
+        }
+
+        try {
+            executorService.invokeAll(callables);
+        } catch (RejectedExecutionException exception) {
+            if (cachedException != null) {
+                throw cachedException;
+            } else {
+                throw new CoreHunterException("Error in thread pool: " + exception.getLocalizedMessage());
+            }
+        } catch (InterruptedException exception) {
+            throw new CoreHunterException("Error in thread pool: " + exception.getLocalizedMessage());
+        }
+    }
+
+    protected final synchronized List<Future<SubSearchType>> submitSubSearches(List<SubSearchType> subSearches) {
+        List<Future<SubSearchType>> newFutures = new ArrayList<Future<SubSearchType>>();
+
+        Iterator<SubSearchType> iterator = subSearches.iterator();
+
+        while (iterator.hasNext()) {
+            newFutures.add(submitSubSearch(iterator.next()));
+        }
+
+        return newFutures;
+    }
+
+    protected final synchronized Future<SubSearchType> submitSubSearch(SubSearchType subSearch) {
+        subSearch.addSearchListener(subSearchListener);
+
+        Future<SubSearchType> future = executorService.submit(new SearchCallable<SolutionType, SubSearchType>(subSearch));
+
+        futures.put(subSearch, future);
+
+        return future;
+    }
+
+    protected final synchronized void submitSubSearch(SubSearchType lrrep, int priority) {
+        Thread lrThread = threadFactory.newThread(new SearchRunnable<SolutionType, SubSearchType>(lrrep));
+        lrThread.setPriority(Thread.MAX_PRIORITY);
+        lrThread.start();
+    }
+
+    protected final synchronized void removeCompletedSubSearches(List<SubSearchType> subSearches) {
+        Iterator<SubSearchType> iterator = subSearches.iterator();
+
+        while (iterator.hasNext()) {
+            removeCompletedSubSearch(iterator.next());
+        }
+    }
+
+    protected final synchronized Future<SubSearchType> removeCompletedSubSearch(SubSearchType subSearch) {
+        return futures.remove(subSearch);
+    }
+
+    protected final synchronized void registerSubSearches(List<SubSearchType> subSearches) {
+        Iterator<SubSearchType> iterator = subSearches.iterator();
+
+        while (iterator.hasNext()) {
+            registerSubSearch(iterator.next());
+        }
+    }
+
+    protected final synchronized void registerSubSearch(SubSearchType subSearch) {
+        subSearch.addSearchListener(subSearchListener);
+    }
+
+    protected final synchronized void unregisterSubSearches(List<SubSearchType> subSearches) {
+        Iterator<SubSearchType> iterator = subSearches.iterator();
+
+        while (iterator.hasNext()) {
+            unregisterSubSearch(iterator.next());
+        }
+    }
+
+    protected final synchronized void unregisterSubSearch(SubSearchType subSearch) {
+        subSearch.removeSearchListener(subSearchListener);
+    }
+
+    protected final boolean tabuReplicasBusy(List<Future<SubSearchType>> tabuFutures) {
+        // remove all tabu replica futures which are already done
+        Iterator<Future<SubSearchType>> itr = tabuFutures.iterator();
+        while (itr.hasNext()) {
+            if (itr.next().isDone()) {
+                itr.remove();
+            }
+        }
+        // if busy futures remain, return true
+        return tabuFutures.size() > 0;
+    }
 }
