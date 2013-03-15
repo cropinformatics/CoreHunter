@@ -51,7 +51,7 @@ public class LocalSearch<
         setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
         // check if current solution is new best solution (may not be the case if this
         // is not the first run of this search engine)
-        if(isNewBestSolution(getCurrentSolutionEvaluation())){
+        if(isNewBestSolution(getCurrentSolutionEvaluation(), getCurrentSolution().getSubsetSize())){
             handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
         }
 
