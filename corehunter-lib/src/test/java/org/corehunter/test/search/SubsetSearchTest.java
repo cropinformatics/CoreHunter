@@ -46,7 +46,7 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
     protected final double DEFAULT_MINIMUM_PROGRESSION = 0;
     protected final int DEFAULT_MINIMUM_SIZE = 20;
     protected final int DEFAULT_MAXIMUM_SIZE = 50;
-    protected final int DEFAULT_TABU_HIST_SIZE = 10;
+    protected final int DEFAULT_TABU_HIST_SIZE = 20;
     protected final double DEFAULT_MINIMUM_TEMPERATURE = 50.0;
     protected final double DEFAULT_MAXIMUM_TEMPERATURE = 200.0;
     protected final long DEFAULT_NUMBER_OF_STEPS = INVALID_NUMBER_OF_STEPS;

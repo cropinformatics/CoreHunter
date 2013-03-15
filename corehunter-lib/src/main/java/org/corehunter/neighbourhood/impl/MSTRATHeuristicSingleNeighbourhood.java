@@ -57,7 +57,8 @@ public class MSTRATHeuristicSingleNeighbourhood<IndexType, SolutionType extends 
 
         // search for "best" neighbour by applying the MSTRAT heuristic
         
-        double neighbourEvaluation;        
+        double neighbourEvaluation;
+        int neighbourSize;
         Iterator<IndexType> iterator;
         IndexType index;
 
@@ -68,13 +69,15 @@ public class MSTRATHeuristicSingleNeighbourhood<IndexType, SolutionType extends 
         /* Look for best addition */
         /**************************/
 
-        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing());        
+        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing());
+        int bestNeighbourSize = getWorstSize();
         AdditionMove<IndexType, SolutionType> bestAdditionMove = null;
         
         // if a pure deletion move is possible, we do not necessarily have to add
         // an index first so in this case the option without an addition is also considered
         if (solution.getSubsetSize() > getSubsetMinimumSize()) {
             bestNeighbourEvaluation = objectiveFunction.calculate(solution);
+            bestNeighbourSize = solution.getSubsetSize();
         }
 
         // evaluate each addition move
@@ -87,12 +90,14 @@ public class MSTRATHeuristicSingleNeighbourhood<IndexType, SolutionType extends 
             additionMove = new AdditionMove<IndexType, SolutionType>(index);
             // apply move
             additionMove.apply(solution);
-            // compute new score
+            // compute new score and size
             neighbourEvaluation = objectiveFunction.calculate(solution);
+            neighbourSize = solution.getSubsetSize();
             // check score improvement and tabu
-            if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation)
+            if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
                     && (tabuManager == null || tabuManager.moveAllowed(additionMove, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
                 bestNeighbourEvaluation = neighbourEvaluation;
+                bestNeighbourSize = neighbourSize;
                 bestAdditionMove = additionMove;
             }
             // undo move
@@ -108,14 +113,16 @@ public class MSTRATHeuristicSingleNeighbourhood<IndexType, SolutionType extends 
         /* Now look for best deletion to follow */
         /****************************************/
         
-        // best addition has been determined, reset best evaluation
+        // best addition has been determined, reset best evaluation and size
         bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing());
+        bestNeighbourSize = getWorstSize();
         DeletionMove<IndexType, SolutionType> bestDeletionMove = null;
 
         if(bestAdditionMove != null && solution.getSubsetSize() <= getSubsetMaximumSize()){
             // an index was added and we did not exceed the maximum size, so it is not
             // necessarily required to delete something now as well (consider pure addition)
             bestNeighbourEvaluation = objectiveFunction.calculate(solution);
+            bestNeighbourSize = solution.getSubsetSize();
         }
         
         // evaluate each deletion move
@@ -133,12 +140,14 @@ public class MSTRATHeuristicSingleNeighbourhood<IndexType, SolutionType extends 
                 deletionMove = new DeletionMove<IndexType, SolutionType>(index);
                 // apply move
                 deletionMove.apply(solution);
-                // compute new score
+                // compute new score and size
                 neighbourEvaluation = objectiveFunction.calculate(solution);
+                neighbourSize = solution.getSubsetSize();
                 // check score improvement and tabu
-                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation)
+                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
                         && (tabuManager == null || tabuManager.moveAllowed(deletionMove, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
                     bestNeighbourEvaluation = neighbourEvaluation;
+                    bestNeighbourSize = neighbourSize;
                     bestDeletionMove = deletionMove;
                 }
                 // undo move
@@ -152,7 +161,7 @@ public class MSTRATHeuristicSingleNeighbourhood<IndexType, SolutionType extends 
             bestAdditionMove.undo(solution);
         }
         
-        // now apply the best move, where in case of both an addition and a deletion
+        // finally apply the best move, where in case of both an addition and a deletion
         // these are combined in a single swap move
         if(bestAdditionMove == null){
             if(bestDeletionMove == null){

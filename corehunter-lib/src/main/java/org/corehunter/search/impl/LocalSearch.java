@@ -44,29 +44,40 @@ public class LocalSearch<
     @Override
     protected void runSearch() throws CoreHunterException {
         
-        double newEvaluation;
-        int newSize;
+        double newEvaluation, evaluation;
+        int newSize, size;
 
+        // accept current solution
         setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
-        handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        // check if current solution is new best solution (may not be the case if this
+        // is not the first run of this search engine)
+        if(isNewBestSolution(getCurrentSolutionEvaluation())){
+            handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        }
 
         IndexedMove<IndexType, SolutionType> move;
         long step = 1;
 
         while (canContinue(step)) {
+            
             // run Local Search step
+            
+            size = getCurrentSolution().getSubsetSize();
+            evaluation = getCurrentSolutionEvaluation();
+            
             move = getNeighbourhood().performRandomMove(getCurrentSolution());
             if(move != null){
                 newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
                 newSize = getCurrentSolution().getSubsetSize();
                 // check if improvement
-                if (isBetterSolution(newEvaluation, getBestSolutionEvaluation())
-                        || (newEvaluation == getBestSolutionEvaluation() && newSize < getBestSolution().getSubsetSize())) // TODO assumes smaller cores are better
-                {
-                    // handle new best solution
-                    handleNewBestSolution(getCurrentSolution(), newEvaluation);
-                    // set current solution evaluation
+                if (isBetterSolution(newEvaluation, evaluation, newSize, size)) {
+                    // accept new solution
                     setCurrentSolutionEvaluation(newEvaluation);
+                    // check if new best solution
+                    if(isNewBestSolution(newEvaluation, newSize)){
+                        // handle new best solution
+                        handleNewBestSolution(getCurrentSolution(), newEvaluation);
+                    }
                 } else {
                     // reject new solution (undo move)
                     move.undo(getCurrentSolution());

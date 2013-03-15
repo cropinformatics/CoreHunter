@@ -65,7 +65,8 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
         // search for best neighbour by perturbing solution
         // in all possible ways (deletion, addition or swap)
         
-        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing()), neighbourEvaluation;        
+        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing()), neighbourEvaluation;
+        int bestNeighbourSize = getWorstSize(), neighbourSize;
         IndexedMove<IndexType, SolutionType> bestMove = null, move;
         
         // get selected and unselected indices (cached copies, see interface SubsetSolution)
@@ -85,12 +86,14 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
                 move = new DeletionMove<IndexType, SolutionType>(index);
                 // apply move
                 move.apply(solution);
-                // compute new score
+                // compute new score and size
                 neighbourEvaluation = objectiveFunction.calculate(solution);
+                neighbourSize = solution.getSubsetSize();
                 // check score improvement and tabu
-                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation)
+                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
                         && (tabuManager == null || tabuManager.moveAllowed(move, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
                     bestNeighbourEvaluation = neighbourEvaluation;
+                    bestNeighbourSize = neighbourSize;
                     bestMove = move;
                 }
                 // undo move
@@ -111,12 +114,14 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
                 move = new AdditionMove<IndexType, SolutionType>(index);
                 // apply move
                 move.apply(solution);
-                // compute new score
+                // compute new score and size
                 neighbourEvaluation = objectiveFunction.calculate(solution);
+                neighbourSize = solution.getSubsetSize();
                 // check score improvement and tabu
-                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation)
+                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
                         && (tabuManager == null || tabuManager.moveAllowed(move, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
                     bestNeighbourEvaluation = neighbourEvaluation;
+                    bestNeighbourSize = neighbourSize;
                     bestMove = move;
                 }
                 // undo move
@@ -145,12 +150,14 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
                 move = new SwapMove<IndexType, SolutionType>(indexToAdd, indexToRemove);
                 // apply move
                 move.apply(solution);
-                // compute new score
+                // compute new score and size
                 neighbourEvaluation = objectiveFunction.calculate(solution);
+                neighbourSize = solution.getSubsetSize();
                 // check score improvement and tabu
-                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation)
+                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
                         && (tabuManager == null || tabuManager.moveAllowed(move, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
                     bestNeighbourEvaluation = neighbourEvaluation;
+                    bestNeighbourSize = neighbourSize;
                     bestMove = move;
                 }
                 // undo swap

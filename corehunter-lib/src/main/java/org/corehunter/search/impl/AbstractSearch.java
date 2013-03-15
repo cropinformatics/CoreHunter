@@ -15,7 +15,6 @@
 package org.corehunter.search.impl;
 
 import java.util.Random;
-import static org.corehunter.Constants.INVALID_EVALUATION;
 import static org.corehunter.Constants.INVALID_NUMBER_OF_STEPS;
 import static org.corehunter.Constants.INVALID_TIME;
 import org.corehunter.CoreHunterException;
@@ -37,10 +36,10 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
     private Random random = new Random();
     private DataType data;
     private SolutionType solution;
-    private double evaluation = INVALID_EVALUATION;
+    private double evaluation;
     private SolutionType bestSolution;
-    private double bestSolutionEvaluation = INVALID_EVALUATION;
-    private double lastBestSolutionScoreDelta = Double.MAX_VALUE;
+    private double bestSolutionEvaluation;
+    private double lastBestSolutionEvaluationDelta;
     private SearchListenerHandler<SolutionType> searchListenerHandler;
     private SearchStatus status;
     private long startTime = -2;
@@ -52,12 +51,16 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
     private long maxTimeWithoutImprovement = INVALID_TIME;
     private long maxNrOfSteps = INVALID_NUMBER_OF_STEPS;
     private double minimumProgression = 0;
+    
+    // min delta for new best solution
+    private static final double MIN_DELTA_FOR_NEW_BEST_SOLUTION = 1e-10;
 
     public AbstractSearch() {
         super(getNextUniqueIdentifier(), getCurrentUniqueIdentifier());
 
         status = SearchStatus.NOT_STARTED;
         searchListenerHandler = new SearchListenerHandler<SolutionType>(this);
+        
     }
 
     @SuppressWarnings("unchecked")
@@ -67,11 +70,14 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
         status = SearchStatus.NOT_STARTED;
         searchListenerHandler = new SearchListenerHandler<SolutionType>(this);
 
-        // set current and best solution + evaluations
-        setInitialSolution((SolutionType) search.getCurrentSolution().copy());
+        // set data
         setData(search.getData());
+        
+        // set initial and best solution + evaluations
+        setInitialSolution((SolutionType) search.getCurrentSolution().copy());
         setCurrentSolutionEvaluation(search.getCurrentSolutionEvaluation());
-        setBestSolutionEvalution(search.getBestSolutionEvaluation());
+        setBestSolution((SolutionType) search.getBestSolution().copy());
+        setBestSolutionEvaluation(search.getBestSolutionEvaluation());
         
         // set stop criteria
         setRuntimeLimit(search.getRuntimeLimit());
@@ -83,14 +89,12 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
     /**
      * Sets the initial solution under evaluation
      *
-     * @return the initial solution under evaluation
      * @throws CoreHunterException if the search is in progress
      */
     public final void setInitialSolution(SolutionType solution) throws CoreHunterException {
         if (this.solution != solution) {
             setCurrentSolution(solution);
-            setBestSolution((SolutionType) solution.copy());
-            handleSolutionSet();
+            handleInitialSolutionSet();
         }
     }
 
@@ -110,17 +114,19 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
         if (!SearchStatus.STARTED.equals(status)) {
             startTime = System.nanoTime();
             bestSolutionTime = startTime;
+            // reset best solution delta to best value
+            lastBestSolutionEvaluationDelta = Double.MAX_VALUE;
 
             try {
+                
                 validate();
-
                 fireSearchStarted();
-
+                
                 runSearch();
 
                 endTime = System.nanoTime();
-
                 fireSearchCompleted();
+                
             } catch (CoreHunterException exception) {
                 endTime = System.nanoTime();
 
@@ -150,7 +156,7 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
     public boolean canContinue(long curStep){
         // check if search was stopped externally
         if(status.equals(SearchStatus.STOPPED)){
-            fireSearchMessage("Stopping... Search engine was terminated.");
+            fireSearchMessage("Stopping... Search engine terminated.");
             return false;
         }
         // check runtime limit
@@ -364,13 +370,12 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
 
     protected abstract void runSearch() throws CoreHunterException;
 
-    protected void handleSolutionSet() throws CoreHunterException {
+    protected void handleInitialSolutionSet() throws CoreHunterException {
         if (SearchStatus.STARTED.equals(status)) {
-            throw new CoreHunterException("Solution can not be set while search in process");
+            throw new CoreHunterException("Initial solution can not be set while search in process");
         }
-
         if (solution == null) {
-            throw new CoreHunterException("No solution defined!");
+            throw new CoreHunterException("No initial solution defined!");
         }
     }
 
@@ -387,7 +392,7 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
 
     @SuppressWarnings("unchecked")
     protected void handleNewBestSolution(SolutionType bestSolution, double bestSolutionEvaluation) {
-        setBestSolutionEvalution(bestSolutionEvaluation);
+        setBestSolutionEvaluation(bestSolutionEvaluation);
         setBestSolution((SolutionType) bestSolution.copy());
         fireNewBestSolution(getBestSolution(), bestSolutionEvaluation);
     }
@@ -397,36 +402,42 @@ public abstract class AbstractSearch<SolutionType extends Solution, DataType ext
         this.bestSolution = bestSolution;
     }
 
-    protected void setBestSolutionEvalution(double bestSolutionEvalution) {
-        // set score delta
-        if(this.bestSolutionEvaluation != INVALID_EVALUATION){
-            lastBestSolutionScoreDelta = getDeltaScore(bestSolutionEvalution, this.bestSolutionEvaluation);
-        } else {
-            // first best solution registered (cannot compute a delta yet, so set to maximum value)
-            lastBestSolutionScoreDelta = Double.MAX_VALUE;
-        }
+    protected final void setBestSolutionEvaluation(double bestSolutionEvaluation) {
+        lastBestSolutionEvaluationDelta = getDeltaScore(bestSolutionEvaluation, this.bestSolutionEvaluation);
         // register new evaluation
-        this.bestSolutionEvaluation = bestSolutionEvalution;
+        this.bestSolutionEvaluation = bestSolutionEvaluation;
     }
     
     /**
-     * Implementation should take care of maximization vs minimization of the evaluations.
+     * Implementation should take care of maximization vs minimization of the evaluation.
      * Positive delta for better evaluation, negative for worse.
      */
     protected abstract double getDeltaScore(double newEvalution, double oldEvalution);
     
     /**
-     * Implementation should take care of maximization vs minimization of the evaluations.
-     */
-    protected abstract boolean isBetterSolution(double newEvaluation, double oldEvaluation);
-    
-    /**
-     * Implementation should take care of maximization vs minimization of the evaluations.
+     * Implementation should take care of maximization vs minimization of the evaluation.
      */
     protected abstract double getWorstEvaluation();
     
+    /**
+     * Compare two different solutions.
+     */
+    protected boolean isBetterSolution(double newEvaluation, double oldEvaluation){
+        return getDeltaScore(newEvaluation, oldEvaluation) > 0;
+    }
+    
+    /**
+     * Check whether a solution is better than the currently best solution. Note: we
+     * require a fixed, small minimum improvement to avoid the same solution being reported
+     * multiple times as a new best solution because of rounding errors during computation
+     * of the evaluation.
+     */
+    protected boolean isNewBestSolution(double evaluation){
+        return getDeltaScore(evaluation, getBestSolutionEvaluation()) > MIN_DELTA_FOR_NEW_BEST_SOLUTION;
+    }
+        
     protected double getLastBestSolutionScoreDelta(){
-        return lastBestSolutionScoreDelta;
+        return lastBestSolutionEvaluationDelta;
     }
     
     protected void setCurrentSolution(SolutionType solution) {

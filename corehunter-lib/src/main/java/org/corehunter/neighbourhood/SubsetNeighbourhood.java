@@ -16,6 +16,7 @@ package org.corehunter.neighbourhood;
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.impl.IndexedTabuManager;
 import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.search.PreferredSize;
 import org.corehunter.search.solution.SubsetSolution;
 
 public interface SubsetNeighbourhood<IndexType, SolutionType extends SubsetSolution<IndexType>>
@@ -43,4 +44,9 @@ public interface SubsetNeighbourhood<IndexType, SolutionType extends SubsetSolut
     public int getSubsetMaximumSize();
 
     public void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException;
+    
+    public PreferredSize getSubsetPreferredSize();
+        
+    public void setSubsetPreferredSize(PreferredSize size) throws CoreHunterException;
+    
 }

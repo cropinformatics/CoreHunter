@@ -15,10 +15,12 @@
 package org.corehunter.neighbourhood.impl;
 
 import java.util.Random;
+import static org.corehunter.Constants.INVALID_SIZE;
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.search.PreferredSize;
 import org.corehunter.search.solution.SubsetSolution;
 
 /**
@@ -29,8 +31,9 @@ import org.corehunter.search.solution.SubsetSolution;
 public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extends SubsetSolution<IndexType>> implements SubsetNeighbourhood<IndexType, SolutionType> {
 
     private Random random = new Random();
-    private int subsetMinimumSize;
-    private int subsetMaximumSize;
+    private int subsetMinimumSize = INVALID_SIZE;
+    private int subsetMaximumSize = INVALID_SIZE;
+    private PreferredSize subsetPreferredSize = PreferredSize.DONT_CARE;
 
     public AbstractSubsetNeighbourhood() {
     }
@@ -38,6 +41,7 @@ public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extend
     protected AbstractSubsetNeighbourhood(AbstractSubsetNeighbourhood<IndexType, SolutionType> singleneighbourhood) throws CoreHunterException {
         setSubsetMinimumSize(singleneighbourhood.getSubsetMinimumSize());
         setSubsetMaximumSize(singleneighbourhood.getSubsetMaximumSize());
+        setSubsetPreferredSize(singleneighbourhood.getSubsetPreferredSize());
     }
     
     /**
@@ -70,36 +74,36 @@ public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extend
     }
 
     @Override
-    public synchronized final void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException {
+    public final void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException {
         if (this.subsetMaximumSize != subsetMaximumSize) {
             this.subsetMaximumSize = subsetMaximumSize;
             handleSubsetMaximumSizeSet();
         }
     }
-
+    
+    @Override 
+    public final PreferredSize getSubsetPreferredSize(){
+        return subsetPreferredSize;
+    }
+    
+    @Override
+    public final void setSubsetPreferredSize(PreferredSize size){
+        if (this.subsetPreferredSize != size){
+            this.subsetPreferredSize = size;
+        }
+    }
+    
     @Override
     public void validate() throws CoreHunterException {
         if (subsetMinimumSize <= 0) {
             throw new CoreHunterException("Subset minimum size must be greater than zero!");
         }
-
         if (subsetMaximumSize <= 0) {
             throw new CoreHunterException("Subset maximum size must be greater than zero!");
         }
-        
         if (subsetMaximumSize < subsetMinimumSize) {
             throw new CoreHunterException("Subset maximum size must be greater then or equal to minimum size!");
         }
-
-        // TODO
-//        if (subsetMinimumSize <= getDataset().getSize()) {
-//            throw new CoreHunterException("Subset minimum size must be less than or equal to dataset size!") ;
-//        }
-//
-//        if (subsetMaximumSize <= getDataset().getSize()) {
-//            throw new CoreHunterException("Subset maximum size must be less than or equal to dataset size!") ;
-//        }
-        
     }
 
     public final void setRandom(Random random) {
@@ -122,8 +126,44 @@ public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extend
         }
     }
 
-    protected boolean isBetterNeighbour(boolean isMinimizing, double neighbourEvaluation, double curBestNeighbourEvaluation) {
-        return isMinimizing ? neighbourEvaluation < curBestNeighbourEvaluation : neighbourEvaluation > curBestNeighbourEvaluation;
+    protected double getDeltaScore(boolean isMinimizing, double neighbourEvaluation, double curBestNeighbourEvaluation){
+        return isMinimizing ? curBestNeighbourEvaluation - neighbourEvaluation : neighbourEvaluation - curBestNeighbourEvaluation;
+    }
+    
+    protected boolean isBetterNeighbour(boolean isMinimizing, double neighbourEvaluation,
+                                            double curBestNeighbourEvaluation, int neighbourSize, int curBestNeighbourSize) {
+        double delta = getDeltaScore(isMinimizing, neighbourEvaluation, curBestNeighbourEvaluation);
+        if(delta > 0){
+            // better score
+            return true;
+        } else if (delta == 0) {
+            // equal score: check size to break tie
+            return isBetterSize(neighbourSize, curBestNeighbourSize);
+        } else {
+            // worse score
+            return false;
+        }
+    }
+    
+    private boolean isBetterSize(int newSize, int oldSize){
+        int sizeDelta = newSize - oldSize;
+        if(getSubsetPreferredSize() == PreferredSize.LARGEST && sizeDelta > 0
+                || getSubsetPreferredSize() == PreferredSize.SMALLEST && sizeDelta < 0){
+            return true;
+        } else {
+            // size not better (or don't care about size)
+            return false;
+        }
+    }
+    
+    protected int getWorstSize(){
+        if (getSubsetPreferredSize() == PreferredSize.LARGEST){
+            return Integer.MIN_VALUE;
+        } else if (getSubsetPreferredSize() == PreferredSize.SMALLEST){
+            return Integer.MAX_VALUE;
+        } else {
+            return INVALID_SIZE;
+        }
     }
 
     protected double getWorstEvaluation(boolean isMinimizing) {

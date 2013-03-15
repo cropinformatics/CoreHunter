@@ -36,24 +36,12 @@ public class MetropolisSearch<
 
     private final static double K_b = 7.213475e-7;
     private double temperature = INVALID_TEMPERATURE;
-    private int accepts;
-    private int rejects;
-    private int improvements;
-    private int totalSteps;
 
     public MetropolisSearch() {
-        accepts = 0;
-        rejects = 0;
-        improvements = 0;
-        totalSteps = 0;
     }
 
     protected MetropolisSearch(MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
-        accepts = 0;
-        rejects = 0;
-        improvements = 0;
-        totalSteps = 0;
         setTemperature(search.getTemperature());
     }
 
@@ -93,19 +81,24 @@ public class MetropolisSearch<
     @Override
     public String toString() {
         DecimalFormat df = new DecimalFormat("#.##");
-        return " (T = " + df.format(temperature) + ")";
+        return "Metropolis (T = " + df.format(temperature) + ")";
     }
 
     @Override
     protected void runSearch() throws CoreHunterException {
         
         double evaluation, newEvaluation;
-        boolean acceptMove;
         int size, newSize;
         IndexedMove<IndexType, SolutionType> move;
-
+        boolean acceptMove;
+        
+        // accept current solution
         setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
-        handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        // check if current solution is new best solution (may not be the case if this
+        // is not the first run of this search engine)
+        if(isNewBestSolution(getCurrentSolutionEvaluation())){
+            handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        }
         
         long curStep = 1;
         while (canContinue(curStep)) {
@@ -115,65 +108,38 @@ public class MetropolisSearch<
             
             move = getNeighbourhood().performRandomMove(getCurrentSolution());
             if(move != null){
-                newSize = getCurrentSolution().getSubsetSize();
+                // compute new evaluation and size
                 newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
-
-                double deltaScore = getDeltaScore(newEvaluation, evaluation);
+                newSize = getCurrentSolution().getSubsetSize();
 
                 // check for improvement w.r.t current solution
-                if (deltaScore > 0 || (deltaScore == 0 && newSize < size)) // TODO should we always accept smaller solutions for equal evaluations?
-                {
-                    // accept new solution!
+                if (isBetterSolution(newEvaluation, evaluation, newSize, size)) {
+                    // better solution: always accept it!
                     acceptMove = true;
                 } else {
-
-                    // no improvement -- annealing criterion used to decide whether
-                    // to accept the new solution
-
-                    int deltaSize = newSize - size;
-
-                    if (deltaSize > 0) // TODO should we always reject larger solutions for worst evaluations?
-                    {
-                        // new solution is bigger than old solution and has no better
-                        // evaluation --> reject new solution, stick with old solution
-
-                        acceptMove = false;
-                    } else {
-                        // new solution is smaller, but has worse or equal evaluation
-                        // accept or reject new solution based on temperature
-                        double P = Math.exp(deltaScore / (temperature * K_b));
-                        double Q = getRandom().nextDouble();
-
-                        if (Q > P) {
-                            acceptMove = false;
-                        } else {
-                            // accept new solution!
-                            acceptMove = true;
-                        }
-                    }
+                    // solution is not better: apply annealing criterion
+                    double P = Math.exp(getDeltaScore(newEvaluation, evaluation) / (temperature * K_b));
+                    double Q = getRandom().nextDouble();
+                    acceptMove = (Q < P);
                 }
 
+                // check if move was accepted
                 if (acceptMove) {
                     // accept solution
                     setCurrentSolutionEvaluation(newEvaluation);
                     // check for improvement w.r.t *best* solution
-                    double deltaScoreBest = getDeltaScore(newEvaluation, getBestSolutionEvaluation());
-                    if (deltaScoreBest > 0 || (deltaScoreBest == 0 && newSize < getBestSolution().getSubsetSize())) {
+                    if (isNewBestSolution(newEvaluation, newSize)) {
                         // new best solution!
-                        handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
-                        improvements++;
+                        handleNewBestSolution(getCurrentSolution(), newEvaluation);
                     }
-                    accepts++;
                 } else {
                     // reject solution: undo move
                     move.undo(getCurrentSolution());
-                    rejects++;
                 }
             } else {
                 // no neighbour found
                 stop();
             }
-            totalSteps++;
             curStep++;
         }
     }

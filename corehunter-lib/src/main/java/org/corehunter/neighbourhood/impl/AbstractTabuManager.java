@@ -25,7 +25,7 @@ public abstract class AbstractTabuManager<MoveType extends Move>
 {
     
     // aspiration criterion delta
-    protected static final double MIN_TABU_ASPIRATION_DELTA = 10e-10;
+    protected static final double MIN_TABU_ASPIRATION_DELTA = 1e-10;
     
     // tabu history size
     protected int histSize;

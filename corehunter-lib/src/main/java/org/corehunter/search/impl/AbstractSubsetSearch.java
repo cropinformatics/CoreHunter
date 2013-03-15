@@ -17,6 +17,7 @@ package org.corehunter.search.impl;
 import static org.corehunter.Constants.INVALID_SIZE;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
+import org.corehunter.search.PreferredSize;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;
 import org.corehunter.search.solution.SubsetSolution;
@@ -27,6 +28,7 @@ public abstract class AbstractSubsetSearch<IndexType, SolutionType extends Subse
 
     private int subsetMinimumSize = INVALID_SIZE;
     private int subsetMaximumSize = INVALID_SIZE;
+    private PreferredSize subsetPreferredSize = PreferredSize.DONT_CARE;
 
     public AbstractSubsetSearch() {
         super();
@@ -36,6 +38,62 @@ public abstract class AbstractSubsetSearch<IndexType, SolutionType extends Subse
         super(search);
         setSubsetMinimumSize(search.getSubsetMinimumSize());
         setSubsetMaximumSize(search.getSubsetMaximumSize());
+        setSubsetPreferredSize(search.getSubsetPreferredSize());
+    }
+    
+    /**
+     * Check for new best solution based on both its evaluation and its size, where
+     * the size is used to break ties according to the preferred subset size setting.
+     * 
+     * @param evaluation
+     * @param size
+     * @return 
+     */
+    protected boolean isNewBestSolution(double evaluation, int size){
+        if(isNewBestSolution(evaluation)){
+            // better solution based on evaluation
+            return true;
+        } else if (getDeltaScore(evaluation, getBestSolutionEvaluation()) >= 0) {
+            // evaluation not worse: break tie based on size
+            return isBetterSize(size, getBestSolution().getSubsetSize());
+        } else {
+            // worse evaluation
+            return false;
+        }
+    }
+    
+    /**
+     * Compare two different solutions based on both evaluation and size, where the
+     * size is used to break ties according to the preferred subset size setting.
+     * 
+     * @param newEvaluation
+     * @param oldEvaluation
+     * @param newSize
+     * @param oldSize
+     * @return 
+     */
+    protected boolean isBetterSolution(double newEvaluation, double oldEvaluation, int newSize, int oldSize){
+        if(isBetterSolution(newEvaluation, oldEvaluation)){
+            // better based on evaluation 
+            return true;
+        } else if (getDeltaScore(newEvaluation, oldEvaluation) >= 0) {
+            // evaluation not worse: check sizes to break tie
+            return isBetterSize(newSize, oldSize);
+        } else {
+            // worse evaluation
+            return false;
+        }
+    }
+    
+    private boolean isBetterSize(int newSize, int oldSize){
+        int sizeDelta = newSize - oldSize;
+        if(subsetPreferredSize == PreferredSize.LARGEST && sizeDelta > 0
+                || subsetPreferredSize == PreferredSize.SMALLEST && sizeDelta < 0){
+            return true;
+        } else {
+            // size not better (or don't care about size)
+            return false;
+        }
     }
 
     @Override
@@ -63,27 +121,35 @@ public abstract class AbstractSubsetSearch<IndexType, SolutionType extends Subse
             handleSubsetMaximumSizeSet();
         }
     }
+    
+    @Override
+    public final PreferredSize getSubsetPreferredSize(){
+        return subsetPreferredSize;
+    }
+    
+    @Override
+    public final void setSubsetPreferredSize(PreferredSize size) throws CoreHunterException{
+        if (this.subsetPreferredSize != size){
+            this.subsetPreferredSize = size;
+            handleSubsetPreferredSizeSet();
+        }
+    }
 
     @Override
     protected void validate() throws CoreHunterException {
         super.validate();
-
         if (subsetMinimumSize <= 0) {
             throw new CoreHunterException("Subset minimum size must be greater than zero!");
         }
-
         if (subsetMaximumSize <= 0) {
             throw new CoreHunterException("Subset maximum size must be greater than zero!");
         }
-
-        if (subsetMinimumSize > getData().getSize()) {
+        if (subsetMinimumSize >= getData().getSize()) {
             throw new CoreHunterException("Subset minimum size must be less than the dataset size!");
         }
-
         if (subsetMaximumSize > getData().getSize()) {
-            throw new CoreHunterException("Subset maximum size must be less than the dataset size!");
+            throw new CoreHunterException("Subset maximum size must be less than or equal to the dataset size!");
         }
-
         if (subsetMaximumSize < subsetMinimumSize) {
             throw new CoreHunterException("Subset maximum size must be greater then or equal to minimum size!");
         }
@@ -104,6 +170,12 @@ public abstract class AbstractSubsetSearch<IndexType, SolutionType extends Subse
         }
         if (subsetMaximumSize <= 0) {
             throw new CoreHunterException("Subset maximum size must be greater than zero!");
+        }
+    }
+    
+    protected void handleSubsetPreferredSizeSet() throws CoreHunterException {
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Subset preferred size can not be set while search in process");
         }
     }
 

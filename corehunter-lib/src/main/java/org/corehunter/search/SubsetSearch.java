@@ -16,10 +16,9 @@ package org.corehunter.search;
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.solution.SubsetSolution;
 
-public interface SubsetSearch<
-	IndexType,
-	SolutionType extends SubsetSolution<IndexType>> extends Search<SolutionType>
+public interface SubsetSearch< IndexType, SolutionType extends SubsetSolution<IndexType>> extends Search<SolutionType>
 {
+    
 	public int getSubsetMinimumSize() ;
 
 	public void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException ;
@@ -27,5 +26,9 @@ public interface SubsetSearch<
 	public int getSubsetMaximumSize() ;
 	
 	public void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException ;
+        
+        public PreferredSize getSubsetPreferredSize();
+        
+        public void setSubsetPreferredSize(PreferredSize size) throws CoreHunterException;
 	
 }

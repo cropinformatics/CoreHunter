@@ -18,7 +18,6 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
-import org.corehunter.neighbourhood.TabuManager;
 import org.corehunter.neighbourhood.impl.IndexedTabuManager;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
@@ -85,9 +84,14 @@ public class TabuSearch<
         IndexedMove<IndexType, SolutionType> move;
         double newEvaluation;
         int newSize;
-
+        
+        // accept current solution
         setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
-        handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        // check if current solution is new best solution (may not be the case if this
+        // is not the first run of this search engine)
+        if(isNewBestSolution(getCurrentSolutionEvaluation())){
+            handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        }
         
         long step = 1;
         while (canContinue(step)) {
@@ -102,11 +106,9 @@ public class TabuSearch<
                 // ALWAYS accept new solution, even it is not an improvement
                 setCurrentSolutionEvaluation(newEvaluation);
                 // check if new best solution was found
-                if (isBetterSolution(newEvaluation, getBestSolutionEvaluation())
-                        || (newEvaluation == getBestSolutionEvaluation() && newSize < getBestSolution().getSubsetSize())) // TODO assumes smaller cores are better
-                {
+                if (isNewBestSolution(newEvaluation, newSize)) {
                     // handle new best solution
-                    handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+                    handleNewBestSolution(getCurrentSolution(), newEvaluation);
                 }
                 // register last move in tabu manager
                 tabuManager.registerMoveTaken(move);

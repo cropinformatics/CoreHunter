@@ -46,6 +46,10 @@ public abstract class AbstractObjectiveSearch<SolutionType extends Solution, Dat
         if (this.objectiveFunction != objectiveFunction) {
             this.objectiveFunction = objectiveFunction;
             handleObjectiveFunctionSet();
+            // reset solution evaluations to worst possible values
+            // when the objective was set or changed
+            setCurrentSolutionEvaluation(getWorstEvaluation());
+            setBestSolutionEvaluation(getWorstEvaluation());
         }
     }
     
@@ -55,11 +59,6 @@ public abstract class AbstractObjectiveSearch<SolutionType extends Solution, Dat
     @Override
     protected double getDeltaScore(double newEvalution, double oldEvalution) {
         return getObjectiveFunction().isMinimizing() ? oldEvalution - newEvalution : newEvalution - oldEvalution;
-    }
-
-    @Override
-    protected boolean isBetterSolution(double newEvaluation, double oldEvaluation) {
-        return getObjectiveFunction().isMinimizing() ? newEvaluation < oldEvaluation : newEvaluation > oldEvaluation;
     }
 
     @Override
