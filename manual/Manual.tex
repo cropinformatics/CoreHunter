@@ -174,6 +174,20 @@ which samples a core with the same parameters as the first example discussed in 
 \begin{verbatim}
     coreanalyser.run("data/examples/bul.csv")
 \end{verbatim}
+The \texttt{coreanalyser.run} command returns a data frame containing the evaluation scores for each diversity measure (columns) and given dataset (rows). For example, when evaluating two core sets \texttt{core1.csv} and \texttt{core2.csv} the command
+\begin{verbatim}
+    eval = coreanalyser.run("core1.csv core2.csv")
+\end{verbatim}
+will return a data frame with the following format:\\[2ex]
+{
+\ttfamily
+\begin{tabular}{llllllllll}
+                   & MR & MRmin & CE & CEmin & SH & HE &NE &PN &CV \\
+core1.csv	  &...& ...	& ... & ... & ... & ... & ...	 & ... & ... \\
+core2.csv	  &...	& ...	 & ... & ... & ... & ... & ... & ... & ...
+\end{tabular}
+}
+
 By default the R script assigns 512 megabytes of RAM memory to the Java virtual machine. However, when sampling from larger datasets this may not be sufficient and may result in a Java heap space error, indicating that the Java virtual machine ran out of memory. Therefore, if desired, the assigned amount of memory can be changed using the optional \texttt{mem} parameter which is available for both \texttt{corehunter.run} and \texttt{coreanalyser.run}. For example, the following command assigns 1 gigabyte of RAM to Core Hunter:
 \begin{verbatim}
     corehunter.run("-MR 0.7 -SH 0.3 data/examples/bul.csv core.csv", mem="1g")
