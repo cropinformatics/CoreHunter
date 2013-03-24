@@ -1,4 +1,4 @@
-package org.corehunter.test;
+package org.corehunter.test.model.ssr.impl;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

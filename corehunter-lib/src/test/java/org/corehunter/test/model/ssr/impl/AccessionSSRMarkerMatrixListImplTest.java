@@ -1,4 +1,4 @@
-package org.corehunter.test;
+package org.corehunter.test.model.ssr.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;

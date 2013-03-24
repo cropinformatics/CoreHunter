@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.corehunter.test.model.impl;
+package org.corehunter.test.model.ssr.impl;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,6 +34,7 @@ import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImpl;
 import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileReader;
 import org.corehunter.model.ssr.impl.SSRAlleleImpl;
 import org.corehunter.model.ssr.impl.SSRMarkerImpl;
+import org.corehunter.test.model.impl.DataReaderTest;
 
 public class AccessionSSRMarkerMatrixDatasetListImplDataFileReaderTest extends DataReaderTest<AccessionSSRMarkerMatrix<Integer>>
 {

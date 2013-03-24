@@ -34,7 +34,7 @@ public class EntityWithDescriptionImpl extends EntityImpl implements EntityWithD
         setDescription(description);
     }
 
-    protected EntityWithDescriptionImpl(EntityWithDescriptionImpl entityWithDescription) {
+    protected EntityWithDescriptionImpl(EntityWithDescription entityWithDescription) {
         super(entityWithDescription);
         setDescription(entityWithDescription.getDescription());
     }

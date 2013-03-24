@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.corehunter.test.model.impl;
+package org.corehunter.test.model.variable.impl;
 
 import static org.junit.Assert.assertEquals;
 
@@ -40,6 +40,7 @@ import org.corehunter.model.variable.interval.IntegerIntervalVariable;
 import org.corehunter.model.variable.nominal.ShortNominalVariable;
 import org.corehunter.model.variable.ordinal.LongOrdinalVariable;
 import org.corehunter.model.variable.ratio.DoubleRatioVariable;
+import org.corehunter.test.model.impl.DataReaderTest;
 
 public class AccessionVariableMatrixDatasetListImplDataFileReaderTest extends DataReaderTest<Matrix<Integer, Object, Accession, Variable>>
 {

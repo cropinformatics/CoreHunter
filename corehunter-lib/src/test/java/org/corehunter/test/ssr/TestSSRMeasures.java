@@ -1,4 +1,4 @@
-package org.corehunter.test;
+package org.corehunter.test.ssr;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.corehunter.ssr.AbstractAccessionSSRDistanceMeasure;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
+import org.corehunter.test.model.ssr.impl.AccessionSSRMarkerMatrixListImplTest;
 import org.junit.Before;
 import org.junit.Test;
 
