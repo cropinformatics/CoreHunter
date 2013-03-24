@@ -35,7 +35,7 @@ public abstract class DataReaderTest<DataType extends Data>
 	    
 	    DataType dataset ;
 	    
-	    int testCount = getTextCount() ;
+	    int testCount = getTestCount() ;
 	    
 			for (int i = 0 ; i < testCount ; ++i)
 			{
@@ -55,7 +55,7 @@ public abstract class DataReaderTest<DataType extends Data>
     }
 	}
 
-	protected int getTextCount()
+	protected int getTestCount()
   {
 	  return 0 ;
   }

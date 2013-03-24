@@ -1,4 +1,4 @@
-package org.corehunter.test.ssr;
+package org.corehunter.test.objectivefunction.ssr;
 
 import static org.junit.Assert.assertEquals;
 
@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.corehunter.ssr.AbstractAccessionSSRDistanceMeasure;
-import org.corehunter.ssr.ModifiedRogersDistanceSSR;
+import org.corehunter.objectivefunction.ssr.AbstractAccessionSSRDistanceMeasure;
+import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.model.ssr.impl.AccessionSSRMarkerMatrixListImplTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import org.junit.Test;
  * @author Chris Thachuk <chris.thachuk@gmail.com>
  * @version $Rev$
  */
-public final class TestSSRMeasures
+public final class TestModifiedRogersDistanceSSR
 {
 	private static final double	precision	= 0.00001;
 	private AccessionSSRMarkerMatrixListImplTest	        ssrData;

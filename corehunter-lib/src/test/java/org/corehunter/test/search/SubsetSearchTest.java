@@ -28,6 +28,7 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.model.impl.AbstractFileUtility;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileReader;
+import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.ObjectiveSearch;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchListener;
@@ -37,7 +38,6 @@ import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.PrintWriterSubsetSearchListener;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
-import org.corehunter.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.search.ssr.SSRLocalSearchTest;
 import org.junit.BeforeClass;
 

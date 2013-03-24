@@ -43,7 +43,7 @@ public class AccessionSSRMarkerMatrixDatasetListImplDataFileReaderTest extends D
 	private static final String MARKER_DATASET_NAME_PREFIX = "Markers for " + SSR_DATA_NAME ;
 	
 	@Override
-	protected int getTextCount()
+	protected int getTestCount()
   {
 	  return 1 ;
   }

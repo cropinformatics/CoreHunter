@@ -36,9 +36,9 @@ import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.objectivefunction.DuplicateMeasureException;
 import org.corehunter.objectivefunction.MultipleObjectiveFunction;
 import org.corehunter.objectivefunction.UnknownMeasureException;
+import org.corehunter.objectivefunction.ssr.MeasureFactorySSR;
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;
-import org.corehunter.ssr.MeasureFactorySSR;
 
 /**
  * A simple text based driver for Core Hunter.

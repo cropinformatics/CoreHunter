@@ -78,8 +78,8 @@ public class AccessionVariableMatrixListImplDataFileReader
 	private static final List<String> TRUE = new ArrayList<String>(4);
 	private static final List<String> FALSE = new ArrayList<String>(4);
 	private static final String EMPTY_STRING = "";
-	private static final String MINIMUM_VALUE = null;
-	private static final String MAXIMUM_VALUE = null;
+	private static final String MINIMUM_VALUE = "min";
+	private static final String MAXIMUM_VALUE = "max";
 	
 	static
 	{
@@ -190,7 +190,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 						{
 							uniqueIdentifiers = true ;
 							names = true ;
-							firstColumn = 1 ;
+							firstColumn = 2 ;
 						}
 						else
 						{
@@ -281,7 +281,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 					throw new CoreHunterException("Dataset must contain at least 1 variable");
 				}
 				
-				parseAccession(accessions, names ? line[0] : null, uniqueIdentifiers ? line[1] : null, lineNumber) ;
+				parseAccession(accessions, uniqueIdentifiers ? line[0] : null, names ? uniqueIdentifiers ? line[1] : line[0] : null, lineNumber) ;
 				
 				parseLine(elements, accessions, variables, line, ranges, lineNumber, firstColumn) ;
 
@@ -291,7 +291,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 					line = (String[]) iterator.next();
 					lineNumber++;
 					
-					parseAccession(accessions, names ? line[0] : null, uniqueIdentifiers ? line[1] : null, lineNumber) ;
+					parseAccession(accessions, uniqueIdentifiers ? line[0] : null, names ? uniqueIdentifiers ? line[1] : line[0] : null, lineNumber) ;
 					
 					parseLine(elements, accessions, variables, line, ranges, lineNumber, firstColumn) ;
 				}
@@ -313,7 +313,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 			return dataset;
   }
 	
-	protected void parseAccession(List<Accession> accessions, String name, String uniqueIdentifier, int lineNumber)
+	protected void parseAccession(List<Accession> accessions, String uniqueIdentifier, String name, int lineNumber)
   {
 		if (name != null)
 			if (uniqueIdentifier != null)
@@ -380,6 +380,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 						variable = new BinaryVariable(uniqueIdentifier, name) ;
 					else
 						throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
+					break ;
 				case INTERVAL:
 					if (dataType != null)
 					{
@@ -389,27 +390,32 @@ public class AccessionVariableMatrixListImplDataFileReader
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new DoubleIntervalVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
 								else
-									variable = new DoubleIntervalVariable(uniqueIdentifier, name) ;						
+									variable = new DoubleIntervalVariable(uniqueIdentifier, name) ;			
+								break ;
 							case FLOAT:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new FloatIntervalVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
 								else
 									variable = new FloatIntervalVariable(uniqueIdentifier, name) ;
+								break ;
 							case INTEGER:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new IntegerIntervalVariable(uniqueIdentifier, name, Integer.valueOf(minimumStringValue), Integer.valueOf(maximumStringValue)) ;
 								else
 									variable = new IntegerIntervalVariable(uniqueIdentifier, name) ;
+								break ;
 							case LONG:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new LongIntervalVariable(uniqueIdentifier, name, Long.valueOf(minimumStringValue), Long.valueOf(maximumStringValue)) ;
 								else
 									variable = new LongIntervalVariable(uniqueIdentifier, name) ;
+								break ;
 							case SHORT:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new ShortIntervalVariable(uniqueIdentifier, name, Short.valueOf(minimumStringValue), Short.valueOf(maximumStringValue)) ;
 								else
 									variable = new ShortIntervalVariable(uniqueIdentifier, name) ;
+								break ;
 							case STRING:
 							case BOOLEAN:
 							default:
@@ -420,6 +426,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 					{
 						variable = new DoubleIntervalVariable(uniqueIdentifier, name) ;
 					}
+					break ;
 				case NOMINAL:
 					if (dataType != null)
 					{
@@ -427,16 +434,22 @@ public class AccessionVariableMatrixListImplDataFileReader
 						{
 							case DOUBLE:
 								variable = new DoubleNominalVariable(uniqueIdentifier, name) ;
+								break ;
 							case FLOAT:
 								variable = new FloatNominalVariable(uniqueIdentifier, name) ;
+								break ;
 							case INTEGER:
 								variable = new IntegerNominalVariable(uniqueIdentifier, name) ;
+								break ;
 							case LONG:
 								variable = new LongNominalVariable(uniqueIdentifier, name) ;
+								break ;
 							case SHORT:
 								variable = new ShortNominalVariable(uniqueIdentifier, name) ;
+								break ;
 							case STRING:
 								variable = new StringNominalVariable(uniqueIdentifier, name) ;
+								break ;
 							case BOOLEAN:
 							default:
 								throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
@@ -444,8 +457,9 @@ public class AccessionVariableMatrixListImplDataFileReader
 					}
 					else
 					{
-						return new StringNominalVariable(uniqueIdentifier, name) ;
+						variable = new StringNominalVariable(uniqueIdentifier, name) ;
 					}
+					break ;
 				case ORDINAL:
 					if (dataType != null)
 					{
@@ -456,26 +470,31 @@ public class AccessionVariableMatrixListImplDataFileReader
 									variable = new DoubleOrdinalVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
 								else
 									variable = new DoubleOrdinalVariable(uniqueIdentifier, name) ;
+								break ;
 							case FLOAT:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new FloatOrdinalVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
 								else
 									variable = new FloatOrdinalVariable(uniqueIdentifier, name) ;
+								break ;
 							case INTEGER:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new IntegerOrdinalVariable(uniqueIdentifier, name, Integer.valueOf(minimumStringValue), Integer.valueOf(maximumStringValue)) ;
 								else
 									variable = new IntegerOrdinalVariable(uniqueIdentifier, name) ;
+								break ;
 							case LONG:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new LongOrdinalVariable(uniqueIdentifier, name, Long.valueOf(minimumStringValue), Long.valueOf(maximumStringValue)) ;
 								else
 									variable = new LongOrdinalVariable(uniqueIdentifier, name) ;
+								break ;
 							case SHORT:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new ShortOrdinalVariable(uniqueIdentifier, name, Short.valueOf(minimumStringValue), Short.valueOf(maximumStringValue)) ;
 								else
 									variable = new ShortOrdinalVariable(uniqueIdentifier, name) ;
+								break ;
 							case STRING:
 							case BOOLEAN:
 							default:
@@ -484,8 +503,9 @@ public class AccessionVariableMatrixListImplDataFileReader
 					}
 					else
 					{
-						return new IntegerOrdinalVariable(uniqueIdentifier, name) ;
+						variable =  new IntegerOrdinalVariable(uniqueIdentifier, name) ;
 					}
+					break ;
 				case RATIO:
 					if (dataType != null)
 					{
@@ -496,11 +516,13 @@ public class AccessionVariableMatrixListImplDataFileReader
 									variable = new DoubleRatioVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
 								else
 									variable = new DoubleRatioVariable(uniqueIdentifier, name) ;
+								break ;
 							case FLOAT:
 								if (minimumStringValue != null && maximumStringValue != null)
 									variable = new FloatRatioVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
 								else
 									variable = new FloatRatioVariable(uniqueIdentifier, name) ;
+								break ;
 							case INTEGER:
 							case LONG:
 							case SHORT:
@@ -514,8 +536,10 @@ public class AccessionVariableMatrixListImplDataFileReader
 					{
 						variable = new DoubleRatioVariable(uniqueIdentifier, name) ;
 					}
+					break ;
 				default:
 					variable = createDefault(uniqueIdentifier, name) ;
+					break ;
 			}
 		}
 		else
@@ -758,8 +782,6 @@ public class AccessionVariableMatrixListImplDataFileReader
   {
 	  return value >= variable.getMinimumValue() && value <= variable.getMaximumValue();
   }
-
-
 
 	protected Matrix<Integer, Object, Accession, Variable> createAccessionVariableMatrixDataset(
 			String name,

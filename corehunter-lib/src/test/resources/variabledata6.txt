@@ -1,6 +1,10 @@
 uid,name,v1,v2,v3,v4,v5
+uid,,vi1,vi2,vi3,vi4,vi5
+description,,d1,d2,d3,d4,d5
 type,,B,N,I,O,R
 dataType,,B,S,I,L,D
+min,,,0,0,0,0
+max,,,1,1,1,1
 a1,a1,t,1,1,1,1
 a2,a2,t,1,1,1,1
 a3,a3,t,1,1,1,1

@@ -28,7 +28,7 @@ public abstract class AbstractSubsetObjectiveFunction<
 	DatasetType extends IndexedData<IndexType>> 
 	extends AbstractObjectiveFunction<SubsetSolution<IndexType>, DatasetType>
 {
-	public AbstractSubsetObjectiveFunction(String name, String description)
+	protected AbstractSubsetObjectiveFunction(String name, String description)
 	{
 		super (name, description) ;
 	}

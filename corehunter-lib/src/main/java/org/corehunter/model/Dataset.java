@@ -13,10 +13,15 @@
 // limitations under the License.
 package org.corehunter.model;
 
-import java.util.Set;
-
+import java.util.Collection;
 
 public interface Dataset<ValueType> extends Data
 {
-	public Set<ValueType> getElements();
+	/**
+	 * Gets the elements of the dataset. If the dataset has a predefined order
+	 * ordered then this method should can return a list, otherwise a set. In
+	 * any case the collection return should be a true set and have no duplicate elements
+	 * @return
+	 */
+	public Collection<ValueType> getElements();
 }

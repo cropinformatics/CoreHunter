@@ -1,4 +1,5 @@
 uid,name,v1,v2,v3,v4,v5
+uid,,vi1,vi2,vi3,vi4,vi5
 type,,B,N,I,O,R
 dataType,,B,S,I,L,D
 a1,a1,t,1,1,1,1

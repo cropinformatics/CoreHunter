@@ -24,9 +24,8 @@ public class EntityWithDescriptionImpl extends EntityImpl implements EntityWithD
         super(name);
     }
 
-    public EntityWithDescriptionImpl(String name, String description) {
-        super(name, name);
-        setDescription(description);
+    public EntityWithDescriptionImpl(String uniqueIdentifier, String name) {
+        super(uniqueIdentifier, name);
     }
 
     public EntityWithDescriptionImpl(String uniqueIdentifier, String name, String description) {
@@ -48,5 +47,35 @@ public class EntityWithDescriptionImpl extends EntityImpl implements EntityWithD
     public final void setDescription(String description) {
         this.description = description;
     }
-    
+
+		@Override
+    public int hashCode()
+    {
+	    final int prime = 31;
+	    int result = super.hashCode();
+	    result = prime * result
+	        + ((description == null) ? 0 : description.hashCode());
+	    return result;
+    }
+
+		@Override
+    public boolean equals(Object obj)
+    {
+	    if (this == obj)
+		    return true;
+	    if (!super.equals(obj))
+		    return false;
+	    if (!EntityWithDescription.class.isAssignableFrom(obj.getClass()))
+		    return false;
+	    EntityWithDescriptionImpl other = (EntityWithDescriptionImpl) obj;
+	    if (description == null)
+	    {
+		    if (other.description != null)
+			    return false;
+	    }
+	    else
+		    if (!description.equals(other.description))
+			    return false;
+	    return true;
+    }
 }

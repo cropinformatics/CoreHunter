@@ -81,7 +81,7 @@ public abstract class CategoricalVariableImpl<DataType extends Object> extends V
 		  return true;
 	  if (!super.equals(obj))
 		  return false;
-	  if (CategoricalVariable.class.isAssignableFrom(obj.getClass()))
+	  if (!CategoricalVariable.class.isAssignableFrom(obj.getClass()))
 		  return false;
 	  @SuppressWarnings("rawtypes")
     CategoricalVariable other = (CategoricalVariable) obj;

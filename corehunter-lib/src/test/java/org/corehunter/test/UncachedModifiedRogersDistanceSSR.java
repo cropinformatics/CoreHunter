@@ -23,8 +23,8 @@ import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.objectivefunction.DistanceMeasureType;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.objectivefunction.impl.AbstractSubsetObjectiveFunction;
+import org.corehunter.objectivefunction.ssr.SSROjectiveFunction;
 import org.corehunter.search.solution.SubsetSolution;
-import org.corehunter.ssr.SSROjectiveFunction;
 
 /**
  * Uncached SSR Modified Rogers distance.

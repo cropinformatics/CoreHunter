@@ -69,7 +69,6 @@ public class EntityImpl implements Entity {
     public int hashCode() {
         int hash = 5;
         hash = 89 * hash + (getUniqueIdentifier() != null ? getUniqueIdentifier().hashCode() : 0);
-        hash = 89 * hash + (getName() != null ? getName().hashCode() : 0);
         return hash;
     }
 

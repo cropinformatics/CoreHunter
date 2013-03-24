@@ -19,11 +19,11 @@ import static org.junit.Assert.fail;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
+import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
-import org.corehunter.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.search.SubsetSearchTest;
 import org.junit.Test;
 

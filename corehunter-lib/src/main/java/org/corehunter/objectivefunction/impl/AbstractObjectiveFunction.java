@@ -34,7 +34,7 @@ public abstract class AbstractObjectiveFunction<
 
 	public AbstractObjectiveFunction(String name, String description)
 	{
-		super (name) ;
+		super (name, name, description) ;
 	}
 	
 	protected AbstractObjectiveFunction(AbstractObjectiveFunction<SolutionType, DataType> objectiveFuncton)

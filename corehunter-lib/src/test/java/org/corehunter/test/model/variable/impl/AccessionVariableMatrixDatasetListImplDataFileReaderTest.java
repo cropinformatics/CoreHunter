@@ -47,9 +47,9 @@ public class AccessionVariableMatrixDatasetListImplDataFileReaderTest extends Da
 	private static final String MARKER_DATASET_NAME_PREFIX = "Variables for " + VARIABLE_DATA_NAME ;
 	
 	@Override
-	protected int getTextCount()
+	protected int getTestCount()
   {
-	  return 1 ;
+	  return 5 ;
   }
 	
 	@Override
@@ -88,22 +88,88 @@ public class AccessionVariableMatrixDatasetListImplDataFileReaderTest extends Da
 	private List<Variable> createVariables(int index) throws DuplicateEntityException
   {
 		List<Variable> variables ;
-		
+		List<Short> shortValues ;
+		List<Long> longValues ;
 		switch (index)
 		{
 			case 0 :
+			case 1 :
 			default :
 				variables = new ArrayList<Variable>(5) ;
 				
 				variables.add(new BinaryVariable("v1")) ;
-				List<Short> shortValues = new ArrayList<Short>(1);
+				shortValues = new ArrayList<Short>(1);
 				shortValues.add((short)1) ;
 				variables.add(new ShortNominalVariable("v2", shortValues)) ;
 				variables.add(new IntegerIntervalVariable("v3",1,1)) ;
-				List<Long> longValues = new ArrayList<Long>(1);
+				longValues = new ArrayList<Long>(1);
 				longValues.add(1l) ;
 				variables.add(new LongOrdinalVariable("v4", 1l, 1l, longValues)) ;
 				variables.add(new DoubleRatioVariable("v5", 1.0, 1.0)) ;
+				break ;
+			case 2 :
+			case 3 :
+				variables = new ArrayList<Variable>(5) ;
+				
+				variables.add(new BinaryVariable("vi1","v1")) ;
+				shortValues = new ArrayList<Short>(1);
+				shortValues.add((short)1) ;
+				variables.add(new ShortNominalVariable("vi2","v2", shortValues)) ;
+				variables.add(new IntegerIntervalVariable("vi3","v3",1,1)) ;
+				longValues = new ArrayList<Long>(1);
+				longValues.add(1l) ;
+				variables.add(new LongOrdinalVariable("vi4","v4", 1l, 1l, longValues)) ;
+				variables.add(new DoubleRatioVariable("vi5","v5", 1.0, 1.0)) ;
+				break ;
+			case 4 :
+				variables = new ArrayList<Variable>(5) ;
+				
+				variables.add(new BinaryVariable("vi1","v1")) ;
+				variables.get(0).setDescription("d1") ;
+				shortValues = new ArrayList<Short>(1);
+				shortValues.add((short)1) ;
+				variables.add(new ShortNominalVariable("vi2","v2", shortValues)) ;
+				variables.get(1).setDescription("d2") ;
+				variables.add(new IntegerIntervalVariable("vi3","v3",1,1)) ;
+				variables.get(2).setDescription("d3") ;
+				longValues = new ArrayList<Long>(1);
+				longValues.add(1l) ;
+				variables.add(new LongOrdinalVariable("vi4","v4", 1l, 1l, longValues)) ;
+				variables.get(3).setDescription("d4") ;
+				variables.add(new DoubleRatioVariable("vi5","v5", 1.0, 1.0)) ;
+				variables.get(4).setDescription("d5") ;
+				break ;
+			case 5 :
+				variables = new ArrayList<Variable>(5) ;
+				
+				variables.add(new BinaryVariable("vi1","v1")) ;
+				shortValues = new ArrayList<Short>(1);
+				shortValues.add((short)1) ;
+				variables.add(new ShortNominalVariable("vi2","v2", shortValues)) ;
+				variables.add(new IntegerIntervalVariable("vi3","v3",1,1)) ;
+				longValues = new ArrayList<Long>(1);
+				longValues.add(1l) ;
+				variables.add(new LongOrdinalVariable("vi4","v4", 1l, 1l, longValues)) ;
+				variables.add(new DoubleRatioVariable("vi5","v5", 1.0, 1.0)) ;
+				break ;
+			case 6 :
+				variables = new ArrayList<Variable>(5) ;
+				
+				variables.add(new BinaryVariable("vi1","v1")) ;
+				variables.get(0).setDescription("d1") ;
+				shortValues = new ArrayList<Short>(1);
+				shortValues.add((short)1) ;
+				variables.add(new ShortNominalVariable("vi2","v2", shortValues)) ;
+				variables.get(1).setDescription("d2") ;
+				variables.add(new IntegerIntervalVariable("vi3","v3",1,1)) ;
+				variables.get(2).setDescription("d3") ;
+				longValues = new ArrayList<Long>(1);
+				longValues.add(1l) ;
+				variables.add(new LongOrdinalVariable("vi4","v4", 1l, 1l, longValues)) ;
+				variables.get(3).setDescription("d4") ;
+				variables.add(new DoubleRatioVariable("vi5","v5", 1.0, 1.0)) ;
+				variables.get(4).setDescription("d5") ;
+				break ;
 		}
 		
 	  return variables ;

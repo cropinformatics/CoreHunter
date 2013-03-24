@@ -45,7 +45,7 @@ public class MultipleObjectiveFunction<SolutionType extends Solution, DatasetTyp
 
 	public MultipleObjectiveFunction(String name, String description)
 	{
-		super(name, description) ;
+		super(name, name, description) ;
 		
 		objectiveFunctions = new ArrayList<ObjectiveFunction<SolutionType>>();
 		objectiveFunctionIndices = new HashMap<String, Integer>();

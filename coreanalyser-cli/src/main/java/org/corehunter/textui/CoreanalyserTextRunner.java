@@ -31,10 +31,10 @@ import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileRea
 import org.corehunter.objectivefunction.DuplicateMeasureException;
 import org.corehunter.objectivefunction.MultipleObjectiveFunction;
 import org.corehunter.objectivefunction.UnknownMeasureException;
+import org.corehunter.objectivefunction.ssr.MeasureFactorySSR;
 import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
-import org.corehunter.ssr.MeasureFactorySSR;
 
 /**
  * A simple text based driver for Core Hunter.
