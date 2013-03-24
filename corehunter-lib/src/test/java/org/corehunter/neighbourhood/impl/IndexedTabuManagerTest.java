@@ -16,7 +16,9 @@ package org.corehunter.neighbourhood.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
+
 import junit.framework.TestCase;
+
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;

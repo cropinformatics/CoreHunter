@@ -1,6 +1,5 @@
 package org.corehunter.model.variable.ratio;
 
-import org.corehunter.model.variable.RangedVariable;
 import org.corehunter.model.variable.VariableDataType;
 import org.corehunter.model.variable.VariableType;
 import org.corehunter.model.variable.impl.RangedVariableImpl;

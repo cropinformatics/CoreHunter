@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchListener;

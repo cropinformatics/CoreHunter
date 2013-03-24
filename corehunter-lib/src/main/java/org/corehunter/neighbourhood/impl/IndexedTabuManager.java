@@ -18,6 +18,7 @@ package org.corehunter.neighbourhood.impl;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
+
 import org.corehunter.neighbourhood.IndexedMove;
 
 

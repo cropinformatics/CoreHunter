@@ -57,6 +57,7 @@ public final class CoreSubsetSearch
 		search.setData(data);
 		search.setNeighbourhood(neighbourhood);
 		search.setObjectiveFunction(objectiveFunction);
+		search.setSubsetMinimumSize(sampleMinimum);
 		search.setSubsetMaximumSize(sampleMaximum);
 		search.setRuntimeLimit(runtime);
 		search.setMinimumProgression(minimumProgression);

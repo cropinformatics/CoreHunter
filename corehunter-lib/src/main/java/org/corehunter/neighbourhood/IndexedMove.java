@@ -15,6 +15,7 @@
 package org.corehunter.neighbourhood;
 
 import java.util.Collection;
+
 import org.corehunter.search.solution.SubsetSolution;
 
 

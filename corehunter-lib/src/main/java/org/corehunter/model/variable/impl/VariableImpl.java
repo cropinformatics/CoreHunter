@@ -1,6 +1,5 @@
 package org.corehunter.model.variable.impl;
 
-import org.corehunter.model.impl.EntityImpl;
 import org.corehunter.model.impl.EntityWithDescriptionImpl;
 import org.corehunter.model.variable.Variable;
 import org.corehunter.model.variable.VariableDataType;

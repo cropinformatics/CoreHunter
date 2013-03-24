@@ -14,6 +14,8 @@
 
 package org.corehunter.test.search.ssr;
 
+import static org.junit.Assert.fail;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
@@ -26,7 +28,6 @@ import org.corehunter.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.UncachedModifiedRogersDistanceSSR;
 import org.corehunter.test.search.SubsetSearchTest;
 import org.corehunter.test.search.impl.CachedSolutionPrintWriterSubsetSearchListener;
-import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>> {

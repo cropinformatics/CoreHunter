@@ -14,17 +14,9 @@
 
 package org.corehunter.search.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.Future;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
-import org.corehunter.neighbourhood.Neighbourhood;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
-import org.corehunter.neighbourhood.impl.MSTRATHeuristicSingleNeighbourhood;
-import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;

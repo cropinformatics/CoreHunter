@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.solution.Solution;
 import org.corehunter.search.solution.SubsetSolution;

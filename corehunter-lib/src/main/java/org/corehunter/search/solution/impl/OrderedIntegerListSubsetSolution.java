@@ -16,6 +16,7 @@ package org.corehunter.search.solution.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
+
 import org.apache.commons.collections.set.ListOrderedSet;
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.solution.Solution;

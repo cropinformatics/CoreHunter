@@ -13,12 +13,12 @@
 // limitations under the License.
 package org.corehunter.model.ssr.impl;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.DataWriter;
 import org.corehunter.model.accession.Accession;
@@ -27,6 +27,8 @@ import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.SSRAllele;
 import org.corehunter.model.ssr.SSRMarker;
 import org.corehunter.utils.EntityUtils;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * SSRAccessionMatrixDataset writer that writes the complete matrix from memory

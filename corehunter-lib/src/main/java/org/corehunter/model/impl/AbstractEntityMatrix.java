@@ -16,6 +16,7 @@ package org.corehunter.model.impl;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Entity;
 import org.corehunter.model.EntityIndexedDataset;

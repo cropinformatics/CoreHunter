@@ -14,6 +14,9 @@
 
 package org.corehunter.test.search.ssr;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
@@ -22,8 +25,6 @@ import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.search.SubsetSearchTest;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class SSRExhaustiveSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>> {

@@ -14,8 +14,10 @@
 
 package org.corehunter.search.impl;
 
-import java.text.DecimalFormat;
 import static org.corehunter.Constants.INVALID_TEMPERATURE;
+
+import java.text.DecimalFormat;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.IndexedMove;

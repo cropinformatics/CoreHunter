@@ -14,10 +14,6 @@
 
 package org.corehunter.search.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import static org.corehunter.Constants.K_b2;
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;

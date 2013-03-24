@@ -14,9 +14,11 @@
 
 package org.corehunter.search.impl;
 
-import java.util.Random;
 import static org.corehunter.Constants.INVALID_NUMBER_OF_STEPS;
 import static org.corehunter.Constants.INVALID_TIME;
+
+import java.util.Random;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Data;
 import org.corehunter.model.impl.EntityImpl;

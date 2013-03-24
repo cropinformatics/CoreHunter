@@ -31,6 +31,7 @@ import org.corehunter.search.solution.SubsetSolution;
  * @author Chris Thachuk <chris.thachuk@gmail.com>
  * @version $Rev$
  */
+// TODO separate into two sub-classes one for MEAN_DISTANCE and one for MIN_DISTANCE
 public abstract class AbstractAccessionSSRDistanceMeasure extends 
 	AbstractSubsetObjectiveFunction<Integer, AccessionSSRMarkerMatrix<Integer>> implements SSROjectiveFunction<Integer>
 {

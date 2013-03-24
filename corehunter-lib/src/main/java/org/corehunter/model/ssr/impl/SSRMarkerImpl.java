@@ -15,6 +15,7 @@ package org.corehunter.model.ssr.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.model.DuplicateEntityException;
 import org.corehunter.model.UnknownEntityException;

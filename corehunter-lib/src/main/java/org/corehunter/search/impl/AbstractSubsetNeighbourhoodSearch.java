@@ -15,6 +15,7 @@
 package org.corehunter.search.impl;
 
 import static org.corehunter.Constants.INVALID_SIZE;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.IndexedMove;

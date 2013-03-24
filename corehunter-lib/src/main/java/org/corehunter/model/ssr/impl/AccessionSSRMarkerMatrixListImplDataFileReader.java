@@ -13,13 +13,13 @@
 // limitations under the License.
 package org.corehunter.model.ssr.impl;
 
-import au.com.bytecode.opencsv.CSVReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.DataReader;
 import org.corehunter.model.EntityIndexedDataset;
@@ -30,6 +30,8 @@ import org.corehunter.model.impl.OrderedEntityDatasetListImpl;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.SSRAllele;
 import org.corehunter.model.ssr.SSRMarker;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * SSRAccessionMatrixDataset reader that reads the complete matrix into memory before

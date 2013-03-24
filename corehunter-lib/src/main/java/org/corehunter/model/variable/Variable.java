@@ -1,5 +1,4 @@
 package org.corehunter.model.variable;
-import org.corehunter.model.Entity;
 import org.corehunter.model.EntityWithDescription;
 
 

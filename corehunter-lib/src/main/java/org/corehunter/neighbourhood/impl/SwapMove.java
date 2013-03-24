@@ -17,6 +17,7 @@ package org.corehunter.neighbourhood.impl;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.corehunter.neighbourhood.AddedIndexMove;
 import org.corehunter.neighbourhood.RemovedIndexMove;
 import org.corehunter.search.solution.SubsetSolution;

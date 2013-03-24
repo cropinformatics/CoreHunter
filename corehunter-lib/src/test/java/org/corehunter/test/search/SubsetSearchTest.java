@@ -14,10 +14,16 @@
 
 package org.corehunter.test.search;
 
-import java.io.File;
 import static org.corehunter.Constants.INVALID_NUMBER_OF_STEPS;
 import static org.corehunter.Constants.INVALID_TIME;
 import static org.corehunter.Constants.SECOND;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.impl.AbstractFileUtility;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
@@ -33,10 +39,6 @@ import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.test.search.ssr.SSRLocalSearchTest;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
 
 public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSolution<IndexType>> {

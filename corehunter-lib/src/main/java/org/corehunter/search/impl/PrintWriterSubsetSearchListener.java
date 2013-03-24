@@ -16,6 +16,7 @@ package org.corehunter.search.impl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;
 

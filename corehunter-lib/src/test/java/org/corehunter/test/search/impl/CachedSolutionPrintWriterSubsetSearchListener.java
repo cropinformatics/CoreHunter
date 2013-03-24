@@ -1,6 +1,7 @@
 package org.corehunter.test.search.impl;
 
 import java.util.HashMap;
+
 import org.corehunter.search.Search;
 import org.corehunter.search.impl.PrintWriterSubsetSearchListener;
 import org.corehunter.search.solution.SubsetSolution;

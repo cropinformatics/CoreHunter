@@ -14,6 +14,7 @@
 package org.corehunter.model.impl;
 
 import java.io.File;
+
 import org.corehunter.model.Data;
 
 public abstract class AbstractFileUtility<DataType extends Data> {

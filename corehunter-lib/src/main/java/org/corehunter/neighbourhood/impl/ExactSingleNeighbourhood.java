@@ -17,6 +17,7 @@ package org.corehunter.neighbourhood.impl;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.objectivefunction.ObjectiveFunction;

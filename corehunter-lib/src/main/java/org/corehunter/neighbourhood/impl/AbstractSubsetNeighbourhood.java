@@ -14,8 +14,10 @@
 
 package org.corehunter.neighbourhood.impl;
 
-import java.util.Random;
 import static org.corehunter.Constants.INVALID_SIZE;
+
+import java.util.Random;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
