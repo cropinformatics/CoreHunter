@@ -39,6 +39,7 @@ import org.corehunter.objectivefunction.UnknownMeasureException;
 import org.corehunter.objectivefunction.ssr.MeasureFactorySSR;
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;
+import org.corehunter.utils.CoreSubsetSearch;
 
 /**
  * A simple text based driver for Core Hunter.

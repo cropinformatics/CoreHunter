@@ -39,12 +39,10 @@ import org.corehunter.search.solution.SubsetSolution;
 public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 	IndexType,
         SolutionType extends SubsetSolution<IndexType>,
-        DatasetType extends IndexedData<IndexType>,
         NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>,
         SubSearchType extends SubsetSearch<IndexType, SolutionType>>
-            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType>
 {
-
     private SearchListener<SolutionType> subSearchListener;
     private ExecutorService executorService;
     private Map<SubSearchType, Future<SubSearchType>> futures;
@@ -56,7 +54,7 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
         initialise();
     }
 
-    protected AbstractParallelSubsetNeighbourhoodSearch(AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType, SubSearchType> search) throws CoreHunterException {
+    protected AbstractParallelSubsetNeighbourhoodSearch(AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType, SubSearchType> search) throws CoreHunterException {
         super(search);
         initialise();
     }

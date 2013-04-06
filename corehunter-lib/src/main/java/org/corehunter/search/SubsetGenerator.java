@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.corehunter.search;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.corehunter.CoreHunterException;
@@ -28,7 +29,7 @@ public interface SubsetGenerator<IndexType> extends Validatable
 
 	public abstract List<IndexType> getIndices() ;
 	
-	public abstract void setIndices(List<IndexType> indices) throws CoreHunterException ;
+	public abstract void setIndices(Collection<IndexType> indices) throws CoreHunterException ;
 	
 	public abstract int getSubsetSize();
 	

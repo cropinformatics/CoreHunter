@@ -16,6 +16,8 @@ package org.corehunter.search.impl;
 
 import static org.corehunter.Constants.INVALID_SIZE;
 
+import java.util.Collection;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.search.PreferredSize;
@@ -23,19 +25,32 @@ import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;
 import org.corehunter.search.solution.SubsetSolution;
 
-public abstract class AbstractSubsetSearch<IndexType, SolutionType extends SubsetSolution<IndexType>, DatasetType extends IndexedData<IndexType>>
-        extends AbstractObjectiveSearch<SolutionType, DatasetType>
+public abstract class AbstractSubsetSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
+        extends AbstractObjectiveSearch<SolutionType>
         implements SubsetSearch<IndexType, SolutionType> {
 
     private int subsetMinimumSize = INVALID_SIZE;
     private int subsetMaximumSize = INVALID_SIZE;
     private PreferredSize subsetPreferredSize = PreferredSize.DONT_CARE;
+    private Collection<IndexType> indices ;
 
     public AbstractSubsetSearch() {
         super();
     }
+    
+    @Override
+    public final Collection<IndexType> getIndices()
+		{
+			return indices;
+		}
 
-    protected AbstractSubsetSearch(AbstractSubsetSearch<IndexType, SolutionType, DatasetType> search) throws CoreHunterException {
+		public final void setIndices(Collection<IndexType> indices) throws CoreHunterException
+		{
+			this.indices = indices;
+			handleIndicesSet() ;
+		}
+
+		protected AbstractSubsetSearch(AbstractSubsetSearch<IndexType, SolutionType> search) throws CoreHunterException {
         super(search);
         setSubsetMinimumSize(search.getSubsetMinimumSize());
         setSubsetMaximumSize(search.getSubsetMaximumSize());
@@ -139,21 +154,30 @@ public abstract class AbstractSubsetSearch<IndexType, SolutionType extends Subse
     @Override
     protected void validate() throws CoreHunterException {
         super.validate();
+        if (indices == null) {
+          throw new CoreHunterException("Indices must be defined!");
+        }
         if (subsetMinimumSize <= 0) {
             throw new CoreHunterException("Subset minimum size must be greater than zero!");
         }
         if (subsetMaximumSize <= 0) {
             throw new CoreHunterException("Subset maximum size must be greater than zero!");
         }
-        if (subsetMinimumSize >= getData().getSize()) {
+        if (subsetMinimumSize >= getIndices().size()) {
             throw new CoreHunterException("Subset minimum size must be less than the dataset size!");
         }
-        if (subsetMaximumSize > getData().getSize()) {
+        if (subsetMaximumSize > getIndices().size()) {
             throw new CoreHunterException("Subset maximum size must be less than or equal to the dataset size!");
         }
         if (subsetMaximumSize < subsetMinimumSize) {
             throw new CoreHunterException("Subset maximum size must be greater then or equal to minimum size!");
         }
+    }
+    
+    protected void handleIndicesSet() throws CoreHunterException {
+      if (SearchStatus.STARTED.equals(getStatus())) {
+          throw new CoreHunterException("Indices can not be set while search in process");
+      }
     }
 
     protected void handleSubsetMinimumSizeSet() throws CoreHunterException {

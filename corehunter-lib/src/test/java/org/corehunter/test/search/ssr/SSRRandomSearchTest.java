@@ -30,7 +30,8 @@ public class SSRRandomSearchTest extends SubsetSearchTest<Integer, SubsetSolutio
 
     @Test
     public void testDefaults() {
-        RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+        RandomSearch<Integer, SubsetSolution<Integer>> search = 
+        		new RandomSearch<Integer, SubsetSolution<Integer>>();
 
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
@@ -38,8 +39,9 @@ public class SSRRandomSearchTest extends SubsetSearchTest<Integer, SubsetSolutio
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
 
-            search.setData(dataFull);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setIndices(dataFull.getIndices()) ;
             search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
 

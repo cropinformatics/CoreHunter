@@ -29,9 +29,8 @@ import org.corehunter.search.solution.SubsetSolution;
 public class TabuSearch<
         IndexType,
         SolutionType extends SubsetSolution<IndexType>,
-        DatasetType extends IndexedData<IndexType>,
         NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> {
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType> {
 
     // tabu manager
     private IndexedTabuManager<IndexType> tabuManager = null;
@@ -40,14 +39,14 @@ public class TabuSearch<
         super();
     }
 
-    protected TabuSearch(TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+    protected TabuSearch(TabuSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
         setTabuManager(search.getTabuManager());
     }
 
     @Override
     public Search<SolutionType> copy() throws CoreHunterException {
-        return new TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+        return new TabuSearch<IndexType, SolutionType, NeighbourhoodType>(this);
     }
 
     public final IndexedTabuManager<IndexType> getTabuManager() {

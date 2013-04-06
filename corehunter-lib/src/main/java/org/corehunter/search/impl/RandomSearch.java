@@ -24,9 +24,8 @@ import org.corehunter.search.solution.SubsetSolution;
 
 public class RandomSearch<
 	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>> 
-	extends AbstractSubsetSearch<IndexType, SolutionType, DatasetType>
+	SolutionType extends SubsetSolution<IndexType>> 
+	extends AbstractSubsetSearch<IndexType, SolutionType>
 {
 	private boolean continueSearch ;
 
@@ -36,7 +35,7 @@ public class RandomSearch<
 	}
 	
 	protected RandomSearch(
-			RandomSearch<IndexType, SolutionType, DatasetType> search) throws CoreHunterException
+			RandomSearch<IndexType, SolutionType> search) throws CoreHunterException
   {
 		super(search);
 		
@@ -47,7 +46,7 @@ public class RandomSearch<
 	@Override
   public Search<SolutionType> copy() throws CoreHunterException
   {
-	  return new RandomSearch<IndexType, SolutionType, DatasetType>(this);
+	  return new RandomSearch<IndexType, SolutionType>(this);
   }
 
 	@Override
@@ -55,7 +54,7 @@ public class RandomSearch<
 	{
 		continueSearch = true;
 		
-		List<IndexType> indices = new ArrayList<IndexType>(getData().getIndices());
+		List<IndexType> indices = new ArrayList<IndexType>(getIndices());
 		List<IndexType> subsetIndices = new ArrayList<IndexType>();
 		
 		while (continueSearch)

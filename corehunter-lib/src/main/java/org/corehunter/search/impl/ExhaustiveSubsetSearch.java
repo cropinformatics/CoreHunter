@@ -28,9 +28,8 @@ import org.corehunter.search.solution.SubsetSolution;
  */
 public class ExhaustiveSubsetSearch<
 	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>> 
-	extends AbstractSubsetSearch<IndexType, SolutionType, DatasetType>
+	SolutionType extends SubsetSolution<IndexType>> 
+	extends AbstractSubsetSearch<IndexType, SolutionType>
 {
 	private SubsetGenerator<IndexType> subsetGenerator ;
 	
@@ -40,17 +39,17 @@ public class ExhaustiveSubsetSearch<
   }
 	
 	protected ExhaustiveSubsetSearch(
-			ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch) throws CoreHunterException
+			ExhaustiveSubsetSearch<IndexType, SolutionType> exhaustiveSearch) throws CoreHunterException
   {
 	  super(exhaustiveSearch) ;
   }
 
 	@Override
-	public ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> copy()
+	public ExhaustiveSubsetSearch<IndexType, SolutionType> copy()
 	{
 		try
     {
-	    return new ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType>(this);
+	    return new ExhaustiveSubsetSearch<IndexType, SolutionType>(this);
     }
     catch (Exception e)
     {
@@ -81,7 +80,7 @@ public class ExhaustiveSubsetSearch<
 	  if (subsetGenerator == null)
 		  throw new CoreHunterException("Subset generator must be defined!") ;
 	  
-	  subsetGenerator.setIndices(getData().getIndices()) ;
+	  subsetGenerator.setIndices(getIndices()) ;
   	subsetGenerator.setSubsetSize(getSubsetMinimumSize()) ;
   	
   	subsetGenerator.validate() ;
@@ -148,7 +147,7 @@ public class ExhaustiveSubsetSearch<
 		long numberOfSubsets = 0 ;
 		
 		for (int i = getSubsetMinimumSize() ; i <= getSubsetMaximumSize(); ++i)
-			numberOfSubsets = numberOfSubsets + MathUtils.binomialCoefficient(getData().getIndices().size(), i);
+			numberOfSubsets = numberOfSubsets + MathUtils.binomialCoefficient(getIndices().size(), i);
 		
 	  return numberOfSubsets ;
   }

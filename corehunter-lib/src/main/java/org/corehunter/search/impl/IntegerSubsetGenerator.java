@@ -17,6 +17,7 @@ package org.corehunter.search.impl;
 import static org.corehunter.Constants.INVALID_SIZE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.math.util.MathUtils;
@@ -43,10 +44,10 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
   }
 
 	@Override
-  public void setIndices(List<Integer> indices) throws CoreHunterException
+  public void setIndices(Collection<Integer> indices) throws CoreHunterException
   {
 		if (indices != null)
-			this.indices = indices ;
+			this.indices = new ArrayList<Integer>(indices) ;
 		else
 			throw new CoreHunterException("Indices must be defined!") ;
   }

@@ -39,7 +39,7 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
         System.out.println("################################################");
         System.out.println("");
         
-        TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
+        TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
@@ -47,11 +47,12 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
 
-            search.setData(dataFull);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             neighbourhood.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
+            search.setIndices(dataFull.getIndices()) ;
             search.setNeighbourhood(neighbourhood);
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
@@ -75,7 +76,7 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
         System.out.println("#####################################################################");
         System.out.println("");
         
-        TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
+        TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
             int size = (int) (0.2 * dataFull.getSize());
@@ -85,11 +86,12 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
 
-            search.setData(dataFull);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(size);
             neighbourhood.setSubsetMaximumSize(size);
+            search.setIndices(dataFull.getIndices()) ;
             search.setNeighbourhood(neighbourhood);
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
@@ -113,7 +115,7 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
         System.out.println("##############################################################");
         System.out.println("");
         
-        TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
+        TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
@@ -121,11 +123,12 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
 
-            search.setData(dataFull);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             neighbourhood.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
+            search.setIndices(dataFull.getIndices()) ;
             search.setNeighbourhood(neighbourhood);
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);

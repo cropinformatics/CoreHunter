@@ -105,7 +105,8 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
     }
 
     public static SubsetSolution<Integer> findOptimalSolution(int minimumSize, int maximumSize, AccessionSSRMarkerMatrix<Integer> data) {
-        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = 
+        		new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
 
         try {
             search = getExhaustiveSubsetSearch(minimumSize, maximumSize, data);
@@ -118,16 +119,16 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
         return search.getBestSolution();
     }
 
-    public static final ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> getExhaustiveSubsetSearch(int size, AccessionSSRMarkerMatrix<Integer> data) {
-        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+    public static final ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> getExhaustiveSubsetSearch(int size, AccessionSSRMarkerMatrix<Integer> data) {
+        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
 
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
 
             search.setInitialSolution(new IntegerSubsetSolution(data.getIndices(), integerSubsetGenerator.first()));
-            search.setData(data);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data);
             search.setSubsetMinimumSize(size);
             search.setSubsetMaximumSize(size);
             search.setSubsetGenerator(new IntegerSubsetGenerator());
@@ -140,16 +141,16 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
         return search;
     }
 
-    public static final ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> getExhaustiveSubsetSearch(int minimumSize, int maximumSize, AccessionSSRMarkerMatrix<Integer> data) {
-        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+    public static final ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> getExhaustiveSubsetSearch(int minimumSize, int maximumSize, AccessionSSRMarkerMatrix<Integer> data) {
+        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
 
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
 
             search.setInitialSolution(new IntegerSubsetSolution(data.getIndices(), integerSubsetGenerator.first()));
-            search.setData(data);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data);
             search.setSubsetMinimumSize(minimumSize);
             search.setSubsetMaximumSize(maximumSize);
             search.setSubsetGenerator(new IntegerSubsetGenerator());

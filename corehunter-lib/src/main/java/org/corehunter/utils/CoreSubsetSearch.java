@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.corehunter.textui;
+package org.corehunter.utils;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
@@ -43,7 +43,7 @@ public final class CoreSubsetSearch
 
 	}
 
-	public static REMCSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> remcSearch(
+	public static REMCSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> remcSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
@@ -52,9 +52,9 @@ public final class CoreSubsetSearch
 	    double minimumTemperature, double maximumTemperature, int steps)
 	    throws CoreHunterException
 	{
-		REMCSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new REMCSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+		REMCSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new REMCSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setNeighbourhood(neighbourhood);
 		search.setObjectiveFunction(objectiveFunction);
 		search.setSubsetMinimumSize(sampleMinimum);
@@ -72,17 +72,17 @@ public final class CoreSubsetSearch
 		return search;
 	}
 	
-	public static MetropolisSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> metropolisSearch(
+	public static MetropolisSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> metropolisSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int runtime, int numberOfSteps)
 	    throws CoreHunterException
 	{
-		MetropolisSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = 
-					new MetropolisSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+		MetropolisSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = 
+					new MetropolisSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setNeighbourhood(neighbourhood);
 		search.setObjectiveFunction(objectiveFunction);
 		search.setRuntimeLimit(runtime);
@@ -93,14 +93,14 @@ public final class CoreSubsetSearch
 		return search;
 	}
 
-	public static ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> exhaustiveSearch(
+	public static ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> exhaustiveSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize) throws CoreHunterException
 	{
-		ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+		ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setObjectiveFunction(objectiveFunction);
 		search.setSubsetMinimumSize(subsetMinimumSize);
 		search.setSubsetMaximumSize(subsetMaximumSize);
@@ -108,16 +108,16 @@ public final class CoreSubsetSearch
 		return search;
 	}
 
-	public static LocalSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> localSearch(
+	public static LocalSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> localSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    long runtime, long minimumProgressionTime, long stuckTime)
 	    throws CoreHunterException
 	{
-		LocalSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new LocalSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+		LocalSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new LocalSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
 		search.setRuntimeLimit(runtime);
@@ -143,15 +143,15 @@ public final class CoreSubsetSearch
 	 * @return
 	 * @throws CoreHunterException
 	 */
-	public static SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> steepestDescentSearch(
+	public static SteepestDescentSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> steepestDescentSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    long runtime, long minimumProgressionTime) throws CoreHunterException
 	{
-		SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+		SteepestDescentSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new SteepestDescentSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
 		search.setRuntimeLimit(runtime);
@@ -184,16 +184,16 @@ public final class CoreSubsetSearch
 	 * @param tabuListSize
 	 * @return
 	 */
-	public static TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> tabuSearch(
+	public static TabuSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> tabuSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    long runtime, long minimumProgressionTime, long stuckTime,
 	    int tabuListSize) throws CoreHunterException
 	{
-		TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+		TabuSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setObjectiveFunction(objectiveFunction);
 		search.setNeighbourhood(neighbourhood);
 		search.setRuntimeLimit(runtime);
@@ -202,7 +202,7 @@ public final class CoreSubsetSearch
 		return search;
 	}
 
-	public static MixedReplicaSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> mixedReplicaSearch(
+	public static MixedReplicaSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> mixedReplicaSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize, long runtime,
@@ -212,9 +212,9 @@ public final class CoreSubsetSearch
 	    int boostTimeFactor, long minBoostTime, double minMCTemp,
 	    double maxMCTemp) throws CoreHunterException
 	{
-		MixedReplicaSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new MixedReplicaSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
+		MixedReplicaSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new MixedReplicaSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setObjectiveFunction(objectiveFunction);
 		search.setSubsetMinimumSize(subsetMinimumSize);
 		search.setSubsetMaximumSize(subsetMaximumSize);
@@ -239,15 +239,15 @@ public final class CoreSubsetSearch
 		return search;
 	}
 
-	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> lrSearch(
+	public static LRSearch<Integer, SubsetSolution<Integer>> lrSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize, int l, int r,
 	    boolean exhaustiveFirstPair) throws CoreHunterException
 	{
-		LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+		LRSearch<Integer, SubsetSolution<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setObjectiveFunction(objectiveFunction);
 		search.setSubsetMinimumSize(subsetMinimumSize);
 		search.setSubsetMaximumSize(subsetMaximumSize);
@@ -266,14 +266,14 @@ public final class CoreSubsetSearch
 	 * @return
 	 * @throws CoreHunterException
 	 */
-	public static RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> randomSearch(
+	public static RandomSearch<Integer, SubsetSolution<Integer>> randomSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize) throws CoreHunterException
 	{
-		RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new RandomSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+		RandomSearch<Integer, SubsetSolution<Integer>> search = new RandomSearch<Integer, SubsetSolution<Integer>>();
 
-		search.setData(data);
+		search.setIndices(data.getIndices());
 		search.setObjectiveFunction(objectiveFunction);
 		search.setSubsetMinimumSize(subsetMinimumSize);
 		search.setSubsetMaximumSize(subsetMaximumSize);
@@ -281,7 +281,7 @@ public final class CoreSubsetSearch
 		return search;
 	}
 
-	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> lrSearch(
+	public static LRSearch<Integer, SubsetSolution<Integer>> lrSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize, int l, int r)
@@ -291,7 +291,7 @@ public final class CoreSubsetSearch
 		    subsetMaximumSize, l, r, true);
 	}
 
-	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> semiLrSearch(
+	public static LRSearch<Integer, SubsetSolution<Integer>> semiLrSearch(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize, int l, int r)
@@ -301,7 +301,7 @@ public final class CoreSubsetSearch
 		    subsetMaximumSize, l, r, false);
 	}
 
-	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> forwardSelection(
+	public static LRSearch<Integer, SubsetSolution<Integer>> forwardSelection(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize)
@@ -311,7 +311,7 @@ public final class CoreSubsetSearch
 		    subsetMaximumSize, 1, 0);
 	}
 
-	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> semiForwardSelection(
+	public static LRSearch<Integer, SubsetSolution<Integer>> semiForwardSelection(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize)
@@ -321,7 +321,7 @@ public final class CoreSubsetSearch
 		    subsetMaximumSize, 1, 0);
 	}
 
-	public static LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> backwardSelection(
+	public static LRSearch<Integer, SubsetSolution<Integer>> backwardSelection(
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int subsetMinimumSize, int subsetMaximumSize)

@@ -33,34 +33,33 @@ import org.corehunter.search.solution.SubsetSolution;
 
 public class LRSearch<
 	IndexType,
-	SolutionType extends SubsetSolution<IndexType>, 
-	DatasetType extends IndexedData<IndexType>> 
-	extends AbstractSubsetSearch<IndexType, SolutionType, DatasetType>
+	SolutionType extends SubsetSolution<IndexType>> 
+	extends AbstractSubsetSearch<IndexType, SolutionType>
 {
 	private int l = INVALID_SIZE ;
 	private int	r = INVALID_SIZE ;
 	
 	private boolean continueSearch ;
-	private ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch;
+	private ExhaustiveSubsetSearch<IndexType, SolutionType> exhaustiveSearch;
 
 	public LRSearch()
 	{
 		super();
 	}
 
-	protected LRSearch(LRSearch<IndexType, SolutionType, DatasetType> search) throws CoreHunterException
+	protected LRSearch(LRSearch<IndexType, SolutionType> search) throws CoreHunterException
   {
 		super(search) ;
 		
 		setL(search.getL()) ;
 		setR(search.getR()) ;
-		setExhaustiveSearch((ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType>)search.getExhaustiveSearch().copy()) ;
+		setExhaustiveSearch((ExhaustiveSubsetSearch<IndexType, SolutionType>)search.getExhaustiveSearch().copy()) ;
   }
 
 	@Override
   public Search<SolutionType> copy() throws CoreHunterException
   {
-	  return new LRSearch<IndexType, SolutionType, DatasetType>(this);
+	  return new LRSearch<IndexType, SolutionType>(this);
   }
 	
 	public final int getL()
@@ -93,13 +92,13 @@ public class LRSearch<
 		}
   }
 
-	public final ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> getExhaustiveSearch()
+	public final ExhaustiveSubsetSearch<IndexType, SolutionType> getExhaustiveSearch()
   {
   	return exhaustiveSearch;
   }
 
 	public final void setExhaustiveSearch(
-      ExhaustiveSubsetSearch<IndexType, SolutionType, DatasetType> exhaustiveSearch) throws CoreHunterException
+      ExhaustiveSubsetSearch<IndexType, SolutionType> exhaustiveSearch) throws CoreHunterException
   {
 		if (this.exhaustiveSearch != exhaustiveSearch)
 		{
@@ -326,7 +325,6 @@ public class LRSearch<
       ObjectiveFunction<SolutionType> objectiveFunction) throws CoreHunterException
   {
 		exhaustiveSearch.setObjectiveFunction(objectiveFunction) ;
-		exhaustiveSearch.setData(getData()) ;
 		exhaustiveSearch.setSubsetMinimumSize(2) ;
 		exhaustiveSearch.setSubsetMaximumSize(2) ;
 		
@@ -338,11 +336,10 @@ public class LRSearch<
 	private void executeRandomSearch(SolutionType solution,
       ObjectiveFunction<SolutionType> objectiveFunction) throws CoreHunterException
   {
-		RandomSearch<IndexType, SolutionType, DatasetType> search = new RandomSearch<IndexType, SolutionType, DatasetType>() ;
+		RandomSearch<IndexType, SolutionType> search = new RandomSearch<IndexType, SolutionType>() ;
 		
 		search.setObjectiveFunction(objectiveFunction) ;
 		search.setInitialSolution(getCurrentSolution()) ;
-		search.setData(getData()) ;
 		search.setSubsetMinimumSize(2) ;
 		search.setSubsetMaximumSize(2) ;
 		

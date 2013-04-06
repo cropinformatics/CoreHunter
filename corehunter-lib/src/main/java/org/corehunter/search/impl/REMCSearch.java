@@ -14,6 +14,8 @@
 
 package org.corehunter.search.impl;
 
+import java.util.Collection;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
@@ -25,9 +27,8 @@ import org.corehunter.search.solution.SubsetSolution;
 public class REMCSearch<
 	IndexType,
         SolutionType extends SubsetSolution<IndexType>,
-        DatasetType extends IndexedData<IndexType>,
         NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-            extends AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType, MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> {
+            extends AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType, MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>> {
 
     private int numberOfReplicas;
     private double minimumTemperature;
@@ -38,7 +39,7 @@ public class REMCSearch<
         super();
     }
 
-    protected REMCSearch(REMCSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+    protected REMCSearch(REMCSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
         setNumberOfReplicas(search.getNumberOfReplicas());
         setMinimumTemperature(search.getMinimumTemperature());
@@ -48,7 +49,7 @@ public class REMCSearch<
 
     @Override
     public Search<SolutionType> copy() throws CoreHunterException {
-        return new REMCSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+        return new REMCSearch<IndexType, SolutionType, NeighbourhoodType>(this);
     }
 
     public final int getNumberOfReplicas() {
@@ -248,13 +249,12 @@ public class REMCSearch<
         
     }
 
-    private MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> createMetropolisSearch(
+    private MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> createMetropolisSearch(
             SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
             NeighbourhoodType neighbourhood, int numberOfSteps, int runtime, double temperature) throws CoreHunterException {
-        MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> subsearch =
-                new MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>();
+        MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> subsearch =
+                new MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>();
 
-        subsearch.setData(getData());
         subsearch.setInitialSolution(solution);
         subsearch.setObjectiveFunction(objectiveFunction);
         subsearch.setNeighbourhood(neighbourhood);

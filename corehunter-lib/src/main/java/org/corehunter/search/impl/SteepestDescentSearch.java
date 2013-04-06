@@ -27,21 +27,20 @@ import org.corehunter.search.solution.SubsetSolution;
 public class SteepestDescentSearch<
         IndexType,
         SolutionType extends SubsetSolution<IndexType>,
-        DatasetType extends IndexedData<IndexType>,
         NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> {
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType> {
 
     public SteepestDescentSearch() {
         super();
     }
 
-    protected SteepestDescentSearch(SteepestDescentSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+    protected SteepestDescentSearch(SteepestDescentSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
     }
 
     @Override
     public Search<SolutionType> copy() throws CoreHunterException {
-        return new SteepestDescentSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+        return new SteepestDescentSearch<IndexType, SolutionType, NeighbourhoodType>(this);
     }
 
     @Override

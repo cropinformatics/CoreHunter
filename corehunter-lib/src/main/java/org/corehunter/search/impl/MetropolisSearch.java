@@ -32,9 +32,8 @@ import org.corehunter.search.solution.SubsetSolution;
 public class MetropolisSearch<
 	IndexType,
         SolutionType extends SubsetSolution<IndexType>,
-        DatasetType extends IndexedData<IndexType>,
         NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> {
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType> {
 
     private final static double K_b = 7.213475e-7;
     private double temperature = INVALID_TEMPERATURE;
@@ -42,14 +41,14 @@ public class MetropolisSearch<
     public MetropolisSearch() {
     }
 
-    protected MetropolisSearch(MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+    protected MetropolisSearch(MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
         setTemperature(search.getTemperature());
     }
 
     @Override
     public Search<SolutionType> copy() throws CoreHunterException {
-        return new MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+        return new MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>(this);
     }
 
     public final double getTemperature() {
@@ -146,7 +145,7 @@ public class MetropolisSearch<
         }
     }
 
-    public void swapTemperature(MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> other) throws CoreHunterException {
+    public void swapTemperature(MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> other) throws CoreHunterException {
         double myTemp = getTemperature();
         setTemperature(other.getTemperature());
         other.setTemperature(myTemp);

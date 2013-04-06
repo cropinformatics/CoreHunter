@@ -31,7 +31,8 @@ public class SSRSteepestDescentSearchTest extends SubsetSearchTest<Integer, Subs
 
     @Test
     public void testDefaults() {
-        SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new SteepestDescentSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
+        SteepestDescentSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search =
+        		new SteepestDescentSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
@@ -39,11 +40,12 @@ public class SSRSteepestDescentSearchTest extends SubsetSearchTest<Integer, Subs
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
 
-            search.setData(dataFull);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             neighbourhood.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
+            search.setIndices(dataFull.getIndices()) ;
             search.setNeighbourhood(neighbourhood);
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);

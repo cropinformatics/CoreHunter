@@ -30,7 +30,7 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
 
     @Test
     public void lr21SearchTestWithRandomSeed() {
-        LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+        LRSearch<Integer, SubsetSolution<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>>();
 
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
@@ -38,8 +38,9 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
 
-            search.setData(dataFull);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setIndices(dataFull.getIndices()) ;
             search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
             search.setL(2);
@@ -52,7 +53,7 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
 
     @Test
     public void lr21SearchTestWithExhaustiveSeed() {
-        LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>>();
+        LRSearch<Integer, SubsetSolution<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>>();
 
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
@@ -60,8 +61,9 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
 
-            search.setData(dataFull);
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
+            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setIndices(dataFull.getIndices()) ;
             search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
             search.setL(2);

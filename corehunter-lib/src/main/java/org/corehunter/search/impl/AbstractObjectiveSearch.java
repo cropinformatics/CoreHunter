@@ -22,8 +22,8 @@ import org.corehunter.search.ObjectiveSearch;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.Solution;
 
-public abstract class AbstractObjectiveSearch<SolutionType extends Solution, DataType extends Data>
-        extends AbstractSearch<SolutionType, DataType>
+public abstract class AbstractObjectiveSearch<SolutionType extends Solution>
+        extends AbstractSearch<SolutionType>
         implements ObjectiveSearch<SolutionType> {
 
     private ObjectiveFunction<SolutionType> objectiveFunction;    
@@ -32,7 +32,7 @@ public abstract class AbstractObjectiveSearch<SolutionType extends Solution, Dat
         super();
     }
 
-    protected AbstractObjectiveSearch(AbstractObjectiveSearch<SolutionType, DataType> search) throws CoreHunterException {
+    protected AbstractObjectiveSearch(AbstractObjectiveSearch<SolutionType> search) throws CoreHunterException {
         super(search);
         setObjectiveFunction(search.getObjectiveFunction());        
     }
@@ -82,10 +82,6 @@ public abstract class AbstractObjectiveSearch<SolutionType extends Solution, Dat
 
         if (objectiveFunction == null) {
             throw new CoreHunterException("No objective function defined!");
-        }
-
-        if (objectiveFunction instanceof ObjectiveFunctionWithData) {
-            ((ObjectiveFunctionWithData) objectiveFunction).setData(getData());
         }
 
         objectiveFunction.validate();

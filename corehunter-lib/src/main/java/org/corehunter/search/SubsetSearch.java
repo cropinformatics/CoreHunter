@@ -13,12 +13,15 @@
 // limitations under the License.
 package org.corehunter.search;
 
+import java.util.Collection;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.solution.SubsetSolution;
 
-public interface SubsetSearch< IndexType, SolutionType extends SubsetSolution<IndexType>> extends Search<SolutionType>
+public interface SubsetSearch<IndexType, SolutionType extends SubsetSolution<IndexType>> extends Search<SolutionType>
 {
-    
+	public Collection<IndexType> getIndices() ;
+	
 	public int getSubsetMinimumSize() ;
 
 	public void setSubsetMinimumSize(int subsetMinimumSize) throws CoreHunterException ;
@@ -27,8 +30,8 @@ public interface SubsetSearch< IndexType, SolutionType extends SubsetSolution<In
 	
 	public void setSubsetMaximumSize(int subsetMaximumSize) throws CoreHunterException ;
         
-        public PreferredSize getSubsetPreferredSize();
+	public PreferredSize getSubsetPreferredSize();
         
-        public void setSubsetPreferredSize(PreferredSize size) throws CoreHunterException;
+	public void setSubsetPreferredSize(PreferredSize size) throws CoreHunterException;
 	
 }

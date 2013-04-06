@@ -24,10 +24,9 @@ import org.corehunter.search.solution.Solution;
 
 public abstract class AbstractNeighbourhoodSearch<
         SolutionType extends Solution,
-        DataType extends Data,
         MoveType extends Move<SolutionType>,
         NeighbourhoodType extends Neighbourhood<SolutionType, MoveType>>
-            extends AbstractObjectiveSearch<SolutionType, DataType>
+            extends AbstractObjectiveSearch<SolutionType>
             implements NeighbourhoodSearch<SolutionType, MoveType, NeighbourhoodType> {
 
     private NeighbourhoodType neighbourhood;
@@ -36,7 +35,7 @@ public abstract class AbstractNeighbourhoodSearch<
         super();
     }
 
-    protected AbstractNeighbourhoodSearch(AbstractNeighbourhoodSearch<SolutionType, DataType, MoveType, NeighbourhoodType> search) throws CoreHunterException {
+    protected AbstractNeighbourhoodSearch(AbstractNeighbourhoodSearch<SolutionType, MoveType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
         setNeighbourhood(search.getNeighbourhood());
     }

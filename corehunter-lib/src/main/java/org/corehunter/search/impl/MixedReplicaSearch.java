@@ -25,9 +25,8 @@ import org.corehunter.search.solution.SubsetSolution;
 public class MixedReplicaSearch<
 	IndexType,
         SolutionType extends SubsetSolution<IndexType>,
-        DatasetType extends IndexedData<IndexType>,
         NeighbourhoodType extends SubsetNeighbourhood<IndexType,SolutionType>>
-            extends AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType, SubsetSearch<IndexType, SolutionType>> {
+            extends AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType, SubsetSearch<IndexType, SolutionType>> {
 
     // default params
     private static final int DEFAULT_LRSEARCH_L = 2;
@@ -44,16 +43,16 @@ public class MixedReplicaSearch<
     private long boostMinimumProgressionTime;
     private int boostTimeFactor;
     private long minimumBoostTime;
-    private LRSearch<IndexType, SolutionType, DatasetType> lrSearchTemplate = null;
-    private LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> localSearchTemplate = null;
-    private MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> metropolisSearchTemplate = null;
-    private TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> tabuSearchTemplate = null;
+    private LRSearch<IndexType, SolutionType> lrSearchTemplate = null;
+    private LocalSearch<IndexType, SolutionType, NeighbourhoodType> localSearchTemplate = null;
+    private MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> metropolisSearchTemplate = null;
+    private TabuSearch<IndexType, SolutionType, NeighbourhoodType> tabuSearchTemplate = null;
 
     public MixedReplicaSearch() {
         super();
     }
 
-    protected MixedReplicaSearch(MixedReplicaSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+    protected MixedReplicaSearch(MixedReplicaSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
 
         setNumberOfNonTabuReplicas(search.getNumberOfNonTabuReplicas());
@@ -73,7 +72,7 @@ public class MixedReplicaSearch<
 
     @Override
     public Search<SolutionType> copy() throws CoreHunterException {
-        return new MixedReplicaSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+        return new MixedReplicaSearch<IndexType, SolutionType, NeighbourhoodType>(this);
     }
 
     public final int getNumberOfTabuReplicas() {
@@ -164,44 +163,44 @@ public class MixedReplicaSearch<
         }
     }
 
-    public final LRSearch<IndexType, SolutionType, DatasetType> getLrSearchTemplate() {
+    public final LRSearch<IndexType, SolutionType> getLrSearchTemplate() {
         return lrSearchTemplate;
     }
 
-    public final void setLrSearchTemplate(LRSearch<IndexType, SolutionType, DatasetType> lrSearchTemplate) throws CoreHunterException {
+    public final void setLrSearchTemplate(LRSearch<IndexType, SolutionType> lrSearchTemplate) throws CoreHunterException {
         if (this.lrSearchTemplate != lrSearchTemplate) {
             this.lrSearchTemplate = lrSearchTemplate;
             handlelrSearchTemplateSet();
         }
     }
 
-    public final LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> getLocalSearchTemplate() {
+    public final LocalSearch<IndexType, SolutionType, NeighbourhoodType> getLocalSearchTemplate() {
         return localSearchTemplate;
     }
 
-    public final void setLocalSearchTemplate(LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> localSearchTemplate) throws CoreHunterException {
+    public final void setLocalSearchTemplate(LocalSearch<IndexType, SolutionType, NeighbourhoodType> localSearchTemplate) throws CoreHunterException {
         if (this.localSearchTemplate != localSearchTemplate) {
             this.localSearchTemplate = localSearchTemplate;
             handleLocalSearchTemplateSet();
         }
     }
 
-    public final MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> getMetropolisSearchTemplate() {
+    public final MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> getMetropolisSearchTemplate() {
         return metropolisSearchTemplate;
     }
 
-    public final void setMetropolisSearchTemplate(MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> metropolisSearchTemplate) throws CoreHunterException {
+    public final void setMetropolisSearchTemplate(MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> metropolisSearchTemplate) throws CoreHunterException {
         if (this.metropolisSearchTemplate != metropolisSearchTemplate) {
             this.metropolisSearchTemplate = metropolisSearchTemplate;
             handleMetropolisSearchTemplateSet();
         }
     }
 
-    public final TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> getTabuSearchTemplate() {
+    public final TabuSearch<IndexType, SolutionType, NeighbourhoodType> getTabuSearchTemplate() {
         return tabuSearchTemplate;
     }
 
-    public final void setTabuSearchTemplate(TabuSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> tabuSearchTemplate) throws CoreHunterException {
+    public final void setTabuSearchTemplate(TabuSearch<IndexType, SolutionType, NeighbourhoodType> tabuSearchTemplate) throws CoreHunterException {
         if (this.tabuSearchTemplate != tabuSearchTemplate) {
             this.tabuSearchTemplate = tabuSearchTemplate;
             handleTabuSearchTemplateSet();

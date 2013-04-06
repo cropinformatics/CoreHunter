@@ -16,6 +16,8 @@ package org.corehunter.search.impl;
 
 import static org.corehunter.Constants.INVALID_SIZE;
 
+import java.util.Collection;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.IndexedMove;
@@ -28,17 +30,30 @@ import org.corehunter.search.solution.SubsetSolution;
 public abstract class AbstractSubsetNeighbourhoodSearch<
 	IndexType,
         SolutionType extends SubsetSolution<IndexType>,
-        DatasetType extends IndexedData<IndexType>,
         NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-            extends AbstractNeighbourhoodSearch<SolutionType, DatasetType, IndexedMove<IndexType, SolutionType>, NeighbourhoodType>
+            extends AbstractNeighbourhoodSearch<SolutionType, IndexedMove<IndexType, SolutionType>, NeighbourhoodType>
             implements SubsetSearch<IndexType, SolutionType>
 {
 
-    public AbstractSubsetNeighbourhoodSearch() {
+    private Collection<IndexType> indices;
+
+		public AbstractSubsetNeighbourhoodSearch() {
         super();
     }
     
-    protected AbstractSubsetNeighbourhoodSearch(AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+    @Override
+    public final Collection<IndexType> getIndices()
+		{
+			return indices;
+		}
+
+		public final void setIndices(Collection<IndexType> indices) throws CoreHunterException
+		{
+			this.indices = indices;
+			handleIndicesSet() ;
+		}
+    
+    protected AbstractSubsetNeighbourhoodSearch(AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
     }
     
@@ -147,6 +162,12 @@ public abstract class AbstractSubsetNeighbourhoodSearch<
             throw new CoreHunterException("Subset minimum size can not be set while search in process");
         }
     }
+    
+    protected void handleIndicesSet() throws CoreHunterException {
+      if (SearchStatus.STARTED.equals(getStatus())) {
+          throw new CoreHunterException("Indices can not be set while search in process");
+      }
+    }
 
     protected void handleSubsetMaximumSizeSet() throws CoreHunterException {
         if (SearchStatus.STARTED.equals(getStatus())) {
@@ -165,15 +186,19 @@ public abstract class AbstractSubsetNeighbourhoodSearch<
         
         super.validate();
         
+        if (indices == null) {
+          throw new CoreHunterException("Indices must be defined!");
+        }
+        
         if(getNeighbourhood() == null){
             throw new CoreHunterException("Neighbourhood undefine!");
         }
         
         // check min/max subset size compared to full dataset size
-        if (getNeighbourhood().getSubsetMinimumSize() >= getData().getSize()) {
+        if (getNeighbourhood().getSubsetMinimumSize() >= getIndices().size()) {
             throw new CoreHunterException("Subset minimum size must be less than the dataset size!");
         }
-        if (getNeighbourhood().getSubsetMaximumSize() > getData().getSize()) {
+        if (getNeighbourhood().getSubsetMaximumSize() > getIndices().size()) {
             throw new CoreHunterException("Subset maximum size must be less than or equal to the dataset size!");
         }
         

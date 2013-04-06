@@ -24,21 +24,20 @@ import org.corehunter.search.solution.SubsetSolution;
 public class LocalSearch<
 	IndexType,
         SolutionType extends SubsetSolution<IndexType>,
-        DatasetType extends IndexedData<IndexType>,
         NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> {
+            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType> {
 
     public LocalSearch() {
         super();
     }
 
-    protected LocalSearch(LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search) throws CoreHunterException {
+    protected LocalSearch(LocalSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
     }
 
     @Override
     public Search<SolutionType> copy() throws CoreHunterException {
-        return new LocalSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>(this);
+        return new LocalSearch<IndexType, SolutionType, NeighbourhoodType>(this);
     }
 
     @Override
