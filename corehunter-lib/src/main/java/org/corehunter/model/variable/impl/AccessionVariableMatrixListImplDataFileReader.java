@@ -283,7 +283,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 				
 				parseAccession(accessions, uniqueIdentifiers ? line[0] : null, names ? uniqueIdentifiers ? line[1] : line[0] : null, lineNumber) ;
 				
-				parseLine(elements, accessions, variables, line, ranges, lineNumber, firstColumn) ;
+				parseLine(elements, accessions, variables, line, ranges, false, lineNumber, firstColumn) ;
 
 				while (iterator.hasNext())
 				{
@@ -293,7 +293,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 					
 					parseAccession(accessions, uniqueIdentifiers ? line[0] : null, names ? uniqueIdentifiers ? line[1] : line[0] : null, lineNumber) ;
 					
-					parseLine(elements, accessions, variables, line, ranges, lineNumber, firstColumn) ;
+					parseLine(elements, accessions, variables, line, ranges, false, lineNumber, firstColumn) ;
 				}
 
 				if (accessions.size() < 1)
@@ -324,14 +324,14 @@ public class AccessionVariableMatrixListImplDataFileReader
 			accessions.add(createAccession(lineNumber)) ;
   }
 
-	protected void parseLine(List<List<Object>> elements, List<Accession> accessions, List<Variable> variables, String[] line, boolean validate, int lineNumber, int firstColumn) throws CoreHunterException
+	protected void parseLine(List<List<Object>> elements, List<Accession> accessions, List<Variable> variables, String[] line, boolean validateRanges, boolean validateValues, int lineNumber, int firstColumn) throws CoreHunterException
   {
 		List<Object> row = new ArrayList<Object>(variables.size()) ;
 		elements.add(row) ;
 		
 		for (int i = 0 ; i < variables.size() ; ++i)
 		{
-			row.add(updateVariable(variables.get(i), parseElement(line[firstColumn + i], variables.get(i), lineNumber, firstColumn + i), validate, lineNumber, firstColumn + i)) ;
+			row.add(updateVariable(variables.get(i), parseElement(line[firstColumn + i], variables.get(i), lineNumber, firstColumn + i), validateRanges, validateValues, lineNumber, firstColumn + i)) ;
 		}
   }
 
@@ -373,173 +373,180 @@ public class AccessionVariableMatrixListImplDataFileReader
 		
 		if (type != null)
 		{
-			switch (type)
+			try
+      {
+	      switch (type)
+	      {
+	      	case BINARY:
+	      		if (dataType == null || VariableDataType.BOOLEAN.equals(dataType))
+	      			variable = new BinaryVariable(uniqueIdentifier, name) ;
+	      		else
+	      			throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
+	      		break ;
+	      	case INTERVAL:
+	      		if (dataType != null)
+	      		{
+	      			switch (dataType)
+	      			{
+	      				case DOUBLE:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new DoubleIntervalVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new DoubleIntervalVariable(uniqueIdentifier, name) ;			
+	      					break ;
+	      				case FLOAT:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new FloatIntervalVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new FloatIntervalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case INTEGER:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new IntegerIntervalVariable(uniqueIdentifier, name, Integer.valueOf(minimumStringValue), Integer.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new IntegerIntervalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case LONG:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new LongIntervalVariable(uniqueIdentifier, name, Long.valueOf(minimumStringValue), Long.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new LongIntervalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case SHORT:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new ShortIntervalVariable(uniqueIdentifier, name, Short.valueOf(minimumStringValue), Short.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new ShortIntervalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case STRING:
+	      				case BOOLEAN:
+	      				default:
+	      					throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
+	      			}
+	      		}
+	      		else
+	      		{
+	      			variable = new DoubleIntervalVariable(uniqueIdentifier, name) ;
+	      		}
+	      		break ;
+	      	case NOMINAL:
+	      		if (dataType != null)
+	      		{
+	      			switch (dataType)
+	      			{
+	      				case DOUBLE:
+	      					variable = new DoubleNominalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case FLOAT:
+	      					variable = new FloatNominalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case INTEGER:
+	      					variable = new IntegerNominalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case LONG:
+	      					variable = new LongNominalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case SHORT:
+	      					variable = new ShortNominalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case STRING:
+	      					variable = new StringNominalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case BOOLEAN:
+	      				default:
+	      					throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
+	      			}
+	      		}
+	      		else
+	      		{
+	      			variable = new StringNominalVariable(uniqueIdentifier, name) ;
+	      		}
+	      		break ;
+	      	case ORDINAL:
+	      		if (dataType != null)
+	      		{
+	      			switch (dataType)
+	      			{
+	      				case DOUBLE:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new DoubleOrdinalVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new DoubleOrdinalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case FLOAT:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new FloatOrdinalVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new FloatOrdinalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case INTEGER:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new IntegerOrdinalVariable(uniqueIdentifier, name, Integer.valueOf(minimumStringValue), Integer.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new IntegerOrdinalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case LONG:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new LongOrdinalVariable(uniqueIdentifier, name, Long.valueOf(minimumStringValue), Long.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new LongOrdinalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case SHORT:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new ShortOrdinalVariable(uniqueIdentifier, name, Short.valueOf(minimumStringValue), Short.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new ShortOrdinalVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case STRING:
+	      				case BOOLEAN:
+	      				default:
+	      					throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
+	      			}
+	      		}
+	      		else
+	      		{
+	      			variable =  new IntegerOrdinalVariable(uniqueIdentifier, name) ;
+	      		}
+	      		break ;
+	      	case RATIO:
+	      		if (dataType != null)
+	      		{
+	      			switch (dataType)
+	      			{
+	      				case DOUBLE:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new DoubleRatioVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new DoubleRatioVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case FLOAT:
+	      					if (minimumStringValue != null && maximumStringValue != null)
+	      						variable = new FloatRatioVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
+	      					else
+	      						variable = new FloatRatioVariable(uniqueIdentifier, name) ;
+	      					break ;
+	      				case INTEGER:
+	      				case LONG:
+	      				case SHORT:
+	      				case STRING:
+	      				case BOOLEAN:
+	      				default:
+	      					throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
+	      			}
+	      		}
+	      		else
+	      		{
+	      			variable = new DoubleRatioVariable(uniqueIdentifier, name) ;
+	      		}
+	      		break ;
+	      	default:
+	      		variable = createDefault(uniqueIdentifier, name) ;
+	      		break ;
+	      }
+			}
+			catch (NumberFormatException e)
 			{
-				case BINARY:
-					if (dataType == null || VariableDataType.BOOLEAN.equals(dataType))
-						variable = new BinaryVariable(uniqueIdentifier, name) ;
-					else
-						throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
-					break ;
-				case INTERVAL:
-					if (dataType != null)
-					{
-						switch (dataType)
-						{
-							case DOUBLE:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new DoubleIntervalVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
-								else
-									variable = new DoubleIntervalVariable(uniqueIdentifier, name) ;			
-								break ;
-							case FLOAT:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new FloatIntervalVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
-								else
-									variable = new FloatIntervalVariable(uniqueIdentifier, name) ;
-								break ;
-							case INTEGER:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new IntegerIntervalVariable(uniqueIdentifier, name, Integer.valueOf(minimumStringValue), Integer.valueOf(maximumStringValue)) ;
-								else
-									variable = new IntegerIntervalVariable(uniqueIdentifier, name) ;
-								break ;
-							case LONG:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new LongIntervalVariable(uniqueIdentifier, name, Long.valueOf(minimumStringValue), Long.valueOf(maximumStringValue)) ;
-								else
-									variable = new LongIntervalVariable(uniqueIdentifier, name) ;
-								break ;
-							case SHORT:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new ShortIntervalVariable(uniqueIdentifier, name, Short.valueOf(minimumStringValue), Short.valueOf(maximumStringValue)) ;
-								else
-									variable = new ShortIntervalVariable(uniqueIdentifier, name) ;
-								break ;
-							case STRING:
-							case BOOLEAN:
-							default:
-								throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
-						}
-					}
-					else
-					{
-						variable = new DoubleIntervalVariable(uniqueIdentifier, name) ;
-					}
-					break ;
-				case NOMINAL:
-					if (dataType != null)
-					{
-						switch (dataType)
-						{
-							case DOUBLE:
-								variable = new DoubleNominalVariable(uniqueIdentifier, name) ;
-								break ;
-							case FLOAT:
-								variable = new FloatNominalVariable(uniqueIdentifier, name) ;
-								break ;
-							case INTEGER:
-								variable = new IntegerNominalVariable(uniqueIdentifier, name) ;
-								break ;
-							case LONG:
-								variable = new LongNominalVariable(uniqueIdentifier, name) ;
-								break ;
-							case SHORT:
-								variable = new ShortNominalVariable(uniqueIdentifier, name) ;
-								break ;
-							case STRING:
-								variable = new StringNominalVariable(uniqueIdentifier, name) ;
-								break ;
-							case BOOLEAN:
-							default:
-								throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
-						}
-					}
-					else
-					{
-						variable = new StringNominalVariable(uniqueIdentifier, name) ;
-					}
-					break ;
-				case ORDINAL:
-					if (dataType != null)
-					{
-						switch (dataType)
-						{
-							case DOUBLE:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new DoubleOrdinalVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
-								else
-									variable = new DoubleOrdinalVariable(uniqueIdentifier, name) ;
-								break ;
-							case FLOAT:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new FloatOrdinalVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
-								else
-									variable = new FloatOrdinalVariable(uniqueIdentifier, name) ;
-								break ;
-							case INTEGER:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new IntegerOrdinalVariable(uniqueIdentifier, name, Integer.valueOf(minimumStringValue), Integer.valueOf(maximumStringValue)) ;
-								else
-									variable = new IntegerOrdinalVariable(uniqueIdentifier, name) ;
-								break ;
-							case LONG:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new LongOrdinalVariable(uniqueIdentifier, name, Long.valueOf(minimumStringValue), Long.valueOf(maximumStringValue)) ;
-								else
-									variable = new LongOrdinalVariable(uniqueIdentifier, name) ;
-								break ;
-							case SHORT:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new ShortOrdinalVariable(uniqueIdentifier, name, Short.valueOf(minimumStringValue), Short.valueOf(maximumStringValue)) ;
-								else
-									variable = new ShortOrdinalVariable(uniqueIdentifier, name) ;
-								break ;
-							case STRING:
-							case BOOLEAN:
-							default:
-								throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
-						}
-					}
-					else
-					{
-						variable =  new IntegerOrdinalVariable(uniqueIdentifier, name) ;
-					}
-					break ;
-				case RATIO:
-					if (dataType != null)
-					{
-						switch (dataType)
-						{
-							case DOUBLE:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new DoubleRatioVariable(uniqueIdentifier, name, Double.valueOf(minimumStringValue), Double.valueOf(maximumStringValue)) ;
-								else
-									variable = new DoubleRatioVariable(uniqueIdentifier, name) ;
-								break ;
-							case FLOAT:
-								if (minimumStringValue != null && maximumStringValue != null)
-									variable = new FloatRatioVariable(uniqueIdentifier, name, Float.valueOf(minimumStringValue), Float.valueOf(maximumStringValue)) ;
-								else
-									variable = new FloatRatioVariable(uniqueIdentifier, name) ;
-								break ;
-							case INTEGER:
-							case LONG:
-							case SHORT:
-							case STRING:
-							case BOOLEAN:
-							default:
-								throw new CoreHunterException("Invalid data type : " + dataType + " for type : " + type) ;
-						}
-					}
-					else
-					{
-						variable = new DoubleRatioVariable(uniqueIdentifier, name) ;
-					}
-					break ;
-				default:
-					variable = createDefault(uniqueIdentifier, name) ;
-					break ;
+				throw new CoreHunterException("Problem creating variable : " + name + " reason : Unable to parse string to number " + e.getLocalizedMessage()) ;
 			}
 		}
 		else
@@ -641,11 +648,11 @@ public class AccessionVariableMatrixListImplDataFileReader
   }
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-  protected Object updateVariable(Variable variable, Object value, boolean validate, int lineNumber, int columnNumber) throws CoreHunterException
+  protected Object updateVariable(Variable variable, Object value, boolean validateRanges, boolean validateValues, int lineNumber, int columnNumber) throws CoreHunterException
   {
-		if (validate) 
+		if (variable instanceof RangedVariable)
 		{
-			if (variable instanceof RangedVariable)
+			if (validateRanges) 
 			{
 				switch(variable.getDataType())
 				{
@@ -689,18 +696,7 @@ public class AccessionVariableMatrixListImplDataFileReader
 					
 				}
 			}
-			
-			if (variable instanceof CategoricalVariable)
-			{
-				if (!((CategoricalVariable)variable).getValues().contains(value))
-					throw new CoreHunterException("Dataset is not properly formatted on line "
-					    + lineNumber + " Please refer to the CoreHunter manual. "
-					        + "value " + value + " not valid value at column " + columnNumber);
-			}
-		}
-		else
-		{
-			if (variable instanceof RangedVariable)
+			else
 			{
 				switch(variable.getDataType())
 				{
@@ -747,8 +743,21 @@ public class AccessionVariableMatrixListImplDataFileReader
 					
 				}
 			}
-			
-			if (variable instanceof CategoricalVariable)
+		}
+		
+		if (variable instanceof CategoricalVariable)
+		{
+			if (validateValues) 
+			{
+				if (variable instanceof CategoricalVariable)
+				{
+					if (!((CategoricalVariable)variable).getValues().contains(value))
+						throw new CoreHunterException("Dataset is not properly formatted on line "
+						    + lineNumber + " Please refer to the CoreHunter manual. "
+						        + "value " + value + " not valid value at column " + columnNumber);
+				}
+			}
+			else
 			{
 				if (!((CategoricalVariable)variable).getValues().contains(value))
 					((CategoricalVariable)variable).addValue(value) ;
