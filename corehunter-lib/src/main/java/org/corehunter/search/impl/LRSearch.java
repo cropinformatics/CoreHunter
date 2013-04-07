@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Stack;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.impl.AdditionMove;
 import org.corehunter.neighbourhood.impl.DeletionMove;
@@ -139,7 +138,9 @@ public class LRSearch<
 
 		double evaluation, newEvaluation, bestNewEvaluation, deltaEvaluation;
 
-		IndexType bestAddIndex = null, bestRemIndex = null;
+		IndexType bestAddIndex = null ;
+		@SuppressWarnings("unused")
+    IndexType bestRemIndex = null;
 		Stack<IndexedMove<IndexType, SolutionType>> history = new Stack<IndexedMove<IndexType, SolutionType>>();
 
 		boolean skipadd = false;

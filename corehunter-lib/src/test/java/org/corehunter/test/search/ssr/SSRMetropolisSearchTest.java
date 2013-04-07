@@ -17,7 +17,6 @@ package org.corehunter.test.search.ssr;
 import static org.junit.Assert.fail;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.SearchListener;
@@ -25,7 +24,6 @@ import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.MetropolisSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
-import org.corehunter.test.UncachedModifiedRogersDistanceSSR;
 import org.corehunter.test.search.SubsetSearchTest;
 import org.corehunter.test.search.impl.CachedSolutionPrintWriterSubsetSearchListener;
 import org.junit.Test;
@@ -60,7 +58,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
             search.setTemperature(DEFAULT_MAXIMUM_TEMPERATURE);
         } catch (CoreHunterException e) {
             e.printStackTrace();
@@ -98,7 +96,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
             search.setTemperature(DEFAULT_MAXIMUM_TEMPERATURE);
         } catch (CoreHunterException e) {
             e.printStackTrace();
@@ -136,7 +134,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
             search.setTemperature(DEFAULT_MAXIMUM_TEMPERATURE);
         } catch (CoreHunterException e) {
             e.printStackTrace();
@@ -174,7 +172,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
             search.setTemperature(DEFAULT_MAXIMUM_TEMPERATURE);
         } catch (CoreHunterException e) {
             e.printStackTrace();
@@ -212,7 +210,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
             search.setTemperature(DEFAULT_MAXIMUM_TEMPERATURE);
         } catch (CoreHunterException e) {
             e.printStackTrace();

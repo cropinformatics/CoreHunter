@@ -40,7 +40,7 @@ public class IndexedTabuManagerTest extends TestCase {
         System.out.println("");
         
         // create tabu manager
-        IndexedTabuManager<Integer> tabuManager = new IndexedTabuManager<Integer>(4);
+        IndexedTabuManager<Integer, SubsetSolution<Integer>> tabuManager = new IndexedTabuManager<Integer, SubsetSolution<Integer>>(4);
         System.out.println("Initial tabu manager state: " + tabuManager);
         // create initial subset solution
         //  - all indices: {0,1,2,3,4,5}

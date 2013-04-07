@@ -61,7 +61,7 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
      */
     @Override
     public IndexedMove<IndexType, SolutionType> performBestMove(SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
-                    IndexedTabuManager<IndexType> tabuManager, double currentBestEvaluation) throws CoreHunterException {
+                    IndexedTabuManager<IndexType, SolutionType> tabuManager, double currentBestEvaluation) throws CoreHunterException {
 
         // search for best neighbour by perturbing solution
         // in all possible ways (deletion, addition or swap)

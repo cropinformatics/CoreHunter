@@ -19,7 +19,6 @@ import static org.corehunter.Constants.INVALID_TEMPERATURE;
 import java.text.DecimalFormat;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
@@ -101,8 +100,8 @@ public class MetropolisSearch<
             handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
         }
         
-        long curStep = 1;
-        while (canContinue(curStep)) {
+        long currentStep = 1;
+        while (canContinue(currentStep)) {
             
             size = getCurrentSolution().getSubsetSize();
             evaluation = getCurrentSolutionEvaluation();
@@ -141,7 +140,7 @@ public class MetropolisSearch<
                 // no neighbour found
                 stop();
             }
-            curStep++;
+            currentStep++;
         }
     }
 

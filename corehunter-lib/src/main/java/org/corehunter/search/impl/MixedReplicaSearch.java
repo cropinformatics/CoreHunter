@@ -15,7 +15,6 @@
 package org.corehunter.search.impl;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
@@ -29,9 +28,9 @@ public class MixedReplicaSearch<
             extends AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType, SubsetSearch<IndexType, SolutionType>> {
 
     // default params
-    private static final int DEFAULT_LRSEARCH_L = 2;
-    private static final int DEFAULT_LRSEARCH_R = 1;
-    private static final int DEFAULT_PROG_BOOST_FACTOR = 2;
+    //private static final int DEFAULT_LRSEARCH_L = 2;
+    //private static final int DEFAULT_LRSEARCH_R = 1;
+    //private static final int DEFAULT_PROG_BOOST_FACTOR = 2;
     // TO DO add defaults for other subsearch parameters
     
     // TO DO specifiy default values

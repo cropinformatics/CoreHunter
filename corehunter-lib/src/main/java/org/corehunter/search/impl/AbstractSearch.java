@@ -20,7 +20,6 @@ import static org.corehunter.Constants.INVALID_TIME;
 import java.util.Random;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.Data;
 import org.corehunter.model.impl.EntityImpl;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchListener;
@@ -48,8 +47,8 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 
 	// stop criteria
 	private long	                              runtimeLimit	                  = INVALID_TIME;
-	private long	                              maxTimeWithoutImprovement	      = INVALID_TIME;
-	private long	                              maxNrOfSteps	                  = INVALID_NUMBER_OF_STEPS;
+	private long	                              maximumTimeWithoutImprovement	      = INVALID_TIME;
+	private long	                              maximumNumberOfSteps	                  = INVALID_NUMBER_OF_STEPS;
 	private double	                            minimumProgression	            = 0;
 
 	// min delta for new best solution
@@ -82,7 +81,7 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		// set stop criteria
 		setRuntimeLimit(search.getRuntimeLimit());
 		setMaxTimeWithoutImprovement(search.getMaxTimeWithoutImprovement());
-		setMaxNumberOfSteps(search.getMaxNumberOfSteps());
+		setMaximumNumberOfSteps(search.getMaximumumberOfSteps());
 		setMinimumProgression(search.getMinimumProgression());
 	}
 
@@ -150,11 +149,11 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 	 * Check whether the search is allowed to continue, w.r.t to its stop
 	 * criteria.
 	 * 
-	 * @param curStep
+	 * @param currentStep
 	 *          Current step number (counted from 1)
 	 * @return
 	 */
-	public boolean canContinue(long curStep)
+	protected boolean canContinue(long currentStep)
 	{
 		// check if search was stopped externally
 		if (status.equals(SearchStatus.STOPPED))
@@ -169,14 +168,14 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 			return false;
 		}
 		// check time without improvement
-		if (maxTimeWithoutImprovement != INVALID_TIME
-		    && getBestSolutionTime() > maxTimeWithoutImprovement)
+		if (maximumTimeWithoutImprovement != INVALID_TIME
+		    && getBestSolutionTime() > maximumTimeWithoutImprovement)
 		{
 			fireSearchMessage("Stopping... Maximum time without improvement exceeded.");
 			return false;
 		}
 		// check number of steps
-		if (maxNrOfSteps != INVALID_NUMBER_OF_STEPS && curStep > maxNrOfSteps)
+		if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && currentStep > maximumNumberOfSteps)
 		{
 			fireSearchMessage("Stopping... Maximum number of steps exceeded.");
 			return false;
@@ -206,33 +205,33 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		}
 	}
 
-	public final long getMaxNumberOfSteps()
+	public final long getMaximumumberOfSteps()
 	{
-		return maxNrOfSteps;
+		return maximumNumberOfSteps;
 	}
 
-	public final void setMaxNumberOfSteps(long maxNrOfSteps)
+	public final void setMaximumNumberOfSteps(long maximumNumberOfSteps)
 	    throws CoreHunterException
 	{
-		if (this.maxNrOfSteps != maxNrOfSteps)
+		if (this.maximumNumberOfSteps != maximumNumberOfSteps)
 		{
-			this.maxNrOfSteps = maxNrOfSteps;
-			handleMaxNumberOfStepsSet();
+			this.maximumNumberOfSteps = maximumNumberOfSteps;
+			handleMaximumNumberOfStepsSet();
 		}
 	}
 
 	public final long getMaxTimeWithoutImprovement()
 	{
-		return maxTimeWithoutImprovement;
+		return maximumTimeWithoutImprovement;
 	}
 
 	public final void setMaxTimeWithoutImprovement(long maxTimeWithoutImprovement)
 	    throws CoreHunterException
 	{
-		if (this.maxTimeWithoutImprovement != maxTimeWithoutImprovement)
+		if (this.maximumTimeWithoutImprovement != maxTimeWithoutImprovement)
 		{
-			this.maxTimeWithoutImprovement = maxTimeWithoutImprovement;
-			handleMaxTimeWithoutImprovementSet();
+			this.maximumTimeWithoutImprovement = maxTimeWithoutImprovement;
+			handleMaximumTimeWithoutImprovementSet();
 		}
 	}
 
@@ -265,33 +264,33 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		}
 	}
 
-	protected void handleMaxNumberOfStepsSet() throws CoreHunterException
+	protected void handleMaximumNumberOfStepsSet() throws CoreHunterException
 	{
 		if (SearchStatus.STARTED.equals(getStatus()))
 		{
 			throw new CoreHunterException(
-			    "Number Of Steps can not be set while search in process");
+			    "Number of steps can not be set while search in process");
 		}
-		if (maxNrOfSteps != INVALID_NUMBER_OF_STEPS && maxNrOfSteps <= 0)
+		if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && maximumNumberOfSteps <= 0)
 		{
 			throw new CoreHunterException(
-			    "Number of Steps can not be less than or equal to zero!");
+			    "Number of steps can not be less than or equal to zero!");
 		}
 	}
 
-	protected void handleMaxTimeWithoutImprovementSet()
+	protected void handleMaximumTimeWithoutImprovementSet()
 	    throws CoreHunterException
 	{
 		if (SearchStatus.STARTED.equals(getStatus()))
 		{
 			throw new CoreHunterException(
-			    "Max time without improvement can not be set can not be set while search in process");
+			    "Maximum time without improvement can not be set can not be set while search in process");
 		}
-		if (maxTimeWithoutImprovement != INVALID_TIME
-		    && maxTimeWithoutImprovement <= 0)
+		if (maximumTimeWithoutImprovement != INVALID_TIME
+		    && maximumTimeWithoutImprovement <= 0)
 		{
 			throw new CoreHunterException(
-			    "Max time without improvement can not be less than or equal to zero!");
+			    "Maximum time without improvement can not be less than or equal to zero!");
 		}
 	}
 
@@ -400,13 +399,13 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 			throw new CoreHunterException(
 			    "Runtime can not be less than or equal to zero!");
 		}
-		if (maxNrOfSteps != INVALID_NUMBER_OF_STEPS && maxNrOfSteps <= 0)
+		if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && maximumNumberOfSteps <= 0)
 		{
 			throw new CoreHunterException(
 			    "Number of Steps can not be less than or equal to zero!");
 		}
-		if (maxTimeWithoutImprovement != INVALID_TIME
-		    && maxTimeWithoutImprovement <= 0)
+		if (maximumTimeWithoutImprovement != INVALID_TIME
+		    && maximumTimeWithoutImprovement <= 0)
 		{
 			throw new CoreHunterException(
 			    "Max time without improvement can not be less than or equal to zero!");

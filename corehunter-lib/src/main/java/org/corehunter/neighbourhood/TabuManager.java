@@ -14,13 +14,15 @@
 
 package org.corehunter.neighbourhood;
 
+import org.corehunter.search.solution.Solution;
+
 /**
  * Tabu Manager keeps track of moves which are tabu, i.e. which are not
  * allowed for a certain period of time.
  * 
  * @author Herman De Beukelaer <herman.debeukelaer@ugent.be>
  */
-public interface TabuManager<MoveType extends Move> {
+public interface TabuManager<SolutionType extends Solution, MoveType extends Move<SolutionType>> {
     
     /**
      * Check whether a specific move is allowed in the current Tabu Manager state.

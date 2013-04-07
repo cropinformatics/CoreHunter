@@ -17,7 +17,6 @@ package org.corehunter.test.search.ssr;
 import static org.junit.Assert.fail;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.impl.IntegerSubsetGenerator;
@@ -57,7 +56,7 @@ public class SSRLocalSearchTest extends SubsetSearchTest<Integer, SubsetSolution
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
         } catch (CoreHunterException e) {
             e.printStackTrace();
             fail(e.getLocalizedMessage());
@@ -95,7 +94,7 @@ public class SSRLocalSearchTest extends SubsetSearchTest<Integer, SubsetSolution
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
         } catch (CoreHunterException e) {
             e.printStackTrace();
             fail(e.getLocalizedMessage());

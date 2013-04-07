@@ -15,7 +15,6 @@
 package org.corehunter.search.impl;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.neighbourhood.impl.IndexedTabuManager;
@@ -33,7 +32,7 @@ public class TabuSearch<
             extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType> {
 
     // tabu manager
-    private IndexedTabuManager<IndexType> tabuManager = null;
+    private IndexedTabuManager<IndexType, SolutionType> tabuManager = null;
 
     public TabuSearch() {
         super();
@@ -49,11 +48,11 @@ public class TabuSearch<
         return new TabuSearch<IndexType, SolutionType, NeighbourhoodType>(this);
     }
 
-    public final IndexedTabuManager<IndexType> getTabuManager() {
+    public final IndexedTabuManager<IndexType, SolutionType> getTabuManager() {
         return tabuManager;
     }
 
-    public final void setTabuManager(IndexedTabuManager<IndexType> tabuManager) throws CoreHunterException {
+    public final void setTabuManager(IndexedTabuManager<IndexType, SolutionType> tabuManager) throws CoreHunterException {
         if (this.tabuManager != tabuManager) {
             this.tabuManager = tabuManager;
             handleTabuManagerSet();

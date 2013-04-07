@@ -16,12 +16,13 @@ package org.corehunter.neighbourhood.impl;
 
 import org.corehunter.neighbourhood.Move;
 import org.corehunter.neighbourhood.TabuManager;
+import org.corehunter.search.solution.Solution;
 
 /**
  *
  */
-public abstract class AbstractTabuManager<MoveType extends Move>
-            implements TabuManager<MoveType>
+public abstract class AbstractTabuManager<SolutionType extends Solution, MoveType extends Move<SolutionType>>
+            implements TabuManager<SolutionType, MoveType>
 {
     
     // aspiration criterion delta

@@ -14,7 +14,6 @@
 package org.corehunter.search.impl;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;

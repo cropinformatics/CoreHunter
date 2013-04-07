@@ -86,7 +86,7 @@ public final class CoreSubsetSearch
 		search.setNeighbourhood(neighbourhood);
 		search.setObjectiveFunction(objectiveFunction);
 		search.setRuntimeLimit(runtime);
-		search.setMaxNumberOfSteps(numberOfSteps) ;
+		search.setMaximumNumberOfSteps(numberOfSteps) ;
 
 		search.start();
 

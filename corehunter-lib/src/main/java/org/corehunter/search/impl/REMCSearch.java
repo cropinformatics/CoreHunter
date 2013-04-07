@@ -14,278 +14,299 @@
 
 package org.corehunter.search.impl;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.IndexedData;
 import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.SubsetSolution;
 
-public class REMCSearch<
-	IndexType,
-        SolutionType extends SubsetSolution<IndexType>,
-        NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-            extends AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType, MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>> {
+import static org.corehunter.Constants.K_b2;
 
-    private int numberOfReplicas;
-    private double minimumTemperature;
-    private double maximumTemperature;
-    private int numberOfMetropolisStepsPerRound;
+public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType>, NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
+    extends
+    AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType, MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>>
+{
 
-    public REMCSearch() {
-        super();
-    }
+	private int	   numberOfReplicas;
+	private double	minimumTemperature;
+	private double	maximumTemperature;
+	private int	   numberOfMetropolisStepsPerRound;
 
-    protected REMCSearch(REMCSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
-        super(search);
-        setNumberOfReplicas(search.getNumberOfReplicas());
-        setMinimumTemperature(search.getMinimumTemperature());
-        setMaximumTemperature(search.getMaximumTemperature());
-        setNumberOfMetropolisStepsPerRound(search.getNumberOfMetropolisStepsPerRound());
-    }
+	public REMCSearch()
+	{
+		super();
+	}
 
-    @Override
-    public Search<SolutionType> copy() throws CoreHunterException {
-        return new REMCSearch<IndexType, SolutionType, NeighbourhoodType>(this);
-    }
+	protected REMCSearch(
+	    REMCSearch<IndexType, SolutionType, NeighbourhoodType> search)
+	    throws CoreHunterException
+	{
+		super(search);
+		setNumberOfReplicas(search.getNumberOfReplicas());
+		setMinimumTemperature(search.getMinimumTemperature());
+		setMaximumTemperature(search.getMaximumTemperature());
+		setNumberOfMetropolisStepsPerRound(search
+		    .getNumberOfMetropolisStepsPerRound());
+	}
 
-    public final int getNumberOfReplicas() {
-        return numberOfReplicas;
-    }
+	@Override
+	public Search<SolutionType> copy() throws CoreHunterException
+	{
+		return new REMCSearch<IndexType, SolutionType, NeighbourhoodType>(this);
+	}
 
-    public final void setNumberOfReplicas(int numberOfReplicas) throws CoreHunterException {
-        if (this.numberOfReplicas != numberOfReplicas) {
-            this.numberOfReplicas = numberOfReplicas;
-            handleNumberOfReplicasSet();
-        }
-    }
+	public final int getNumberOfReplicas()
+	{
+		return numberOfReplicas;
+	}
 
-    public final double getMinimumTemperature() {
-        return minimumTemperature;
-    }
+	public final void setNumberOfReplicas(int numberOfReplicas)
+	    throws CoreHunterException
+	{
+		if (this.numberOfReplicas != numberOfReplicas)
+		{
+			this.numberOfReplicas = numberOfReplicas;
+			handleNumberOfReplicasSet();
+		}
+	}
 
-    public final void setMinimumTemperature(double minimumTemperature) throws CoreHunterException {
-        if (this.minimumTemperature != minimumTemperature) {
-            this.minimumTemperature = minimumTemperature;
-            handleMinimumTemperatureSet();
-        }
-    }
+	public final double getMinimumTemperature()
+	{
+		return minimumTemperature;
+	}
 
-    public final double getMaximumTemperature() {
-        return maximumTemperature;
-    }
+	public final void setMinimumTemperature(double minimumTemperature)
+	    throws CoreHunterException
+	{
+		if (this.minimumTemperature != minimumTemperature)
+		{
+			this.minimumTemperature = minimumTemperature;
+			handleMinimumTemperatureSet();
+		}
+	}
 
-    public final void setMaximumTemperature(double maximumTemperature) throws CoreHunterException {
-        if (this.maximumTemperature != maximumTemperature) {
-            this.maximumTemperature = maximumTemperature;
-            handleMaximumTemperatureSet();
-        }
-    }
+	public final double getMaximumTemperature()
+	{
+		return maximumTemperature;
+	}
 
-    public final int getNumberOfMetropolisStepsPerRound() {
-        return numberOfMetropolisStepsPerRound;
-    }
+	public final void setMaximumTemperature(double maximumTemperature)
+	    throws CoreHunterException
+	{
+		if (this.maximumTemperature != maximumTemperature)
+		{
+			this.maximumTemperature = maximumTemperature;
+			handleMaximumTemperatureSet();
+		}
+	}
 
-    public final void setNumberOfMetropolisStepsPerRound(int numberOfSteps) throws CoreHunterException {
-        if (this.numberOfMetropolisStepsPerRound != numberOfSteps) {
-            this.numberOfMetropolisStepsPerRound = numberOfSteps;
-            handleNumberOfMetropolisStepsPerRoundSet();
-        }
-    }
+	public final int getNumberOfMetropolisStepsPerRound()
+	{
+		return numberOfMetropolisStepsPerRound;
+	}
 
-    protected void handleNumberOfReplicasSet() throws CoreHunterException {
-        if (numberOfReplicas <= 0) {
-            throw new CoreHunterException("Number Of Replicas can not be less than or equal to zero!");
-        }
-        if (SearchStatus.STARTED.equals(getStatus())) {
-            throw new CoreHunterException("Number Of Replicas can not be set while search in process");
-        }
-    }
+	public final void setNumberOfMetropolisStepsPerRound(int numberOfSteps)
+	    throws CoreHunterException
+	{
+		if (this.numberOfMetropolisStepsPerRound != numberOfSteps)
+		{
+			this.numberOfMetropolisStepsPerRound = numberOfSteps;
+			handleNumberOfMetropolisStepsPerRoundSet();
+		}
+	}
 
-    protected void handleMinimumTemperatureSet() throws CoreHunterException {
-        if (minimumTemperature < 0) {
-            throw new CoreHunterException("Minimum Temperature can not be less than zero!");
-        }
-        if (SearchStatus.STARTED.equals(getStatus())) {
-            throw new CoreHunterException("Minimum Temperature can not be set while search in process");
-        }
-    }
+	protected void handleNumberOfReplicasSet() throws CoreHunterException
+	{
+		if (numberOfReplicas <= 0)
+		{
+			throw new CoreHunterException(
+			    "Number Of Replicas can not be less than or equal to zero!");
+		}
+		if (SearchStatus.STARTED.equals(getStatus()))
+		{
+			throw new CoreHunterException(
+			    "Number Of Replicas can not be set while search in process");
+		}
+	}
 
-    protected void handleMaximumTemperatureSet() throws CoreHunterException {
-        if (maximumTemperature < 0) {
-            throw new CoreHunterException("Maximum Temperature can not be less than zero!");
-        }
-        if (SearchStatus.STARTED.equals(getStatus())) {
-            throw new CoreHunterException("Maximum Temperature can not be set while search in process");
-        }
-    }
+	protected void handleMinimumTemperatureSet() throws CoreHunterException
+	{
+		if (minimumTemperature < 0)
+		{
+			throw new CoreHunterException(
+			    "Minimum Temperature can not be less than zero!");
+		}
+		if (SearchStatus.STARTED.equals(getStatus()))
+		{
+			throw new CoreHunterException(
+			    "Minimum Temperature can not be set while search in process");
+		}
+	}
 
-    protected void handleNumberOfMetropolisStepsPerRoundSet() throws CoreHunterException {
-        if (numberOfMetropolisStepsPerRound <= 0){
-            throw new CoreHunterException("Number of Metropolis Steps per Round can not be less than or equal to zero!");
-        }
-        if (SearchStatus.STARTED.equals(getStatus())) {
-            throw new CoreHunterException("Number of Metropolis Steps per Round can not be set while search in process");
-        }
-    }
+	protected void handleMaximumTemperatureSet() throws CoreHunterException
+	{
+		if (maximumTemperature < 0)
+		{
+			throw new CoreHunterException(
+			    "Maximum Temperature can not be less than zero!");
+		}
+		if (SearchStatus.STARTED.equals(getStatus()))
+		{
+			throw new CoreHunterException(
+			    "Maximum Temperature can not be set while search in process");
+		}
+	}
 
-    @Override
-    protected void validate() throws CoreHunterException {
-        super.validate();
+	protected void handleNumberOfMetropolisStepsPerRoundSet()
+	    throws CoreHunterException
+	{
+		if (numberOfMetropolisStepsPerRound <= 0)
+		{
+			throw new CoreHunterException(
+			    "Number of Metropolis Steps per Round can not be less than or equal to zero!");
+		}
+		if (SearchStatus.STARTED.equals(getStatus()))
+		{
+			throw new CoreHunterException(
+			    "Number of Metropolis Steps per Round can not be set while search in process");
+		}
+	}
 
-        if (numberOfReplicas <= 0) {
-            throw new CoreHunterException("Number Of Replicas can not be less than or equal to zero!");
-        }
+	@Override
+	protected void validate() throws CoreHunterException
+	{
+		super.validate();
 
-        if (minimumTemperature < 0) {
-            throw new CoreHunterException("Minimum Temperature can not be less than zero!");
-        }
+		if (numberOfReplicas <= 0)
+		{
+			throw new CoreHunterException(
+			    "Number Of Replicas can not be less than or equal to zero!");
+		}
 
-        if (maximumTemperature < 0) {
-            throw new CoreHunterException("Maximum Temperature can not be less than zero!");
-        }
+		if (minimumTemperature < 0)
+		{
+			throw new CoreHunterException(
+			    "Minimum Temperature can not be less than zero!");
+		}
 
-        if (maximumTemperature < minimumTemperature) {
-            throw new CoreHunterException("Maximum Temperature can not be less than Miimum Temperature!");
-        }
-        
-        if (numberOfMetropolisStepsPerRound <= 0){
-            throw new CoreHunterException("Number of Metropolis Steps per Round can not be less than or equal to zero!");
-        }
-    }
+		if (maximumTemperature < 0)
+		{
+			throw new CoreHunterException(
+			    "Maximum Temperature can not be less than zero!");
+		}
 
-    @SuppressWarnings("unchecked")
-    protected void runSearch() throws CoreHunterException {
-        
-        /*
-        
-        continueSearch = true;
+		if (maximumTemperature < minimumTemperature)
+		{
+			throw new CoreHunterException(
+			    "Maximum Temperature can not be less than Miimum Temperature!");
+		}
 
-        List<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> replicas = new ArrayList<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>>(numberOfReplicas);
+		if (numberOfMetropolisStepsPerRound <= 0)
+		{
+			throw new CoreHunterException(
+			    "Number of Metropolis Steps per Round can not be less than or equal to zero!");
+		}
+	}
 
-        for (int i = 0; i < numberOfReplicas; i++) {
-            double temperature = minimumTemperature + i * (maximumTemperature - minimumTemperature) / (numberOfReplicas - 1);
-            replicas.add(createMetropolisSearch((SolutionType) getCurrentSolution().copy(), getObjectiveFunction().copy(), (NeighbourhoodType) getNeighbourhood().copy(), numberOfMetropolisStepsPerRound,
-                    -1, temperature));
+	@SuppressWarnings("unchecked")
+	protected void runSearch() throws CoreHunterException
+	{
+		List<MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>> replicas = new ArrayList<MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>>(
+		    numberOfReplicas);
 
-        }
+		// initialise searches
+		for (int i = 0; i < numberOfReplicas; i++)
+		{
+			double temperature = minimumTemperature + i
+			    * (maximumTemperature - minimumTemperature) / (numberOfReplicas - 1);
+			
+			replicas.add(createMetropolisSearch(
+					(SolutionType) getCurrentSolution().copy(), 
+					getObjectiveFunction().copy(),
+			    (NeighbourhoodType) getNeighbourhood().copy(),
+			    numberOfMetropolisStepsPerRound, 
+			    -1, 
+			    temperature));
+		}
 
-        int swapBase = 0;
+		int swapBase = 0;
 
-        double previousBestEvaluation = getBestSolutionEvaluation();
-        int previousBestSubsetSize = getBestSolution().getSubsetSize();
+		registerSubSearches(replicas);
 
-        double progression;
+    long currentStep = 1;
 
-        registerSubSearches(replicas);
+		while (canContinue(currentStep))
+		{
+			startSubSearches(replicas); // returns when all are complete
 
-        while (continueSearch) {
-            startSubSearches(replicas); // returns when all are complete
+			// consider swapping temperatures of adjacent replicas
+			for (int i = swapBase; i < numberOfReplicas - 1; i += 2)
+			{
+				MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> m = replicas
+				    .get(i);
+				MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> n = replicas
+				    .get(i + 1);
 
-            if (minimumProgression > 0) {
-                // All tasks are done, check minimum progression
-                progression = getDeltaScore(getBestSolutionEvaluation(), previousBestEvaluation);
+				double B_m = 1.0 / (K_b2 * m.getTemperature());
+				double B_n = 1.0 / (K_b2 * n.getTemperature());
+				double B_diff = B_n - B_m;
+				// TODO check if this the right around +ve delta here means m is better
+				// than n
+				double E_delta = getDeltaScore(m.getBestSolutionEvaluation(),
+				    n.getBestSolutionEvaluation());
 
-                // check minimum progression
-                if (progression > 0 && getBestSolution().getSubsetSize() >= previousBestSubsetSize && progression < minimumProgression) {
-                    continueSearch = false;
-                }
-            }
+				boolean swap = false;
 
-            previousBestEvaluation = getBestSolutionEvaluation();
-            previousBestSubsetSize = getBestSolution().getSubsetSize();
+				if (E_delta <= 0)
+				{
+					swap = true;
+				}
+				else
+				{
+					double p = getRandom().nextDouble();
 
-            // check stuckTime
-            continueSearch = continueSearch && stuckTime > getBestSolutionTime();
+					if (Math.exp(B_diff * E_delta) > p)
+					{
+						swap = true;
+					}
+				}
 
-            // consider swapping temperatures of adjacent replicas
-            for (int i = swapBase; i < numberOfReplicas - 1; i += 2) {
-                MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> m = replicas.get(i);
-                MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> n = replicas.get(i + 1);
-            }
+				if (swap)
+				{
+					m.swapTemperature(n);
+					MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> temp = replicas
+					    .get(i);
+					replicas.set(i, replicas.get(i + 1));
+					replicas.set(i + 1, temp);
+				}
+			}
 
-            // consider swapping temperatures of adjacent replicas
-            for (int i = swapBase; i < numberOfReplicas - 1; i += 2) {
-                MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> m = replicas.get(i);
-                MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> n = replicas.get(i + 1);
+			swapBase = 1 - swapBase;
 
-                double B_m = 1.0 / (K_b2 * m.getTemperature());
-                double B_n = 1.0 / (K_b2 * n.getTemperature());
-                double B_diff = B_n - B_m;
-                // TODO check if this the right around +ve delta here means m is better than n
-                double E_delta = getDeltaScore(m.getBestSolutionEvaluation(), n.getBestSolutionEvaluation());
+			++currentStep ;
+		}
 
-                boolean swap = false;
+		unregisterSubSearches(replicas);
+	}
 
-                if (E_delta <= 0) {
-                    swap = true;
-                } else {
-                    double p = getRandom().nextDouble();
+	protected MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> createMetropolisSearch(
+	    SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
+	    NeighbourhoodType neighbourhood, int numberOfSteps, int runtime,
+	    double temperature) throws CoreHunterException
+	{
+		MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> subsearch = new MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>();
 
-                    if (Math.exp(B_diff * E_delta) > p) {
-                        swap = true;
-                    }
-                }
+		subsearch.setInitialSolution(solution);
+		subsearch.setObjectiveFunction(objectiveFunction);
+		subsearch.setNeighbourhood(neighbourhood);
+		subsearch.setMaximumNumberOfSteps(numberOfSteps);
+		subsearch.setRuntimeLimit(runtime);
+		subsearch.setTemperature(temperature);
 
-                if (swap) {
-                    m.swapTemperature(n);
-                    MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> temp = replicas.get(i);
-                    replicas.set(i, replicas.get(i + 1));
-                    replicas.set(i + 1, temp);
-                }
-            }
-
-            swapBase = 1 - swapBase;
-
-            continueSearch = continueSearch && getSearchTime() < runtime;
-        }
-
-        unregisterSubSearches(replicas);
-        
-        */
-        
-    }
-
-    private MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> createMetropolisSearch(
-            SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
-            NeighbourhoodType neighbourhood, int numberOfSteps, int runtime, double temperature) throws CoreHunterException {
-        MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> subsearch =
-                new MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>();
-
-        subsearch.setInitialSolution(solution);
-        subsearch.setObjectiveFunction(objectiveFunction);
-        subsearch.setNeighbourhood(neighbourhood);
-        subsearch.setMaxNumberOfSteps(numberOfSteps);
-        subsearch.setRuntimeLimit(runtime);
-        subsearch.setTemperature(temperature);
-
-        return subsearch;
-    }
-    
-    // this is temp method to double check the best solution
-    /*private void findBestSubSearch2(List<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> replicas) {
-        Iterator<MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType>> iterator = replicas.iterator();
-
-        double bestSolutionEvaluation = this.getWorstEvaluation();
-
-        MetropolisSearch<IndexType, SolutionType, DatasetType, NeighbourhoodType> search;
-        SolutionType bestSolution = null;
-
-        while (iterator.hasNext()) {
-            search = iterator.next();
-
-            if (isBetterSolution(search.getBestSolutionEvaluation(), bestSolutionEvaluation)) {
-                bestSolution = search.getBestSolution();
-                bestSolutionEvaluation = search.getBestSolutionEvaluation();
-            }
-        }
-
-        if (bestSolution != null) {
-            handleNewBestSolution(bestSolution, bestSolutionEvaluation);
-        }
-    }*/
-
+		return subsearch;
+	}
 }

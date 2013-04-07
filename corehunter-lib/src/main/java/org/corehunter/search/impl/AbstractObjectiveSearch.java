@@ -15,9 +15,7 @@
 package org.corehunter.search.impl;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.Data;
 import org.corehunter.objectivefunction.ObjectiveFunction;
-import org.corehunter.objectivefunction.impl.ObjectiveFunctionWithData;
 import org.corehunter.search.ObjectiveSearch;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.Solution;
@@ -75,7 +73,6 @@ public abstract class AbstractObjectiveSearch<SolutionType extends Solution>
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     protected void validate() throws CoreHunterException {
         super.validate();

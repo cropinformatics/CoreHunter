@@ -20,9 +20,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.corehunter.neighbourhood.IndexedMove;
+import org.corehunter.search.solution.SubsetSolution;
 
 
-public class IndexedTabuManager<IndexType> extends AbstractTabuManager<IndexedMove<IndexType, ?>>
+public class IndexedTabuManager<IndexType, SolutionType extends SubsetSolution<IndexType>> extends AbstractTabuManager<SolutionType, IndexedMove<IndexType, SolutionType>>
 {
     
     // history of indices which are currently tabu
@@ -37,7 +38,7 @@ public class IndexedTabuManager<IndexType> extends AbstractTabuManager<IndexedMo
      * Check tabu indices.
      */
     @Override
-    public boolean moveIsTabu(IndexedMove<IndexType, ?> move) {
+    public boolean moveIsTabu(IndexedMove<IndexType, SolutionType> move) {
         // move is tabu if at least one of its involved indices
         // are contained in the current tabu list
         boolean isTabu = false;
@@ -48,7 +49,7 @@ public class IndexedTabuManager<IndexType> extends AbstractTabuManager<IndexedMo
         return isTabu;
     }
 
-    public void registerMoveTaken(IndexedMove<IndexType, ?> move) {
+    public void registerMoveTaken(IndexedMove<IndexType, SolutionType> move) {
         // register all indices involved in the indexed move as tabu
         for(IndexType index : move.getInvolvedIndices()){
             registerTabuIndex(index);

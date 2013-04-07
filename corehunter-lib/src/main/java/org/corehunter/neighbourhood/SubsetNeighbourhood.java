@@ -35,7 +35,7 @@ public interface SubsetNeighbourhood<IndexType, SolutionType extends SubsetSolut
      * @return The move the that was made, or null if no non-tabu neighbours were found
      */
     public IndexedMove<IndexType, SolutionType> performBestMove(SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
-                IndexedTabuManager<IndexType> tabuManager, double currentBestEvaluation) throws CoreHunterException;
+                IndexedTabuManager<IndexType, SolutionType> tabuManager, double currentBestEvaluation) throws CoreHunterException;
 
     public int getSubsetMinimumSize();
 

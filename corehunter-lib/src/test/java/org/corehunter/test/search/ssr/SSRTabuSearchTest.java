@@ -17,7 +17,6 @@ package org.corehunter.test.search.ssr;
 import static org.junit.Assert.fail;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.neighbourhood.impl.IndexedTabuManager;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
@@ -57,8 +56,8 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
-            search.setTabuManager(new IndexedTabuManager<Integer>(DEFAULT_TABU_HIST_SIZE));
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setTabuManager(new IndexedTabuManager<Integer, SubsetSolution<Integer>>(DEFAULT_TABU_HIST_SIZE));
         } catch (CoreHunterException e) {
             e.printStackTrace();
             fail(e.getLocalizedMessage());
@@ -96,8 +95,8 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
-            search.setTabuManager(new IndexedTabuManager<Integer>(DEFAULT_TABU_HIST_SIZE));
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setTabuManager(new IndexedTabuManager<Integer, SubsetSolution<Integer>>(DEFAULT_TABU_HIST_SIZE));
         } catch (CoreHunterException e) {
             e.printStackTrace();
             fail(e.getLocalizedMessage());
@@ -133,9 +132,9 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);
             search.setMinimumProgression(DEFAULT_MINIMUM_PROGRESSION);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
             // oversized tabu history (should lead to some point where all neighbours are tabu)
-            search.setTabuManager(new IndexedTabuManager<Integer>(10*DEFAULT_MAXIMUM_SIZE));
+            search.setTabuManager(new IndexedTabuManager<Integer, SubsetSolution<Integer>>(10*DEFAULT_MAXIMUM_SIZE));
         } catch (CoreHunterException e) {
             e.printStackTrace();
             fail(e.getLocalizedMessage());

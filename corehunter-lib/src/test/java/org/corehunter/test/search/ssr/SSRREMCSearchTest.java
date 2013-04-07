@@ -17,7 +17,6 @@ package org.corehunter.test.search.ssr;
 import static org.junit.Assert.fail;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.SearchListener;
@@ -25,7 +24,6 @@ import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.REMCSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
-import org.corehunter.test.UncachedModifiedRogersDistanceSSR;
 import org.corehunter.test.search.SubsetSearchTest;
 import org.corehunter.test.search.impl.CachedSolutionPrintWriterSubsetSearchListener;
 import org.junit.Test;
@@ -56,7 +54,7 @@ public class SSRREMCSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMinimumTemperature(DEFAULT_MINIMUM_TEMPERATURE);
             search.setMaximumTemperature(DEFAULT_MAXIMUM_TEMPERATURE);
-            search.setMaxNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
+            search.setMaximumNumberOfSteps(DEFAULT_NUMBER_OF_STEPS);
             search.setNumberOfReplicas(DEFAULT_NUMBER_OF_REPLICAS);
         } catch (CoreHunterException e) {
             e.printStackTrace();

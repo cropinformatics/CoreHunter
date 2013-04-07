@@ -19,7 +19,6 @@ import static org.corehunter.Constants.INVALID_SIZE;
 import java.util.Collection;
 
 import org.corehunter.CoreHunterException;
-import org.corehunter.model.IndexedData;
 import org.corehunter.search.PreferredSize;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;

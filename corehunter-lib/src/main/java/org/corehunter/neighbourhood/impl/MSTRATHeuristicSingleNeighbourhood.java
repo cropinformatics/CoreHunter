@@ -53,7 +53,7 @@ public class MSTRATHeuristicSingleNeighbourhood<IndexType, SolutionType extends 
     public IndexedMove<IndexType, SolutionType> performBestMove(
             SolutionType solution,
             ObjectiveFunction<SolutionType> objectiveFunction,
-            IndexedTabuManager<IndexType> tabuManager,
+            IndexedTabuManager<IndexType, SolutionType> tabuManager,
             double currentBestEvaluation) throws CoreHunterException {
 
         // search for "best" neighbour by applying the MSTRAT heuristic
