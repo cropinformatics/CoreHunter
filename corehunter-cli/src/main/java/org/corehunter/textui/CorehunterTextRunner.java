@@ -1340,7 +1340,7 @@ public final class CorehunterTextRunner
 	private void showVersion()
 	{
 		System.out.println("");
-		System.out.println("Corehunter version: 2.0");
+		System.out.println("Corehunter version: 3.0");
 		System.out.println("");
 	}
 
