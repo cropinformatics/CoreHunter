@@ -14,6 +14,3 @@ source("corehunter/R/corehunter.R")
 x <- read.csv("corehunter/data/bul.csv",header=F) 
 
 coresubset.random(x, min=2,max=3)
-
-
-

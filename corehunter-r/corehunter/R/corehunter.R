@@ -72,6 +72,8 @@ coresubset.parameters <- function(x, min=NULL, max=NULL, intensity=NULL)
 	
 	if (parameters$max < parameters$min)
 		stop("max can not be less than min!") 
+	
+	return (parameters)
 }
 
 
