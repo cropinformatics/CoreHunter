@@ -1,0 +1,9 @@
+Package: corehunter
+Type: Package
+Title: Core Hunter is a library for selecting and analysing genetic resources.
+Version: 2.0
+Date: 2013-06-15
+Author: Guy Davenport, Herman De Beukelaer
+Maintainer: Guy Davenport <guy@daveneti.com>
+Description: Core Hunter is a library for selecting and analysing genetic resources.
+License: LICENSE

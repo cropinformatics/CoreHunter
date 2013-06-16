@@ -1,5 +1,9 @@
-/corehunter-lib/target/
-/corehunter-cli/target/
-/coreanalyser-cli/target/
-/bin
+target/
+bin/
 .DS_Store
+.project
+.settings
+.classpath
+*.tar.gz
+*.jar
+*.zip

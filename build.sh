@@ -38,6 +38,6 @@ function build_corehunter {
 if [ ! -f $ROOT/bin/corehunter-cli.jar ] || [ ! -f $ROOT/bin/coreanalyser-cli.jar ]; then
     build_corehunter
 else
-    echo "CoreHunter suite is already built."
+    echo "CoreHunter suite is already built. Run clean.sh first, or clean_and_build.sh to rebuild"
 fi
 
