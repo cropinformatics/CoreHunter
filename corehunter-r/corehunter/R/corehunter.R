@@ -22,58 +22,10 @@ library(rJava)
 
 coresubset.random <- function(x, min=NULL, max=NULL, intensity=NULL) 
 {
-	parameters <- coresubset.parameters(x, min, max, intensity)
+	parameters <- .create.parameters(x, min, max, intensity)
 
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "randomSearch", parameters$collection, as.integer(parameters$min), as.integer(parameters$max))
 	
-	return(.jevalArray(.jarray(.jrcall(subset, "getAccessionNames")),simplify=FALSE))
+	return(.create.coresubset(subset))
 }
-
-coresubset.parameters <- function(x, min=NULL, max=NULL, intensity=NULL) 
-{
-	parameters <- list() 
-	
-	parameters$collection <- .jnew("org/corehunter/AccessionCollection")
-	parameters$dataset <- .jrcall("org/corehunter/SSRDataset", "createFromArray", .jarray(as.matrix(x), dispatch = TRUE))
-	
-	.jrcall(parameters$collection, "addDataset", parameters$dataset)
-	
-	parameters$size <- .jrcall(parameters$collection, "size")
-	
-	if (!is.null(min) && !is.null(max))
-	{
-		parameters$min <- as.integer(min)
-		parameters$max <- as.integer(max)
-	}
-	else
-	{
-		if (!is.null(intensity))
-		{
-			parameters$min <- as.integer(intensity * parameters$size)
-			parameters$max <- parameters$min
-		}
-		else
-		{
-			stop("Either intensity or, min and max must be defined!") 
-		}
-	}
-	
-	if (parameters$min <= 0)
-		stop("min must be greater than zero!") 
-	
-	if (parameters$max <= 0)
-		stop("max must be greater than zero!") 
-	
-	if (parameters$min >= parameters$size)
-		stop("min must be less than size!") 
-	
-	if (parameters$max >= parameters$size)
-		stop("max must be less than size!") 
-	
-	if (parameters$max < parameters$min)
-		stop("max can not be less than min!") 
-	
-	return (parameters)
-}
-
 
