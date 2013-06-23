@@ -80,6 +80,16 @@ public class AccessionCollection {
     }
     
     /**
+     * getAccessionNames
+     *
+     * @param  
+     * @return 
+     */
+    public String[] getAccessionNamesAsArray() {
+	return accessionNameMap.keySet().toArray(new String[accessionNameMap.size()]);
+    }
+    
+    /**
      * getAccessions
      *
      * @param  

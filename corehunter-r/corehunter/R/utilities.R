@@ -25,7 +25,16 @@ library(rJava)
 	parameters <- list() 
 	
 	parameters$collection <- .jnew("org/corehunter/AccessionCollection")
-	parameters$dataset <- .jrcall("org/corehunter/SSRDataset", "createFromArray", .jarray(as.matrix(x), dispatch = TRUE))
+	parameters$accessionNames <- colnames(x)[3:ncol(x)]
+	parameters$markerNames <- as.character(x[,1])
+	parameters$alleleNames <- as.character(x[,2])
+	parameters$scores <- x[,3:ncol(x)]
+	parameters$dataset <- .jrcall("org/corehunter/SSRDataset", "createFromArray",
+			.jarray(as.array(parameters$accessionNames), dispatch = TRUE),
+			.jarray(as.array(parameters$markerNames), dispatch = TRUE),
+			.jarray(as.array(parameters$alleleNames), dispatch = TRUE),
+			.jarray(as.matrix(parameters$scores), dispatch = TRUE)
+			)
 	
 	.jrcall(parameters$collection, "addDataset", parameters$dataset)
 	
@@ -67,9 +76,28 @@ library(rJava)
 	return (parameters)
 }
 
-.create.coresubset <- function(subset)
+.create.coresubset <- function(x, parameters, subset)
 {
-	return(.jevalArray(.jarray(.jrcall(subset, "getAccessionNames")),simplify=FALSE))
+	selected <- .jrcall(subset, "getAccessionNamesAsArray") ;
+	
+	core <- data.frame(row.names = parameters$accessionNames) 
+	
+	core$selected <- parameters$accessionNames %in% selected
+	
+	return(core)
 }
 
+.create.random.neighourhood(min=NULL, max=NULL) <- function(x, parameters, subset)
+{
+	neighborhood <- .jnew("org/corehunter/search/RandomSingleNeighborhood", as.integer(min), as.integer(max)) ;
+
+	return(neighborhood)
+}
+
+.create.heuristic.neighourhood(min=NULL, max=NULL) <- function(x, parameters, subset)
+{
+	neighborhood <- .jnew("org/corehunter/search/HeuristicSingleNeighborhood", as.integer(min), as.integer(max)) ;
+	
+	return(neighborhood)
+}
 

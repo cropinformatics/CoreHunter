@@ -12,7 +12,6 @@ setwd("/Users/daveneti/Repositories/CoreHunter/corehunter-r")
 source("corehunter/R/utilities.R")
 source("corehunter/R/corehunter.R")
 
+x <- read.csv("corehunter/data/bul.csv",header=T) 
 
-x <- read.csv("corehunter/data/bul.csv",header=F) 
-
-coresubset.random(x, min=2,max=3)
+core <- coresubset.random(x, minSize=2, maxSize=3)

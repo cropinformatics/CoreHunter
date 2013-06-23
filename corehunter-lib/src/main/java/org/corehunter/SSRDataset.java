@@ -108,6 +108,96 @@ public final class SSRDataset extends AccessionDataset<List<Double>>
 		return createFromArray((String[][])lines.toArray(new String[lines.size()][0])) ;
 	}
 	
+	public static SSRDataset createFromArray(String[] accessionNames, String[] markerNames, String[] alleleNames, double[][] scores)
+	{
+		// TODO: add some error checking in here
+		SSRDataset ds = null;
+		List<String> accessions = new ArrayList<String>();
+		Map<String, List<String>> markersToAlleles = new HashMap<String, List<String>>();
+
+			if (accessionNames.length > 0)
+			{
+				for (int i = 0; i < accessionNames.length; i++)
+				{
+					accessions.add(accessionNames[i]);
+				}
+			}
+			
+			if (accessions.size() < 2)
+			{
+				System.err.println("Dataset must contain at least 2 accessions");
+				return null;
+			}
+
+			if (markerNames.length == alleleNames.length)
+				System.err.println("Dataset is not properly formatted, number of marker marker names must match number of allele names");
+			
+			for (int i = 0 ; i < markerNames.length ; ++i)
+			{
+				if (!markersToAlleles.containsKey(markerNames[i]))
+					{
+						markersToAlleles.put(markerNames[i], new ArrayList<String>());
+					}
+					markersToAlleles.get(markerNames[i]).add(alleleNames[i]);
+			}
+			
+			if (scores.length == alleleNames.length)
+				System.err.println("Dataset is not properly formatted, number of scores must match number of allele names");
+
+			if (markersToAlleles.size() < 1)
+			{
+				System.err.println("Dataset must contain at least 1 marker/allele");
+				return null;
+			}
+
+			// create the SSRDataset object
+			ds = new SSRDataset(accessions, markersToAlleles);
+
+			for (int j = 0 ; j < scores.length ; ++j)
+			{
+					for (int i = 0; i < scores.length; i++)
+					{
+						String accession = accessions.get(i);
+						Double alleleValue = null;
+						
+						if (scores[i].length == accessions.size())
+							System.err.println("Dataset is not properly formatted, number of scores must match number of accessions at " + i);
+
+						try
+						{
+							alleleValue = new Double(scores[j][i]);
+							ds.setValue(accession, markerNames[j], alleleNames[j], alleleValue);
+						}
+						catch (NumberFormatException nfe)
+						{
+							System.err.println("");
+							System.err.println(nfe.getMessage());
+							System.err.println("");
+							System.err.println("Invalid allele value for accession '"
+							    + accession + "' marker '" + markerNames[j] + "' allele '" + alleleNames[j]
+							    + "'");
+							return null;
+						}
+						catch (UnknownAccessionException uae)
+						{
+							System.err.println("");
+							System.err.println("bug found.  please contact authors");
+							return null;
+						}
+						catch (UnknownTraitException ute)
+						{
+							System.err.println("");
+							System.err.println("bug found.  please contact authors");
+							return null;
+						}
+					}
+				
+			}
+
+
+		return ds;
+	}
+	
 	public static SSRDataset createFromArray(String[][] lines)
 	{
 		// TODO: add some error checking in here
