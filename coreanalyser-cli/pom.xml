@@ -5,14 +5,12 @@
   <parent>
     <groupId>org.corehunter</groupId>
     <artifactId>corehunter</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.corehunter</groupId>
   <artifactId>coreanalyser-cli</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
   <name>Core Analyser CLI application</name>
   <description>A simple command line interface to the Core Hunter library for analysing existing core subsets</description>
   <url>corehunter.org</url>
