@@ -7,10 +7,11 @@
 # We assume the availability of mavan, java, and a JDK
 # installation for this to work.
 #
-# Author: Chris Thachuk
+# Author: Chris Thachuk, Guy Davenport
 # Date: Feb 3, 2011
 
 ROOT=`dirname $0`
+VERSION="2.0-SNAPSHOT"
 
 function check_requirements {
  hash mvn 2>&- || { echo >&2 "Maven must be installed first.  Aborting."; exit 1; }
@@ -31,8 +32,8 @@ function build_corehunter {
 	mkdir $ROOT/bin
     fi
 
-    cp -f $ROOT/corehunter-cli/target/corehunter-cli-1.0-SNAPSHOT-jar-with-dependencies.jar $ROOT/bin/corehunter-cli.jar
-    cp -f $ROOT/coreanalyser-cli/target/coreanalyser-cli-1.0-SNAPSHOT-jar-with-dependencies.jar $ROOT/bin/coreanalyser-cli.jar
+    cp -f $ROOT/corehunter-cli/target/corehunter-cli-$VERSION-jar-with-dependencies.jar $ROOT/bin/corehunter-cli.jar
+    cp -f $ROOT/coreanalyser-cli/target/coreanalyser-cli-$VERSION-jar-with-dependencies.jar $ROOT/bin/coreanalyser-cli.jar
 }
 
 if [ ! -f $ROOT/bin/corehunter-cli.jar ] || [ ! -f $ROOT/bin/coreanalyser-cli.jar ]; then
