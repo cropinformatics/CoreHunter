@@ -18,25 +18,48 @@ import java.io.File;
 import org.corehunter.model.Data;
 import org.corehunter.model.DataReader;
 
-public abstract class AbstractDataFileReader<DataType extends Data> extends AbstractFileUtility<DataType> implements DataReader<DataType> {
+public abstract class AbstractDataFileReader<DataType extends Data> extends
+    AbstractFileUtility<DataType> implements DataReader<DataType>
+{
 
-    private String dataName;
+	private String dataName;
+	private String dataUniqueIdentifier;
+	
+	public AbstractDataFileReader(File file)
+	{
+		this(file.getName(), file.getName(), file);
+	}
 
-    public AbstractDataFileReader(File file) {
-        super(file);
-    }
+	public AbstractDataFileReader(String dataName, File file)
+	{
+		this(dataName, dataName, file);
+	}
+	
+	public AbstractDataFileReader(String dataUniqueIdentifier, String dataName, File file)
+	{
+		super(file);
+		
+		setDatasetName(dataName);
+		setDataUniqueIdentifier(dataUniqueIdentifier);
+	}
 
-    public AbstractDataFileReader(String dataName, File file) {
-        super(file);
-        setDatasetName(dataName);
-    }
+	public final String getDataName()
+	{
+		return dataName;
+	}
 
-    public final String getDataName() {
-        return dataName;
-    }
+	public final void setDatasetName(String dataName)
+	{
+		this.dataName = dataName;
+	}
+	
+	public final String getDataUniqueIdentifier()
+	{
+		return dataUniqueIdentifier;
+	}
 
-    public final void setDatasetName(String dataName) {
-        this.dataName = dataName;
-    }
-    
+	public final void setDataUniqueIdentifier(String dataUniqueIdentifier)
+	{
+		this.dataUniqueIdentifier = dataUniqueIdentifier;
+	}
 }

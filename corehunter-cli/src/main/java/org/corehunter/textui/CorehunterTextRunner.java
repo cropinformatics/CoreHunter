@@ -416,8 +416,7 @@ public final class CorehunterTextRunner
 	    	System.out.println(comp + ": " + scores.get(comp));
 	    }
 
-	    AccessionSSRMarkerMatrixListImplDataFileWriter writer = new AccessionSSRMarkerMatrixListImplDataFileWriter("CoreSubset",
-	        new File(coresubsetFile)) ;
+	    AccessionSSRMarkerMatrixListImplDataFileWriter writer = new AccessionSSRMarkerMatrixListImplDataFileWriter(new File(coresubsetFile)) ;
 	    
 	    writer.setIndices(dataset.getIndices()) ;
 	    

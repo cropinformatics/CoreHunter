@@ -30,249 +30,319 @@ import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.SSRAllele;
 import org.corehunter.model.ssr.SSRMarker;
 
-public class AccessionSSRMarkerMatrixListImpl
-        extends EntityMatrixListImpl<List<Double>, Accession, SSRMarker>
-        implements AccessionSSRMarkerMatrix<Integer> {
+public class AccessionSSRMarkerMatrixListImpl extends
+    EntityMatrixListImpl<List<Double>, Accession, SSRMarker> implements
+    AccessionSSRMarkerMatrix<Integer>
+{
 
-    private double[] externalDistances;
+	private double[]	externalDistances;
 
-    public AccessionSSRMarkerMatrixListImpl(String name,
-            EntityIndexedDataset<Integer, Accession> rowHeaders,
-            EntityIndexedDataset<Integer, SSRMarker> columnHeaders,
-            List<List<List<Double>>> elements) {
-        
-        super(name, rowHeaders, columnHeaders, elements);
-        
-    }
+	public AccessionSSRMarkerMatrixListImpl(String name,
+	    EntityIndexedDataset<Integer, Accession> rowHeaders,
+	    EntityIndexedDataset<Integer, SSRMarker> columnHeaders,
+	    List<List<List<Double>>> elements)
+	{
 
-    public AccessionSSRMarkerMatrixListImpl(String uniqueIdentifier, String name,
-            EntityIndexedDataset<Integer, Accession> rowHeaders,
-            EntityIndexedDataset<Integer, SSRMarker> columnHeaders,
-            List<List<List<Double>>> elements, double[] externalDistances) {
-        
-        super(uniqueIdentifier, name, rowHeaders, columnHeaders, elements);
-        this.externalDistances = externalDistances;
-        
-    }
+		super(name, rowHeaders, columnHeaders, elements);
 
-    @Override
-    public void validate() throws CoreHunterException {
-        super.validate();
-        if (externalDistances != null && externalDistances.length != getColumnHeaders().getSize()) {
-            throw new CoreHunterException("Number of external distances does not match number of column headers!");
-        }
-    }
+	}
 
-    @Override
-    public final int getAlleleCount(Integer index) throws UnknownIndexException {
-        ListIterator<List<Double>> mItr = getRowElements(index).listIterator();
-        ListIterator<Double> aItr;
+	public AccessionSSRMarkerMatrixListImpl(String uniqueIdentifier, String name,
+	    EntityIndexedDataset<Integer, Accession> rowHeaders,
+	    EntityIndexedDataset<Integer, SSRMarker> columnHeaders,
+	    List<List<List<Double>>> elements, double[] externalDistances)
+	{
 
-        int alleleCnt = 0;
-        while (mItr.hasNext()) {
-            aItr = mItr.next().listIterator();
-            while (aItr.hasNext()) {
-                alleleCnt++;
-                aItr.next();
-            }
-        }
-        return alleleCnt;
-    }
+		super(uniqueIdentifier, name, rowHeaders, columnHeaders, elements);
+		this.externalDistances = externalDistances;
 
-    @Override
-    public final int getMarkerCount(Integer index) throws UnknownIndexException {
-        return getRowElements(index).size();
-    }
+	}
 
-    // TODO can be optimised, unnecessary code here 
-    @Override
-    public final double[][] getMarkerAlleleTotals(List<Integer> indices) throws UnknownIndexException {
-        if (indices.isEmpty()) {
-            return null;
-        }
+	@Override
+	public void validate() throws CoreHunterException
+	{
+		super.validate();
+		if (externalDistances != null
+		    && externalDistances.length != getColumnHeaders().getSize())
+		{
+			throw new CoreHunterException(
+			    "Number of external distances does not match number of column headers!");
+		}
+	}
 
-        Integer index1 = indices.get(0);
-        int markerCnt = getMarkerCount(index1);
-        double markerAlleleTotals[][] = new double[markerCnt][];
+	@Override
+	public final int getAlleleCount(Integer index) throws UnknownIndexException
+	{
+		ListIterator<List<Double>> mItr = getRowElements(index).listIterator();
+		ListIterator<Double> aItr;
 
-        ListIterator<List<Double>> markerIterator = getRowElements(index1).listIterator();
-        ListIterator<Double> alleleIterator;
+		int alleleCnt = 0;
+		while (mItr.hasNext())
+		{
+			aItr = mItr.next().listIterator();
+			while (aItr.hasNext())
+			{
+				alleleCnt++;
+				aItr.next();
+			}
+		}
+		return alleleCnt;
+	}
 
-        int i = 0;
-        while (markerIterator.hasNext()) {
-            List<Double> alleles = markerIterator.next();
+	@Override
+	public final int getMarkerCount(Integer index) throws UnknownIndexException
+	{
+		return getRowElements(index).size();
+	}
 
-            markerAlleleTotals[i] = new double[alleles.size()];
+	// TODO can be optimised, unnecessary code here
+	@Override
+	public final double[][] getMarkerAlleleTotals(List<Integer> indices)
+	    throws UnknownIndexException
+	{
+		if (indices.isEmpty())
+		{
+			return null;
+		}
 
-            for (int j = 0; j < alleles.size(); j++) {
-                markerAlleleTotals[i][j] = 0.0;
-            }
-            i++;
-        }
+		Integer index1 = indices.get(0);
+		int markerCnt = getMarkerCount(index1);
+		double markerAlleleTotals[][] = new double[markerCnt][];
 
-        for (Integer index : indices) {
-            markerIterator = getRowElements(index).listIterator();
+		ListIterator<List<Double>> markerIterator = getRowElements(index1)
+		    .listIterator();
+		ListIterator<Double> alleleIterator;
 
-            i = 0;
-            while (markerIterator.hasNext()) {
-                alleleIterator = markerIterator.next().listIterator();
-                int j = 0;
-                while (alleleIterator.hasNext()) {
-                    Double val = alleleIterator.next();
-                    if (val != null) {
-                        double v = val.doubleValue();
-                        markerAlleleTotals[i][j] += v;
-                    }
-                    j++;
-                }
-                i++;
-            }
-        }
+		int i = 0;
+		while (markerIterator.hasNext())
+		{
+			List<Double> alleles = markerIterator.next();
 
-        return markerAlleleTotals;
-    }
+			markerAlleleTotals[i] = new double[alleles.size()];
 
-    // TODO can be optimised, unnecessary code here 
-    @Override
-    public final double[] getAlleleTotals(List<Integer> indices) throws UnknownIndexException {
-        if (indices.isEmpty()) {
-            return null;
-        }
+			for (int j = 0; j < alleles.size(); j++)
+			{
+				markerAlleleTotals[i][j] = 0.0;
+			}
+			i++;
+		}
 
-        Integer index1 = indices.get(0);
-        int alleleCount = getAlleleCount(index1);
-        double alleleTotals[] = new double[alleleCount];
-        for (int i = 0; i < alleleCount; i++) {
-            alleleTotals[i] = 0.0;
-        }
+		for (Integer index : indices)
+		{
+			markerIterator = getRowElements(index).listIterator();
 
-        for (Integer index : indices) {
-            ListIterator<List<Double>> markerIterator = getRowElements(index).listIterator();
-            ListIterator<Double> alleleIterator;
+			i = 0;
+			while (markerIterator.hasNext())
+			{
+				alleleIterator = markerIterator.next().listIterator();
+				int j = 0;
+				while (alleleIterator.hasNext())
+				{
+					Double val = alleleIterator.next();
+					if (val != null)
+					{
+						double v = val.doubleValue();
+						markerAlleleTotals[i][j] += v;
+					}
+					j++;
+				}
+				i++;
+			}
+		}
 
-            int i = 0;
-            while (markerIterator.hasNext()) {
-                alleleIterator = markerIterator.next().listIterator();
-                while (alleleIterator.hasNext()) {
-                    Double value = alleleIterator.next();
-                    if (value != null) {
-                        double v = value.doubleValue();
-                        alleleTotals[i] += v;
-                    }
-                    i++;
-                }
-            }
-        }
+		return markerAlleleTotals;
+	}
 
-        return alleleTotals;
-    }
+	// TODO can be optimised, unnecessary code here
+	@Override
+	public final double[] getAlleleTotals(List<Integer> indices)
+	    throws UnknownIndexException
+	{
+		if (indices.isEmpty())
+		{
+			return null;
+		}
 
-    // TODO can be optimised, unnecessary code here 
-    @Override
-    public final int[] getAlleleCounts(List<Integer> indices) throws UnknownIndexException {
-        if (indices.isEmpty()) {
-            return null;
-        }
+		Integer index1 = indices.get(0);
+		int alleleCount = getAlleleCount(index1);
+		double alleleTotals[] = new double[alleleCount];
+		for (int i = 0; i < alleleCount; i++)
+		{
+			alleleTotals[i] = 0.0;
+		}
 
-        Integer index1 = indices.get(0);
-        int alleleCount = getAlleleCount(index1);
-        int alleleTotals[] = new int[alleleCount];
+		for (Integer index : indices)
+		{
+			ListIterator<List<Double>> markerIterator = getRowElements(index)
+			    .listIterator();
+			ListIterator<Double> alleleIterator;
 
-        for (int i = 0; i < alleleCount; i++) {
-            alleleTotals[i] = 0;
-        }
+			int i = 0;
+			while (markerIterator.hasNext())
+			{
+				alleleIterator = markerIterator.next().listIterator();
+				while (alleleIterator.hasNext())
+				{
+					Double value = alleleIterator.next();
+					if (value != null)
+					{
+						double v = value.doubleValue();
+						alleleTotals[i] += v;
+					}
+					i++;
+				}
+			}
+		}
 
-        for (Integer index : indices) {
-            ListIterator<List<Double>> markerIterator = getRowElements(index).listIterator();
-            ListIterator<Double> alleleIterator;
+		return alleleTotals;
+	}
 
-            int i = 0;
-            while (markerIterator.hasNext()) {
-                alleleIterator = markerIterator.next().listIterator();
-                while (alleleIterator.hasNext()) {
-                    Double value = alleleIterator.next();
-                    if (value != null) {
-                        double v = value.doubleValue();
-                        if (v > 0) {
-                            alleleTotals[i] += 1;
-                        }
-                    }
-                    i++;
-                }
-            }
-        }
+	// TODO can be optimised, unnecessary code here
+	@Override
+	public final int[] getAlleleCounts(List<Integer> indices)
+	    throws UnknownIndexException
+	{
+		if (indices.isEmpty())
+		{
+			return null;
+		}
 
-        return alleleTotals;
-    }
+		Integer index1 = indices.get(0);
+		int alleleCount = getAlleleCount(index1);
+		int alleleTotals[] = new int[alleleCount];
 
-    @Override
-    public boolean externalDistancesSpecified(){
-        return externalDistances != null;
-    }
-    
-    @Override
-    public double getExternalDistance(Integer index) {
-        return externalDistances != null ? externalDistances[index] : 0;
-    }
+		for (int i = 0; i < alleleCount; i++)
+		{
+			alleleTotals[i] = 0;
+		}
 
-    public void setExternalDistance(Integer index, double distance) throws UnknownEntityException {
-        externalDistances[index] = distance;
-    }
+		for (Integer index : indices)
+		{
+			ListIterator<List<Double>> markerIterator = getRowElements(index)
+			    .listIterator();
+			ListIterator<Double> alleleIterator;
 
-    public double[] getExternalDistances() {
-        return externalDistances;
-    }
+			int i = 0;
+			while (markerIterator.hasNext())
+			{
+				alleleIterator = markerIterator.next().listIterator();
+				while (alleleIterator.hasNext())
+				{
+					Double value = alleleIterator.next();
+					if (value != null)
+					{
+						double v = value.doubleValue();
+						if (v > 0)
+						{
+							alleleTotals[i] += 1;
+						}
+					}
+					i++;
+				}
+			}
+		}
 
-    @Override
-    public Double getValue(Accession accession, SSRMarker marker, SSRAllele alelle) throws UnknownEntityException {
-        return getElement(accession, marker).get(marker.indexOfAllele(alelle));
-    }
+		return alleleTotals;
+	}
 
-    @Override
-    public void setValue(Accession accession, SSRMarker marker, SSRAllele alelle, Double value) throws UnknownEntityException {
-        getElement(accession, marker).set(marker.indexOfAllele(alelle), value);
-    }
+	@Override
+	public boolean externalDistancesSpecified()
+	{
+		return externalDistances != null;
+	}
 
-    @Override
-    public List<Double> getValues(Accession accession, SSRMarker marker) throws UnknownEntityException {
-        return getElement(accession, marker);
-    }
+	@Override
+	public double getExternalDistance(Integer index)
+	{
+		return externalDistances != null ? externalDistances[index] : 0;
+	}
 
-    @Override
-    public void setValues(Accession accession, SSRMarker marker, List<Double> values) throws UnknownEntityException {
-        setElement(accession, marker, values);
-    }
+	public void setExternalDistance(Integer index, double distance)
+	    throws UnknownEntityException
+	{
+		externalDistances[index] = distance;
+	}
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public boolean equals(Object object) {
-        if (object instanceof AccessionEntityMatrix) {
-            if (object instanceof AccessionSSRMarkerMatrixListImpl) {
-                return super.equals(object) && ObjectUtils.equals(getExternalDistances(), ((AccessionSSRMarkerMatrixListImpl) object).getExternalDistances());
-            } else {
-                boolean equals = super.equals(object);
+	public double[] getExternalDistances()
+	{
+		return externalDistances;
+	}
 
-                Iterator<Integer> iterator = getIndices().iterator();
+	@Override
+	public Double getValue(Accession accession, SSRMarker marker, SSRAllele alelle)
+	    throws UnknownEntityException
+	{
+		return getElement(accession, marker).get(marker.indexOfAllele(alelle));
+	}
 
-                while (equals && iterator.hasNext()) {
-                    equals = externalDistancesEquals((AccessionEntityMatrix<Integer, List<Double>, SSRMarker>) object, iterator.next());
-                }
+	@Override
+	public void setValue(Accession accession, SSRMarker marker, SSRAllele alelle,
+	    Double value) throws UnknownEntityException
+	{
+		getElement(accession, marker).set(marker.indexOfAllele(alelle), value);
+	}
 
-                return equals;
-            }
-        } else {
-            return super.equals(object);
-        }
-    }
+	@Override
+	public List<Double> getValues(Accession accession, SSRMarker marker)
+	    throws UnknownEntityException
+	{
+		return getElement(accession, marker);
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 53 * hash + Arrays.hashCode(getExternalDistances());
-        return hash;
-    }
+	@Override
+	public void setValues(Accession accession, SSRMarker marker,
+	    List<Double> values) throws UnknownEntityException
+	{
+		setElement(accession, marker, values);
+	}
 
-    private boolean externalDistancesEquals(AccessionEntityMatrix<Integer, List<Double>, SSRMarker> matrix, Integer index) {
-        return getExternalDistance(index) == matrix.getExternalDistance(index);
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals(Object object)
+	{
+		if (object instanceof AccessionEntityMatrix)
+		{
+			if (object instanceof AccessionSSRMarkerMatrixListImpl)
+			{
+				return super.equals(object)
+				    && ObjectUtils.equals(getExternalDistances(),
+				        ((AccessionSSRMarkerMatrixListImpl) object)
+				            .getExternalDistances());
+			}
+			else
+			{
+				boolean equals = super.equals(object);
+
+				Iterator<Integer> iterator = getIndices().iterator();
+
+				while (equals && iterator.hasNext())
+				{
+					equals = externalDistancesEquals(
+					    (AccessionEntityMatrix<Integer, List<Double>, SSRMarker>) object,
+					    iterator.next());
+				}
+
+				return equals;
+			}
+		}
+		else
+		{
+			return super.equals(object);
+		}
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = super.hashCode();
+		hash = 53 * hash + Arrays.hashCode(getExternalDistances());
+		return hash;
+	}
+
+	private boolean externalDistancesEquals(
+	    AccessionEntityMatrix<Integer, List<Double>, SSRMarker> matrix,
+	    Integer index)
+	{
+		return getExternalDistance(index) == matrix.getExternalDistance(index);
+	}
 }

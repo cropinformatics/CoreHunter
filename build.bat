@@ -12,7 +12,7 @@
 echo "Building Core Hunter"
 
 :: build package using Maven
-call mvn package
+call mvn package -Dmaven.test.skip=true
 
 echo "Copying jar files to bin directory"
 

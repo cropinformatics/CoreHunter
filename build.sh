@@ -24,7 +24,7 @@ function build_corehunter {
     echo "Rebuilding Corehunter"
 
     echo "  - building corehunter"
-    mvn package
+    mvn package -Dmaven.test.skip=true
     
     echo "  - copying to ROOT of current project"
     if [ ! -d $ROOT/bin ]; then
