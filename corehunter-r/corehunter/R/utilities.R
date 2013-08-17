@@ -20,7 +20,7 @@
 library(rJava)
 .jinit() # this starts the JVM
 
-.create.parameters <- function(x, min=NULL, max=NULL, intensity=NULL) 
+.create.paramters.without.masure <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
 	parameters <- list() 
 	
@@ -38,19 +38,22 @@ library(rJava)
 	
 	.jrcall(parameters$collection, "addDataset", parameters$dataset)
 	
-	parameters$size <- .jrcall(parameters$collection, "size")
+	parameters$collectionSize <- .jrcall(parameters$collection, "size")
 	
-	if (!is.null(min) && !is.null(max))
+	parameters$minSize <- 0 
+	parameters$maxSize <- 0 
+	
+	if (!is.null(minSize) && !is.null(maxSize))
 	{
-		parameters$min <- as.integer(min)
-		parameters$max <- as.integer(max)
+		parameters$minSize <- as.integer(minSize)
+		parameters$maxSize <- as.integer(maxSize)
 	}
 	else
 	{
 		if (!is.null(intensity))
-		{
-			parameters$min <- as.integer(intensity * parameters$size)
-			parameters$max <- parameters$min
+		{	
+			parameters$minSize <- as.integer(intensity * parameters$collectionSize)
+			parameters$maxSize <- parameters$minSize
 		}
 		else
 		{
@@ -58,20 +61,41 @@ library(rJava)
 		}
 	}
 	
-	if (parameters$min <= 0)
-		stop("min must be greater than zero!") 
+	if (parameters$minSize <= 0)
+		stop("min subset size must be greater than zero!") 
 	
-	if (parameters$max <= 0)
-		stop("max must be greater than zero!") 
+	if (parameters$maxSize <= 0)
+		stop("max subset size must be greater than zero!") 
 	
-	if (parameters$min >= parameters$size)
-		stop("min must be less than size!") 
+	if (parameters$minSize >= parameters$collectionSize)
+		stop("min subset size must be less than size!") 
 	
-	if (parameters$max >= parameters$size)
-		stop("max must be less than size!") 
+	if (parameters$maxSize >= parameters$collectionSize)
+		stop("max subset size must be less than size!") 
 	
-	if (parameters$max < parameters$min)
-		stop("max can not be less than min!") 
+	if (parameters$maxSize < parameters$minSize)
+		stop("max subset size can not be less than min!") 
+	
+	return (parameters)
+}
+
+.create.parameters <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL, measure=NULL) 
+{
+	parameters <- .create.paramters.without.masure(x, minSize, maxSize, intensity) ;
+	
+	if (!is.null(measure))
+	{
+		parameters$objectiveFunction = .create.objectiveFunction(measure, collectionSize=parameters$collectionSize) ;
+	}
+	else
+	{
+		stop("Measure not defined!") 	
+	}
+	
+	if (is.null(parameters$objectiveFunction))
+	{
+		stop("Measure not defined!") 	
+	}
 	
 	return (parameters)
 }
@@ -87,17 +111,76 @@ library(rJava)
 	return(core)
 }
 
-.create.random.neighourhood(min=NULL, max=NULL) <- function(x, parameters, subset)
+.create.random.neighourhood <- function(x, parameters, subset, minSize=NULL, maxSize=NULL)
 {
-	neighborhood <- .jnew("org/corehunter/search/RandomSingleNeighborhood", as.integer(min), as.integer(max)) ;
+	neighborhood <- .jnew("org/corehunter/search/RandomSingleNeighborhood", as.integer(minSize), as.integer(maxSize)) ;
 
 	return(neighborhood)
 }
 
-.create.heuristic.neighourhood(min=NULL, max=NULL) <- function(x, parameters, subset)
+.create.heuristic.neighourhood <- function(x, parameters, subset, minSize=NULL, max=NULL)
 {
-	neighborhood <- .jnew("org/corehunter/search/HeuristicSingleNeighborhood", as.integer(min), as.integer(max)) ;
+	neighborhood <- .jnew("org/corehunter/search/HeuristicSingleNeighborhood", as.integer(minSize), as.integer(maxSize)) ;
 	
 	return(neighborhood)
+}
+
+.create.objectiveFunction <- function(measure, collectionSize = NULL) 
+{
+	measureNames <- .jrcall("org/corehunter/measures/MeasureFactory", "getMeasureNames") ;
+	availableMeasureNames <- measureNames
+	
+	if (is.null(collectionSize))
+		stop("Collection size not defined!") 
+	
+	if (collectionSize <= 0)
+		stop("Collection size must be greater than zero!") 
+	
+	if (is.data.frame(measure))
+	{
+		objectiveFunction <- .jnew("org/corehunter/measures/PseudoMeasure") ;
+		
+		measures = rownames(measure) ;
+		
+		for (m in measures) 
+		{
+			if (m %in% measureNames)
+			{
+				if (m %in% availableMeasureNames)
+				{
+					obj <- .jrcall("org/corehunter/measures/MeasureFactory", "createMeasure", m, as.integer(collectionSize)) ;
+					
+					.jrcall(objectiveFunction, "addMeasure", obj,  measure[m,] ) ;
+					
+					availableMeasureNames <- availableMeasureNames[availableMeasureNames != m]
+				}
+				else
+				{
+					stop(paste("Meaure already in use : ", m)) 
+				}
+			}
+			else
+			{
+				stop(paste("Unknown measure : ", m)) 
+			}
+		}
+	}
+	else
+	{
+		if (measure %in% measureNames)
+		{
+			objectiveFunction <- .jnew("org/corehunter/measures/PseudoMeasure") ;
+			
+			obj <- .jrcall("org/corehunter/measures/MeasureFactory", "createMeasure", measure, as.integer(collectionSize)) ;
+			
+			.jrcall(objectiveFunction, "addMeasure", obj,  1.0) ;
+		}
+		else
+		{
+				stop("Unknown measure : " + measure) 
+		}	
+	}
+
+	return (objectiveFunction)
 }
 
