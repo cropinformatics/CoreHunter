@@ -96,7 +96,7 @@ public final class CorehunterTextRunner {
     private int remcReplicas;
     private int remcMcSteps;
     
-    //private int tabuListSize;
+    private int tabuListSize;
     private boolean tabuListSizeSpecified = false;
 
     private int mixrepNrOfTabuReplicas;
