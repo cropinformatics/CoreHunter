@@ -20,7 +20,7 @@
 library(rJava)
 .jinit() # this starts the JVM
 
-.create.paramters.without.masure <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
+.create.parameters.without.measure <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
 	parameters <- list() 
 	
@@ -81,7 +81,7 @@ library(rJava)
 
 .create.parameters <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL, measure=NULL) 
 {
-	parameters <- .create.paramters.without.masure(x, minSize, maxSize, intensity) ;
+	parameters <- .create.parameters.without.measure(x, minSize, maxSize, intensity) ;
 	
 	if (!is.null(measure))
 	{
