@@ -19,15 +19,15 @@ import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImpl;
 import org.corehunter.model.ssr.impl.SSRAlleleImpl;
 import org.corehunter.model.ssr.impl.SSRMarkerImpl;
 
-public class AccessionSSRMarkerMatrixListImplTest extends
+public class AccessionSSRMarkerMatrixListImplWrapperForTests extends
     AccessionSSRMarkerMatrixListImpl
 {
 
-	public AccessionSSRMarkerMatrixListImplTest(
+	public AccessionSSRMarkerMatrixListImplWrapperForTests(
       Collection<String> accessionNames,
       Map<String, List<String>> markersToAlleles) throws DuplicateEntityException
   {
-	  super("test", createAccssions(accessionNames), createMarkers(markersToAlleles), createElements(accessionNames, markersToAlleles));
+	  super("test", createAccessions(accessionNames), createMarkers(markersToAlleles), createElements(accessionNames, markersToAlleles));
   }
 	
 	private static List<List<List<Double>>> createElements(Collection<String> accessionNames, Map<String, List<String>> markersToAlleles)
@@ -39,13 +39,13 @@ public class AccessionSSRMarkerMatrixListImplTest extends
 		
 		while (accessions.hasNext())
 		{
-			elements.add(createAccssionElements(accessions.next(), markersToAlleles)) ;
+			elements.add(createAccessionElements(accessions.next(), markersToAlleles)) ;
 		}
 		
 	  return elements;
   }
 
-	private static List<List<Double>> createAccssionElements(String accessionName,
+	private static List<List<Double>> createAccessionElements(String accessionName,
       Map<String, List<String>> markersToAlleles)
   {
 		List<List<Double>> elements = new ArrayList<List<Double>>(markersToAlleles.size()) ;
@@ -69,19 +69,19 @@ public class AccessionSSRMarkerMatrixListImplTest extends
 	  return elements ;
   }
 
-	private static EntityIndexedDataset<Integer, Accession> createAccssions(
+	private static EntityIndexedDataset<Integer, Accession> createAccessions(
       Collection<String> accessionNames)
   {
 		List<Accession> accessions = new ArrayList<Accession>(accessionNames.size()) ;
 		Iterator<String> iterator = accessionNames.iterator() ;
 		
 		while (iterator.hasNext())
-			accessions.add(createAccssion(iterator.next())) ;
+			accessions.add(createAccession(iterator.next())) ;
 		
 	  return new OrderedEntityDatasetListImpl<Accession>("accessions", accessions);
   }
 
-	private static Accession createAccssion(String accessionName)
+	private static Accession createAccession(String accessionName)
   {
 	  return new AccessionImpl(accessionName);
   }

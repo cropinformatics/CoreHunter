@@ -69,6 +69,11 @@ public class OrderedEntityDatasetListImpl<ValueType extends Entity> extends Enti
     public Integer getIndex(ValueType value) {
         return elements.indexOf(value);
     }
+    
+    @Override
+    public Integer getIndexByName(String name) throws UnknownEntityException {
+        return getIndex(getElementByName(name));
+    }
 
     @Override
     public List<Integer> getIndices() {

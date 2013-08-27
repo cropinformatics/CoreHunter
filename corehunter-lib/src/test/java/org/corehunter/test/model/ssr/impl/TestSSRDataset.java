@@ -24,7 +24,7 @@ public final class TestSSRDataset
 	private static final double	      precision	= 0.00001;
 	private Collection<String>	      accessionNames;
 	private Map<String, List<String>>	markersToAlleles;
-	private AccessionSSRMarkerMatrixListImplTest	              ssrData;
+	private AccessionSSRMarkerMatrixListImplWrapperForTests	              ssrData;
 
 	@Before
 	public void setUpBefore() throws Exception
@@ -42,7 +42,7 @@ public final class TestSSRDataset
 		markersToAlleles.get("M2").add("allele1");
 		markersToAlleles.get("M2").add("allele2");
 
-		ssrData = new AccessionSSRMarkerMatrixListImplTest(accessionNames, markersToAlleles);
+		ssrData = new AccessionSSRMarkerMatrixListImplWrapperForTests(accessionNames, markersToAlleles);
 
 		ssrData.setValue("A1", "M1", "allele1", 0.3);
 		ssrData.setValue("A1", "M1", "allele2", 0.6);

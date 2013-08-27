@@ -14,6 +14,7 @@
 
 package org.corehunter.objectivefunction.ssr;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -90,15 +91,34 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 		}
   }
 
+        /**
+         * Calculate distance measure score for given integer subset solution. If
+         * no solution is given (null), score is computed for entire dataset.
+         * 
+         * @param solution
+         * @return
+         * @throws CoreHunterException 
+         */
 	@Override
 	public final double calculate(SubsetSolution<Integer> solution) throws CoreHunterException
 	{
-		if (cachedResults == null)
-			cachedResults = new DistanceCachedResult(solution) ;
+            
+                // create cache upon first call
+		if(cachedResults == null) {
+                    cachedResults = new DistanceCachedResult() ;
+                }
+                
+                Collection<Integer> indices;
+                // if solution is null, compute for entire dataset
+                if(solution == null){
+                    indices = getData().getIndices();
+                } else {
+                    indices = solution.getSubsetIndices();
+                }
 		
-		List<Integer> aIndices = cachedResults.getAddedIndices(solution.getSubsetIndices());
-		List<Integer> rIndices = cachedResults.getRemovedIndices(solution.getSubsetIndices());
-		List<Integer> cIndices = cachedResults.getCommonIndices(solution.getSubsetIndices());
+		List<Integer> aIndices = cachedResults.getAddedIndices(indices);
+		List<Integer> rIndices = cachedResults.getRemovedIndices(indices);
+		List<Integer> cIndices = cachedResults.getCommonIndices(indices);
 
 		double dist;
 
@@ -153,7 +173,7 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 			// recache our results under this id
 			cachedResults.setTotal(total);
 			cachedResults.setCount(count);
-			cachedResults.setIndices(solution.getSubsetIndices());
+			cachedResults.setIndices(indices);
 
 			return total / count;
 
@@ -253,7 +273,7 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 				}
 
 				// recache results
-				cachedResults.setIndices(solution.getIndices());
+				cachedResults.setIndices(indices);
 
 				// System.out.println("Min cache size: " + minFreqTable.size());
 				return minFreqTable.firstKey();
@@ -340,8 +360,7 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 
 		private TreeMap<Double, Integer>	minFreqTable;
 
-		// TODO why does this take SubsetSolution<IndexType> as parameter?
-		public DistanceCachedResult(SubsetSolution<Integer> solution)
+		public DistanceCachedResult()
 		{
 			super();
 			pTotal = 0.0;

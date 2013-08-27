@@ -8,10 +8,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.corehunter.objectivefunction.ssr.AbstractAccessionSSRDistanceMeasure;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.test.model.ssr.impl.AccessionSSRMarkerMatrixListImplTest;
+import org.corehunter.search.solution.SubsetSolution;
+import org.corehunter.search.solution.impl.IntegerSubsetSolution;
+import org.corehunter.test.model.ssr.impl.AccessionSSRMarkerMatrixListImplWrapperForTests;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +27,7 @@ import org.junit.Test;
 public final class TestModifiedRogersDistanceSSR
 {
 	private static final double	precision	= 0.00001;
-	private AccessionSSRMarkerMatrixListImplTest	        ssrData;
+	private AccessionSSRMarkerMatrixListImplWrapperForTests	        ssrData;
 	private AbstractAccessionSSRDistanceMeasure	    mr;
 
 	@Before
@@ -47,7 +50,7 @@ public final class TestModifiedRogersDistanceSSR
 		markersToAlleles.get("M2").add("allele1");
 		markersToAlleles.get("M2").add("allele2");
 
-		ssrData = new AccessionSSRMarkerMatrixListImplTest(accessionNames, markersToAlleles);
+		ssrData = new AccessionSSRMarkerMatrixListImplWrapperForTests(accessionNames, markersToAlleles);
 
 		// A1
 		ssrData.setValue("A1", "M1", "allele1", 0.3);
@@ -82,29 +85,57 @@ public final class TestModifiedRogersDistanceSSR
 		ssrData.setValue("A4", "M2", "allele2", 0.5);
 		
 		mr.setData(ssrData) ;
+
  	}
 
 	@Test
 	public void verifyMRBetweenAccessions() throws Exception
 	{
 		assertEquals(0.374165738677394,
-		    mr.calculate(0, 1), precision);
+                             mr.calculate(
+                                ssrData.getRowHeaders().getIndexByName("A1"),
+                                ssrData.getRowHeaders().getIndexByName("A2")
+                             ), precision);
 		assertEquals(0.070710678118655,
-		    mr.calculate(0,2), precision);
+                             mr.calculate(
+                                ssrData.getRowHeaders().getIndexByName("A1"),
+                                ssrData.getRowHeaders().getIndexByName("A3")
+                             ), precision);
 		assertEquals(0.374165738677394,
-		    mr.calculate(0, 3), precision);
+                             mr.calculate(
+                                ssrData.getRowHeaders().getIndexByName("A1"),
+                                ssrData.getRowHeaders().getIndexByName("A4")
+                             ), precision);
 		assertEquals(0.308220700148449,
-		    mr.calculate(1, 2), precision);
+                             mr.calculate(
+                                ssrData.getRowHeaders().getIndexByName("A2"),
+                                ssrData.getRowHeaders().getIndexByName("A3")
+                             ), precision);
 		assertEquals(0.500000000000000,
-		    mr.calculate(1, 3), precision);
+                             mr.calculate(
+                                ssrData.getRowHeaders().getIndexByName("A2"),
+                                ssrData.getRowHeaders().getIndexByName("A4")
+                             ), precision);
 		assertEquals(0.308220700148449,
-		    mr.calculate(2, 3), precision);
+                             mr.calculate(
+                                ssrData.getRowHeaders().getIndexByName("A3"),
+                                ssrData.getRowHeaders().getIndexByName("A4")
+                             ), precision);
 	}
 
 	@Test
 	public void verifyAverageMRAllAccessions() throws Exception
 	{
+                // compute average MR of all accession pairs
 		assertEquals(0.322580592628, mr.calculate(null), precision);
+                // compute score for subset
+                Set<Integer> indices = new HashSet<Integer>();
+                indices.add(ssrData.getRowHeaders().getIndexByName("A1"));
+                indices.add(ssrData.getRowHeaders().getIndexByName("A3"));
+                SubsetSolution<Integer> subset = new IntegerSubsetSolution(ssrData.getIndices(), indices);
+                assertEquals(0.070710678118655, mr.calculate(subset), precision);
+                // again compute overall average MR to check cache funtionality
+                assertEquals(0.322580592628, mr.calculate(null), precision);
 	}
 
 }
