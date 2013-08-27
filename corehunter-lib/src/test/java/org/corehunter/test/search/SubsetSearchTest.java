@@ -43,7 +43,7 @@ import org.junit.BeforeClass;
 
 public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSolution<IndexType>> {
 
-    protected final long DEFAULT_RUNTIME = 60*SECOND;
+    protected final long DEFAULT_RUNTIME = 2*SECOND;
     protected final long DEFAULT_STUCKTIME = INVALID_TIME;
     protected final double DEFAULT_MINIMUM_PROGRESSION = 0;
     protected final int DEFAULT_MINIMUM_SIZE = 20;
