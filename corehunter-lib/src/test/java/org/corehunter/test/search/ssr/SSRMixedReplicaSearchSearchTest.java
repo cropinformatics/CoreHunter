@@ -36,8 +36,9 @@ public class SSRMixedReplicaSearchSearchTest extends SubsetSearchTest<Integer, S
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);

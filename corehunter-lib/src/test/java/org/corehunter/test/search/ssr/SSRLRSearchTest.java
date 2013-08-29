@@ -34,8 +34,9 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
-
-            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
+            integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
+            
+            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
@@ -57,8 +58,9 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);

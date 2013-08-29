@@ -1,10 +1,27 @@
+// Copyright 2013 Herman De Beukelaer, Guy Davenport
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.corehunter.test.search.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.junit.Test;
@@ -12,39 +29,50 @@ import org.junit.Test;
 public class IntegerSubsetGeneratorTest
 {
 
-	private static List<Integer> indices = new ArrayList<Integer>();
+	private static List<Integer> completeSet = new ArrayList<Integer>();
+        private static Random rg = new Random();
 	
 	static
 	{
 		for (int i = 0 ; i < 10; ++i)
-			indices.add(i) ;
+			completeSet.add(rg.nextInt(100)) ;
 	}
 	
 	@Test
 	public void test()
 	{
+                // generates subsets of complete set
 		IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
-		KSubsetGenerator kSubsetGenerator = new KSubsetGenerator(5, indices.size()) ;
+                // generates subsets of {1..k} with k equal to the size of the complete set
+		KSubsetGenerator kSubsetGenerator = new KSubsetGenerator(5, completeSet.size()) ;
 
 		try
     {
-			integerSubsetGenerator.setIndices(indices) ;
+			integerSubsetGenerator.setCompleteSet(completeSet) ;
 			integerSubsetGenerator.setSubsetSize(5) ;
 			
 			assertEquals(kSubsetGenerator.getNrOfKSubsets(), integerSubsetGenerator.getNumberOfSubsets()) ;
 			
 			Integer[] kSubset = kSubsetGenerator.first() ;
-			List<Integer> subset = integerSubsetGenerator.first() ;
+			List<Integer> subset = integerSubsetGenerator.next() ;
+                        
+                        //System.out.println("kSubset: " + Arrays.toString(kSubset));
+                        //System.out.println("subset" + Arrays.toString(subset.toArray()));
 
-			assertSubsetEquals(0, kSubset, subset.toArray(new Integer[subset.size()])) ;
+			assertSubsetEquals(1, createSubsetFromIndices(kSubset), subset.toArray(new Integer[subset.size()])) ;
 	    
 	    for (long i = 1 ; i < integerSubsetGenerator.getNumberOfSubsets() ; ++i)
 	    {
-	    	kSubsetGenerator.successor(kSubset) ;
-				integerSubsetGenerator.next(subset) ;
+                    kSubsetGenerator.successor(kSubset) ;
+                    subset = integerSubsetGenerator.next() ;
+                    
+                    //System.out.println("kSubset: " + Arrays.toString(kSubset));
+                    //System.out.println("subset" + Arrays.toString(subset.toArray()));
 
-		    assertSubsetEquals(i+1, kSubset, subset.toArray(new Integer[subset.size()])) ;
+		    assertSubsetEquals(i+1, createSubsetFromIndices(kSubset), subset.toArray(new Integer[subset.size()])) ;
 	    }
+            
+            assertFalse(integerSubsetGenerator.hasNext());
     }
     catch (Exception e)
     {
@@ -57,9 +85,23 @@ public class IntegerSubsetGeneratorTest
   {
     assertEquals("Size expected: " + expected.length + " but actually " + expected.length, expected.length, actual.length) ;
     
-    for (int i = 1 ; i < expected.length ; ++i)
+    for (int i = 0 ; i < expected.length ; ++i)
     {
-	    assertEquals("In subset " + index +" Value at position " + i, expected[i] - 1, actual[i].intValue()) ;
+	    assertEquals("In subset " + index +" Value at position " + i, expected[i].intValue(), actual[i].intValue()) ;
     }
   }
+        
+        /**
+         * Create subset of complete set, from subset of indices in {1..k}.
+         * 
+         * @param indices
+         * @return 
+         */
+        private Integer[] createSubsetFromIndices(Integer[] indices){
+            Integer[] subset = new Integer[indices.length];
+            for(int i=0; i<indices.length; i++){
+                subset[i] = completeSet.get(indices[i]-1);
+            }
+            return subset;
+        }
 }

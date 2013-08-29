@@ -15,24 +15,27 @@ package org.corehunter.search;
 
 import java.util.Collection;
 import java.util.List;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Validatable;
 
-public interface SubsetGenerator<IndexType> extends Validatable
+public interface SubsetGenerator<IndexType> extends Validatable    
 {
-	public abstract long getNumberOfSubsets();
+	public long getNumberOfSubsets() throws CoreHunterException;
 
-	public abstract List<IndexType> first();
+	public List<IndexType> next() throws CoreHunterException;
+        
+        public boolean hasNext() throws CoreHunterException;
+        
+        public void restart();
 
-	public abstract List<Integer> next(List<IndexType> subset);
-
-	public abstract List<IndexType> getIndices() ;
+	public List<IndexType> getCompleteSet();
 	
-	public abstract void setIndices(Collection<IndexType> indices) throws CoreHunterException ;
+	public void setCompleteSet(Collection<IndexType> indices) throws CoreHunterException;
 	
-	public abstract int getSubsetSize();
+	public int getSubsetSize();
 	
-	public abstract void setSubsetSize(int subsetSize) throws CoreHunterException ;
+	public void setSubsetSize(int subsetSize) throws CoreHunterException;
+        
+        public SubsetGenerator<IndexType> copy() throws CoreHunterException;
 
 }

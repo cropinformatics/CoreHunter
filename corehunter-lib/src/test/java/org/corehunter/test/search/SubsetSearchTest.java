@@ -125,8 +125,9 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(data.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(data.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(data.getIndices(), integerSubsetGenerator.next()));
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data);
             search.setSubsetMinimumSize(size);
@@ -147,8 +148,9 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(data.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(data.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(data.getIndices(), integerSubsetGenerator.next()));
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data);
             search.setSubsetMinimumSize(minimumSize);

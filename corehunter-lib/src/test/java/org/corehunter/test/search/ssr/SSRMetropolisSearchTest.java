@@ -45,8 +45,9 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
@@ -83,8 +84,9 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
@@ -121,8 +123,9 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
@@ -159,8 +162,9 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(data10.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(data10.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(data10.getIndices(), integerSubsetGenerator.next()));
 
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data10);
@@ -197,6 +201,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(data10.getIndices());
 
             search.setInitialSolution(findOptimalSolution(2, 5, data10));
 

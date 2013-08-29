@@ -48,7 +48,9 @@ public class ExhaustiveSubsetSearch<
 	{
 		try
     {
-	    return new ExhaustiveSubsetSearch<IndexType, SolutionType>(this);
+	    ExhaustiveSubsetSearch<IndexType, SolutionType> copy = new ExhaustiveSubsetSearch<IndexType, SolutionType>(this);
+            copy.setSubsetGenerator(subsetGenerator.copy());
+            return copy;
     }
     catch (Exception e)
     {
@@ -74,23 +76,23 @@ public class ExhaustiveSubsetSearch<
 	@Override
   protected void validate() throws CoreHunterException
   {
-	  super.validate();
+        super.validate();
 	  
-	  if (subsetGenerator == null)
-		  throw new CoreHunterException("Subset generator must be defined!") ;
+        if (subsetGenerator == null)
+            throw new CoreHunterException("Subset generator must be defined!") ;
 	  
-	  subsetGenerator.setIndices(getIndices()) ;
-  	subsetGenerator.setSubsetSize(getSubsetMinimumSize()) ;
+        subsetGenerator.setCompleteSet(getIndices()) ;
+        subsetGenerator.setSubsetSize(getSubsetMinimumSize()) ;
   	
   	subsetGenerator.validate() ;
   }
 
 	protected void handleSubsetGeneratorSet() throws CoreHunterException
   {
-		if (SearchStatus.STARTED.equals(getStatus()))
+            if (SearchStatus.STARTED.equals(getStatus()))
 	  	throw new CoreHunterException("Subset generator can not be set while search in process") ;
 		
-	  if (subsetGenerator == null)
+            if (subsetGenerator == null)
 		  throw new CoreHunterException("Subset generator must be defined!") ;
   }
 
@@ -102,32 +104,34 @@ public class ExhaustiveSubsetSearch<
 		double progress = 0;
 		double newProgress;
 
-		// Calculate pseudomeasure for all possible core sets and return best
-		// core
+		// Calculate pseudomeasure for all possible core sets and return best core
 		
 		long nr = getNumberOfSubsets() ;
 
 		fireSearchMessage("Nr of possible core sets: " + nr + "!");
 
-		for (int i = getSubsetMinimumSize() ; i <= getSubsetMaximumSize(); ++i)
+		for (int i = getSubsetMinimumSize() ; i <= getSubsetMaximumSize(); i++)
 		{
 			subsetGenerator.setSubsetSize(i) ;
- 			nr = subsetGenerator.getNumberOfSubsets() ;
 			
-			List<IndexType> subsetIndices = subsetGenerator.first();
-	
-			for (long j = 1; j <= nr; j++)
+			List<IndexType> subsetIndices;
+                        long j = 1;
+                        nr = subsetGenerator.getNumberOfSubsets();
+			while (subsetGenerator.hasNext())
 			{
+                                // create next subset
+                                subsetIndices = subsetGenerator.next();
+        
+                                // fire progress
 				newProgress = (double) j / (double) nr;
-	
 				if (newProgress > progress)
 				{
 					fireSearchProgress(newProgress);
 					progress = newProgress;
 				}
 	
+                                // evaluate solution
 				getCurrentSolution().setSubsetIndices(subsetIndices);
-	
 				score = getObjectiveFunction().calculate(getCurrentSolution());
 				
 				if (isBetterSolution(score, bestScore))
@@ -135,8 +139,6 @@ public class ExhaustiveSubsetSearch<
 					bestScore = score;
 					handleNewBestSolution(getCurrentSolution(), bestScore);
 				}
-				
-				subsetGenerator.next(subsetIndices);
 			}
 		}
 	}

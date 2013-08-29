@@ -30,14 +30,14 @@ public class SSRExhaustiveSearchTest extends SubsetSearchTest<Integer, SubsetSol
 
     @Test
     public void exhaustiveSerchTest() {
-        SubsetSolution<Integer> soluiton1 = test(2, 5);
-        SubsetSolution<Integer> soluiton2 = test(2, 5);
-        SubsetSolution<Integer> soluiton3 = test(2, 3);
+        SubsetSolution<Integer> solution1 = test(2, 5);
+        SubsetSolution<Integer> solution2 = test(2, 5);
+        SubsetSolution<Integer> solution3 = test(2, 3);
 
-        assertEquals("Two exhaustive searches are not the same", soluiton1, soluiton2);
+        assertEquals("Two exhaustive searches are not the same", solution1, solution2);
 
-        if (soluiton1.getSubsetSize() <= 3) {
-            assertEquals("Two exhaustive searches are not the same", soluiton1, soluiton3);
+        if (solution1.getSubsetSize() <= 3) {
+            assertEquals("Two exhaustive searches are not the same", solution1, solution3);
         }
     }
 
@@ -48,8 +48,9 @@ public class SSRExhaustiveSearchTest extends SubsetSearchTest<Integer, SubsetSol
         try {
             IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
             integerSubsetGenerator.setSubsetSize(2);
+            integerSubsetGenerator.setCompleteSet(data10.getIndices());
 
-            search.setInitialSolution(new IntegerSubsetSolution(data10.getIndices(), integerSubsetGenerator.first()));
+            search.setInitialSolution(new IntegerSubsetSolution(data10.getIndices(), integerSubsetGenerator.next()));
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data10);
             search.setIndices(data10.getIndices()) ;
