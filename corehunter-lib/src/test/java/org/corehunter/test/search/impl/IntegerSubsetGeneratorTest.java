@@ -14,16 +14,16 @@
 
 package org.corehunter.test.search.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import org.corehunter.CoreHunterException;
+import org.corehunter.search.impl.IntegerSubsetGenerator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
-import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.junit.Test;
 
 public class IntegerSubsetGeneratorTest
@@ -41,15 +41,16 @@ public class IntegerSubsetGeneratorTest
 	@Test
 	public void test()
 	{
+                int k = rg.nextInt(10)+1;
                 // generates subsets of complete set
 		IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
                 // generates subsets of {1..k} with k equal to the size of the complete set
-		KSubsetGenerator kSubsetGenerator = new KSubsetGenerator(5, completeSet.size()) ;
+		KSubsetGenerator kSubsetGenerator = new KSubsetGenerator(k, completeSet.size()) ;
 
 		try
     {
 			integerSubsetGenerator.setCompleteSet(completeSet) ;
-			integerSubsetGenerator.setSubsetSize(5) ;
+			integerSubsetGenerator.setSubsetSize(k) ;
 			
 			assertEquals(kSubsetGenerator.getNrOfKSubsets(), integerSubsetGenerator.getNumberOfSubsets()) ;
 			
@@ -103,5 +104,28 @@ public class IntegerSubsetGeneratorTest
                 subset[i] = completeSet.get(indices[i]-1);
             }
             return subset;
+        }
+        
+        @Test
+	public void testNoNext() throws CoreHunterException {
+            
+            IntegerSubsetGenerator generator = new IntegerSubsetGenerator();
+            generator.setCompleteSet(completeSet);
+            generator.setSubsetSize(4);
+            
+            // generate all subsets
+            for(int i=0; i<210; i++){
+                generator.next();
+            }
+            
+            // check if error thrown when trying to get next subset
+            boolean thrown = false;
+            try{
+                generator.next();
+            }catch(NoSuchElementException ex){
+                thrown = true;
+            }
+            assertTrue(thrown);
+            
         }
 }

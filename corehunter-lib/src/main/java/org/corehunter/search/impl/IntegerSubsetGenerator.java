@@ -39,7 +39,6 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
                                           // of list representation of complete set,
                                           // not to be confused with the selected elements
                                           // themselves
-        private int generated = 0;
         private long cachedNumberOfSubsets = -1;
 
 	public IntegerSubsetGenerator()
@@ -96,7 +95,6 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
         
         @Override
         public void restart() {
-            generated = 0;
             curSelectedIndices = null;
             cachedNumberOfSubsets = -1; // flush cache
         }
@@ -116,8 +114,23 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
         public boolean hasNext() throws CoreHunterException {
             // validate generator
             validate();
-            // check if not all subsets have been generated
-            return generated < getNumberOfSubsets();
+            // not completed if no subsets generated yet
+            if(curSelectedIndices == null){
+                return true;
+            }
+            // else, check if not all subsets have been generated:
+            // selected indices of last subset are
+            //  [0, 1, 2, ..., n-1]
+            // with n the size of the complete set
+            boolean finalIndices = true;
+            int i=0;
+            while(finalIndices && i<subsetSize-1){
+                finalIndices = (curSelectedIndices[i] == i);
+                i++;
+            }
+            finalIndices = (finalIndices && curSelectedIndices[subsetSize-1] == completeSet.size()-1);
+            // has next if not final indices
+            return !finalIndices;
         }
         
 	/**
@@ -138,7 +151,6 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
                         curSelectedIndices[i] = i;
 		}
 		
-                generated++;
 		return first;
 	}
 
@@ -162,7 +174,7 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
                 }
                 
                 // check if first call
-                if(generated == 0){
+                if(curSelectedIndices == null){
                     return first();
                 }
                 
@@ -216,7 +228,6 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
                         next.add(completeSet.get(curSelectedIndices[i-1]));
 		}
 		
-                generated++;
 		return next;
 	}
         
