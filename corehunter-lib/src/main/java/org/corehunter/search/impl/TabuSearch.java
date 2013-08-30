@@ -91,8 +91,7 @@ public class TabuSearch<
             handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
         }
         
-        long step = 1;
-        while (canContinue(step)) {
+        while (canContinue()) {
             
             // run TABU search step
 
@@ -114,7 +113,7 @@ public class TabuSearch<
                 // no non-tabu neighbour found
                 stop();
             }
-            step++;
+            incStepsTaken();
         }
          
     }

@@ -19,14 +19,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import org.corehunter.CoreHunterException;
-import org.corehunter.search.impl.IntegerSubsetGenerator;
+import org.corehunter.search.impl.IndexSubsetGenerator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-public class IntegerSubsetGeneratorTest
+public class IndexSubsetGeneratorTest
 {
 
 	private static List<Integer> completeSet = new ArrayList<Integer>();
@@ -43,7 +43,7 @@ public class IntegerSubsetGeneratorTest
 	{
                 int k = rg.nextInt(10)+1;
                 // generates subsets of complete set
-		IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
+		IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>() ;
                 // generates subsets of {1..k} with k equal to the size of the complete set
 		KSubsetGenerator kSubsetGenerator = new KSubsetGenerator(k, completeSet.size()) ;
 
@@ -109,7 +109,7 @@ public class IntegerSubsetGeneratorTest
         @Test
 	public void testNoNext() throws CoreHunterException {
             
-            IntegerSubsetGenerator generator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator<Integer> generator = new IndexSubsetGenerator<Integer>();
             generator.setCompleteSet(completeSet);
             generator.setSubsetSize(4);
             

@@ -237,9 +237,7 @@ public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType
 
 		registerSubSearches(replicas);
 
-    long currentStep = 1;
-
-		while (canContinue(currentStep))
+		while (canContinue())
 		{
 			startSubSearches(replicas); // returns when all are complete
 
@@ -287,7 +285,7 @@ public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType
 
 			swapBase = 1 - swapBase;
 
-			++currentStep ;
+			incStepsTaken();
 		}
 
 		unregisterSubSearches(replicas);

@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.search.impl.IntegerSubsetGenerator;
+import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.corehunter.search.impl.LocalSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
@@ -41,7 +41,7 @@ public class SSRLocalSearchTest extends SubsetSearchTest<Integer, SubsetSolution
         		new LocalSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
@@ -81,7 +81,7 @@ public class SSRLocalSearchTest extends SubsetSearchTest<Integer, SubsetSolution
         try {
             int size = (int) (0.2 * dataFull.getSize());
             
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(size);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
@@ -92,6 +92,7 @@ public class SSRLocalSearchTest extends SubsetSearchTest<Integer, SubsetSolution
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(size);
             neighbourhood.setSubsetMaximumSize(size);
+            search.setIndices(dataFull.getIndices());
             search.setNeighbourhood(neighbourhood);
             search.setRuntimeLimit(DEFAULT_RUNTIME);
             search.setMaxTimeWithoutImprovement(DEFAULT_STUCKTIME);

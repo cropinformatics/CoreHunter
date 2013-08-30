@@ -20,7 +20,7 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.SearchListener;
-import org.corehunter.search.impl.IntegerSubsetGenerator;
+import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.corehunter.search.impl.MetropolisSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
@@ -43,7 +43,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
@@ -82,7 +82,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
@@ -121,7 +121,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
@@ -160,7 +160,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(data10.getIndices());
 
@@ -199,7 +199,7 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(data10.getIndices());
 

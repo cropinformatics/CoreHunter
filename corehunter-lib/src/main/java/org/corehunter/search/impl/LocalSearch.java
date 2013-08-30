@@ -54,9 +54,8 @@ public class LocalSearch<
         }
 
         IndexedMove<IndexType, SolutionType> move;
-        long step = 1;
 
-        while (canContinue(step)) {
+        while (canContinue()) {
             
             // run Local Search step
             
@@ -83,7 +82,7 @@ public class LocalSearch<
             } else {
                 stop();
             }
-            step++;
+            incStepsTaken();
         }
         
     }

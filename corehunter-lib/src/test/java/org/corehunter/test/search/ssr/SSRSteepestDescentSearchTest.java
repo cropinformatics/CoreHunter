@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.search.impl.IntegerSubsetGenerator;
+import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.corehunter.search.impl.SteepestDescentSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
@@ -34,7 +34,7 @@ public class SSRSteepestDescentSearchTest extends SubsetSearchTest<Integer, Subs
         		new SteepestDescentSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
+            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 

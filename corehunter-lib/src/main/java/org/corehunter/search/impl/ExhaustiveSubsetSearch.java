@@ -11,11 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 package org.corehunter.search.impl;
 
 import java.util.List;
-
 import org.apache.commons.math.util.MathUtils;
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.SearchStatus;
@@ -25,132 +23,91 @@ import org.corehunter.search.solution.SubsetSolution;
 /**
  * Evaluate all possible core sets and return best one
  */
-public class ExhaustiveSubsetSearch<
-	IndexType,
-	SolutionType extends SubsetSolution<IndexType>> 
-	extends AbstractSubsetSearch<IndexType, SolutionType>
-{
-	private SubsetGenerator<IndexType> subsetGenerator ;
-	
-	public ExhaustiveSubsetSearch() 
-  {
-	  super() ;
-  }
-	
-	protected ExhaustiveSubsetSearch(
-			ExhaustiveSubsetSearch<IndexType, SolutionType> exhaustiveSearch) throws CoreHunterException
-  {
-	  super(exhaustiveSearch) ;
-  }
+public class ExhaustiveSubsetSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
+                                                                        extends AbstractSubsetSearch<IndexType, SolutionType> {
 
-	@Override
-	public ExhaustiveSubsetSearch<IndexType, SolutionType> copy()
-	{
-		try
-    {
-	    ExhaustiveSubsetSearch<IndexType, SolutionType> copy = new ExhaustiveSubsetSearch<IndexType, SolutionType>(this);
-            copy.setSubsetGenerator(subsetGenerator.copy());
-            return copy;
+    private SubsetGenerator<IndexType> subsetGenerator = new IndexSubsetGenerator<IndexType>();
+
+    public ExhaustiveSubsetSearch() {
+        super();
     }
-    catch (Exception e)
-    {
-	    return null ;
+
+    protected ExhaustiveSubsetSearch(ExhaustiveSubsetSearch<IndexType, SolutionType> exhaustiveSearch) throws CoreHunterException {
+        super(exhaustiveSearch);
     }
-	}
 
-	public final SubsetGenerator<IndexType> getSubsetGenerator()
-  {
-  	return subsetGenerator;
-  }
+    @Override
+    public ExhaustiveSubsetSearch<IndexType, SolutionType> copy() {
+        try {
+            return new ExhaustiveSubsetSearch<IndexType, SolutionType>(this);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-	public final void setSubsetGenerator(SubsetGenerator<IndexType> subsetGenerator) throws CoreHunterException
-  {
-		if (this.subsetGenerator != subsetGenerator)
-  	{
-			this.subsetGenerator = subsetGenerator;
-		
-			handleSubsetGeneratorSet() ;
-  	}
-  }
-
-	@Override
-  protected void validate() throws CoreHunterException
-  {
+    @Override
+    protected void validate() throws CoreHunterException {
         super.validate();
-	  
-        if (subsetGenerator == null)
-            throw new CoreHunterException("Subset generator must be defined!") ;
-	  
-        subsetGenerator.setCompleteSet(getIndices()) ;
-        subsetGenerator.setSubsetSize(getSubsetMinimumSize()) ;
-  	
-  	subsetGenerator.validate() ;
-  }
 
-	protected void handleSubsetGeneratorSet() throws CoreHunterException
-  {
-            if (SearchStatus.STARTED.equals(getStatus()))
-	  	throw new CoreHunterException("Subset generator can not be set while search in process") ;
-		
-            if (subsetGenerator == null)
-		  throw new CoreHunterException("Subset generator must be defined!") ;
-  }
+        if (subsetGenerator == null) {
+            throw new CoreHunterException("Subset generator must be defined!");
+        }
 
-	@Override
-	protected void runSearch() throws CoreHunterException
-	{
-		double score, bestScore = getWorstEvaluation() ;
-		
-		double progress = 0;
-		double newProgress;
+        subsetGenerator.setCompleteSet(getIndices());
+        subsetGenerator.setSubsetSize(getSubsetMinimumSize());
+        subsetGenerator.validate();
+    }
 
-		// Calculate pseudomeasure for all possible core sets and return best core
-		
-		long nr = getNumberOfSubsets() ;
+    @Override
+    protected void runSearch() throws CoreHunterException {
+        double score;
 
-		fireSearchMessage("Nr of possible core sets: " + nr + "!");
+        double progress = 0;
+        double newProgress;
 
-		for (int i = getSubsetMinimumSize() ; i <= getSubsetMaximumSize(); i++)
-		{
-			subsetGenerator.setSubsetSize(i) ;
-			
-			List<IndexType> subsetIndices;
-                        long j = 1;
-                        nr = subsetGenerator.getNumberOfSubsets();
-			while (subsetGenerator.hasNext())
-			{
-                                // create next subset
-                                subsetIndices = subsetGenerator.next();
-        
-                                // fire progress
-				newProgress = (double) j / (double) nr;
-				if (newProgress > progress)
-				{
-					fireSearchProgress(newProgress);
-					progress = newProgress;
-				}
-	
-                                // evaluate solution
-				getCurrentSolution().setSubsetIndices(subsetIndices);
-				score = getObjectiveFunction().calculate(getCurrentSolution());
-				
-				if (isBetterSolution(score, bestScore))
-				{
-					bestScore = score;
-					handleNewBestSolution(getCurrentSolution(), bestScore);
-				}
-			}
-		}
-	}
+        // Calculate pseudomeasure for all possible core sets and return best core
 
-	private long getNumberOfSubsets()
-  {
-		long numberOfSubsets = 0 ;
-		
-		for (int i = getSubsetMinimumSize() ; i <= getSubsetMaximumSize(); ++i)
-			numberOfSubsets = numberOfSubsets + MathUtils.binomialCoefficient(getIndices().size(), i);
-		
-	  return numberOfSubsets ;
-  }
+        long nr = getNumberOfSubsets();
 
+        fireSearchMessage("Nr of possible core sets: " + nr + "!");
+
+        for (int i = getSubsetMinimumSize(); i <= getSubsetMaximumSize(); i++) {
+            subsetGenerator.setSubsetSize(i);
+
+            List<IndexType> subsetIndices;
+            long j = 1;
+            nr = subsetGenerator.getNumberOfSubsets();
+            while (subsetGenerator.hasNext()) {
+                // create next subset
+                subsetIndices = subsetGenerator.next();
+
+                // fire progress
+                newProgress = (double) j / (double) nr;
+                if (newProgress > progress) {
+                    fireSearchProgress(newProgress);
+                    progress = newProgress;
+                }
+
+                // create and evaluate next solution
+                getCurrentSolution().setSubsetIndices(subsetIndices);
+                score = getObjectiveFunction().calculate(getCurrentSolution());
+                setCurrentSolutionEvaluation(score);
+
+                // check if new best solution found
+                if (isNewBestSolution(getCurrentSolutionEvaluation(), getCurrentSolution().getSubsetSize())) {
+                    handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+                }
+            }
+        }
+    }
+
+    private long getNumberOfSubsets() {
+        long numberOfSubsets = 0;
+
+        for (int i = getSubsetMinimumSize(); i <= getSubsetMaximumSize(); ++i) {
+            numberOfSubsets = numberOfSubsets + MathUtils.binomialCoefficient(getIndices().size(), i);
+        }
+
+        return numberOfSubsets;
+    }
 }

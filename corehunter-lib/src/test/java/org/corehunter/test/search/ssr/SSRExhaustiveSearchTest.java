@@ -14,16 +14,14 @@
 
 package org.corehunter.test.search.ssr;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
-import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.test.search.SubsetSearchTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class SSRExhaustiveSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>> {
@@ -42,21 +40,16 @@ public class SSRExhaustiveSearchTest extends SubsetSearchTest<Integer, SubsetSol
     }
 
     public SubsetSolution<Integer> test(int minimumSize, int maximumSize) {
-        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = 
-        		new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
+        
+        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
-            integerSubsetGenerator.setSubsetSize(2);
-            integerSubsetGenerator.setCompleteSet(data10.getIndices());
-
-            search.setInitialSolution(new IntegerSubsetSolution(data10.getIndices(), integerSubsetGenerator.next()));
+            search.setInitialSolution(new IntegerSubsetSolution(data10.getIndices()));
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data10);
             search.setIndices(data10.getIndices()) ;
             search.setSubsetMinimumSize(minimumSize);
             search.setSubsetMaximumSize(maximumSize);
-            search.setSubsetGenerator(new IntegerSubsetGenerator());
         } catch (CoreHunterException e) {
             e.printStackTrace();
             fail(e.getLocalizedMessage());

@@ -14,6 +14,7 @@
 
 package org.corehunter.search.solution.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,25 +44,39 @@ public class IntegerSubsetSolution implements SubsetSolution<Integer> {
         this.remainingIndices.addAll(indices);
         this.remainingIndices.removeAll(subsetIndices);
     }
+    
+    /**
+     * Create empty integer subset solution.
+     */
+    public IntegerSubsetSolution(Collection<Integer> indices){
+        this(indices, new ArrayList<Integer>());
+    }
 
+    /**
+     * Copy constructor.
+     */
     private IntegerSubsetSolution(SubsetSolution<Integer> subsetSolution) {
         this.indices = new HashSet<Integer>(subsetSolution.getIndices());
         this.subsetIndices = new HashSet<Integer>(subsetSolution.getSubsetIndices());
         this.remainingIndices = new HashSet<Integer>(subsetSolution.getRemainingIndices());
     }
 
+    @Override
     public Collection<Integer> getIndices() {
         return indices;
     }
 
+    @Override
     public int getSize() {
         return indices.size();
     }
 
+    @Override
     public Collection<Integer> getSubsetIndices() {
         return subsetIndices;
     }
 
+    @Override
     public void setSubsetIndices(Collection<Integer> subsetIndices) {
         this.subsetIndices.clear();
         this.subsetIndices.addAll(subsetIndices);
@@ -70,24 +85,29 @@ public class IntegerSubsetSolution implements SubsetSolution<Integer> {
         remainingIndices.removeAll(subsetIndices);
     }
 
+    @Override
     public int getSubsetSize() {
         return subsetIndices.size();
     }
 
+    @Override
     public Collection<Integer> getRemainingIndices() {
         return remainingIndices;
     }
 
+    @Override
     public int getRemainingSize() {
         return remainingIndices.size();
     }
 
+    @Override
     public void addIndex(Integer index) {
         if(remainingIndices.remove(index)) {
             subsetIndices.add(index);
         }
     }
 
+    @Override
     public Integer addRandomIndex(Random random) {
         Iterator<Integer> it = remainingIndices.iterator();
         Integer index = it.next();
@@ -99,18 +119,21 @@ public class IntegerSubsetSolution implements SubsetSolution<Integer> {
         return index;
     }
 
+    @Override
     public void addAllIndices() {
         subsetIndices.clear();
         remainingIndices.clear();
         subsetIndices.addAll(indices);
     }
 
+    @Override
     public void removeIndex(Integer index) {
         if(subsetIndices.remove(index)){
             remainingIndices.add(index);
         }
     }
 
+    @Override
     public Integer removeRandomIndex(Random random) {
         Iterator<Integer> it = subsetIndices.iterator();
         Integer index = it.next();
@@ -122,12 +145,14 @@ public class IntegerSubsetSolution implements SubsetSolution<Integer> {
         return index;
     }
 
+    @Override
     public void removeAllIndices() {
         subsetIndices.clear();
         remainingIndices.clear();
         remainingIndices.addAll(indices);
     }
 
+    @Override
     public void swapIndices(Integer indexToAdd, Integer indexToRemove) {
         if (subsetIndices.remove(indexToRemove)) {
             if (remainingIndices.remove(indexToAdd)) {
@@ -139,6 +164,7 @@ public class IntegerSubsetSolution implements SubsetSolution<Integer> {
         }
     }
 
+    @Override
     public Integer[] swapRandomIndices(Random random) {
         // randomly select index to add
         Iterator<Integer> itUnselected = remainingIndices.iterator();
@@ -162,20 +188,20 @@ public class IntegerSubsetSolution implements SubsetSolution<Integer> {
         return swapIndices;
     }
 
+    @Override
     public boolean containsIndexInSubset(Integer index) {
         return subsetIndices.contains(index);
     }
 
+    @Override
     public Solution copy() {
         return new IntegerSubsetSolution(this);
     }
 
+    @Override
     public void validate() throws CoreHunterException {
         if (indices.isEmpty()) {
             throw new CoreHunterException("Set must contain at least one index!");
-        }
-        if (subsetIndices.isEmpty()) {
-            throw new CoreHunterException("Subset must contain at least one index!");
         }
         if (!indices.containsAll(subsetIndices)) {
             throw new CoreHunterException("Subset indices must all be present in set!");
@@ -187,7 +213,7 @@ public class IntegerSubsetSolution implements SubsetSolution<Integer> {
     
     @Override
     public String toString() {
-        return "indices =" + subsetIndices;
+        return "indices = " + subsetIndices;
     }
 
     @Override

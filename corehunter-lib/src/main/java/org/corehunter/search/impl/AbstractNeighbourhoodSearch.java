@@ -14,12 +14,14 @@
 
 package org.corehunter.search.impl;
 
+import static org.corehunter.Constants.*;
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.Move;
 import org.corehunter.neighbourhood.Neighbourhood;
 import org.corehunter.search.NeighbourhoodSearch;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.Solution;
+
 
 public abstract class AbstractNeighbourhoodSearch<
         SolutionType extends Solution,
@@ -28,7 +30,17 @@ public abstract class AbstractNeighbourhoodSearch<
             extends AbstractObjectiveSearch<SolutionType>
             implements NeighbourhoodSearch<SolutionType, MoveType, NeighbourhoodType> {
 
+    // neighbourhood
     private NeighbourhoodType neighbourhood;
+    
+    // stop criteria
+    private long runtimeLimit = INVALID_TIME;
+    private long maximumTimeWithoutImprovement = INVALID_TIME;
+    private long maximumNumberOfSteps = INVALID_NUMBER_OF_STEPS;
+    private double minimumProgression = 0;
+    
+    // number of steps already performed
+    private long stepsTaken;
 
     public AbstractNeighbourhoodSearch() {
         super();
@@ -36,7 +48,23 @@ public abstract class AbstractNeighbourhoodSearch<
 
     protected AbstractNeighbourhoodSearch(AbstractNeighbourhoodSearch<SolutionType, MoveType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
-        setNeighbourhood(search.getNeighbourhood());
+        // set neighbourhood
+        setNeighbourhood((NeighbourhoodType)search.getNeighbourhood().copy());
+        // set stop criteria
+        setRuntimeLimit(search.getRuntimeLimit());
+        setMaxTimeWithoutImprovement(search.getMaxTimeWithoutImprovement());
+        setMaximumNumberOfSteps(search.getMaximumumberOfSteps());
+        setMinimumProgression(search.getMinimumProgression());
+    }
+    
+    @Override
+    public void start() throws CoreHunterException {
+        
+        if (!SearchStatus.STARTED.equals(getStatus())) {
+            resetStepsTaken();
+            super.start();
+        }
+        
     }
 
     @Override
@@ -59,15 +87,168 @@ public abstract class AbstractNeighbourhoodSearch<
             throw new CoreHunterException("Neighbourhood can not be set while search in process");
         }
     }
+    
+    public final long getRuntimeLimit() {
+        return runtimeLimit;
+    }
+
+    public final void setRuntimeLimit(long runtimeLimit) throws CoreHunterException {
+        if (this.runtimeLimit != runtimeLimit) {
+            this.runtimeLimit = runtimeLimit;
+            handleRuntimeLimitSet();
+        }
+    }
+
+    public final long getMaximumumberOfSteps() {
+        return maximumNumberOfSteps;
+    }
+
+    public final void setMaximumNumberOfSteps(long maximumNumberOfSteps) throws CoreHunterException {
+        if (this.maximumNumberOfSteps != maximumNumberOfSteps) {
+            this.maximumNumberOfSteps = maximumNumberOfSteps;
+            handleMaximumNumberOfStepsSet();
+        }
+    }
+
+    public final long getMaxTimeWithoutImprovement() {
+        return maximumTimeWithoutImprovement;
+    }
+
+    public final void setMaxTimeWithoutImprovement(long maxTimeWithoutImprovement) throws CoreHunterException {
+        if (this.maximumTimeWithoutImprovement != maxTimeWithoutImprovement) {
+            this.maximumTimeWithoutImprovement = maxTimeWithoutImprovement;
+            handleMaximumTimeWithoutImprovementSet();
+        }
+    }
+
+    public final double getMinimumProgression() {
+        return minimumProgression;
+    }
+
+    public final void setMinimumProgression(double minimumProgression) throws CoreHunterException {
+        if (this.minimumProgression != minimumProgression) {
+            this.minimumProgression = minimumProgression;
+            handleMinimumProgressionSet();
+        }
+    }
+
+    protected void handleRuntimeLimitSet() throws CoreHunterException {
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Runtime can not be set while search in process");
+        }
+        if (runtimeLimit != INVALID_TIME && runtimeLimit <= 0) {
+            throw new CoreHunterException("Runtime can not be less than or equal to zero!");
+        }
+    }
+
+    protected void handleMaximumNumberOfStepsSet() throws CoreHunterException {
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Number of steps can not be set while search in process");
+        }
+        if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && maximumNumberOfSteps <= 0) {
+            throw new CoreHunterException("Number of steps can not be less than or equal to zero!");
+        }
+    }
+
+    protected void handleMaximumTimeWithoutImprovementSet()
+            throws CoreHunterException {
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Maximum time without improvement can not be set can not be set while search in process");
+        }
+        if (maximumTimeWithoutImprovement != INVALID_TIME
+                && maximumTimeWithoutImprovement <= 0) {
+            throw new CoreHunterException( "Maximum time without improvement can not be less than or equal to zero!");
+        }
+    }
+
+    protected void handleMinimumProgressionSet() throws CoreHunterException {
+        if (SearchStatus.STARTED.equals(getStatus())) {
+            throw new CoreHunterException("Minimum Progression can not be set while search in process");
+        }
+        if (minimumProgression < 0) {
+            throw new CoreHunterException("Minimum Progression can not be less than zero!");
+        }
+    }
+    
+    protected void resetStepsTaken(){
+        stepsTaken = 0;
+    }
+    
+    protected void incStepsTaken(){
+        stepsTaken++;
+    }
+    
+    protected long getStepsTaken(){
+        return stepsTaken;
+    }
+    
+    /**
+    * Check whether the search has been stopped manually, or one of the
+    * stop criteria has been exceeded.
+    */
+    @Override
+   protected boolean canContinue()
+   {
+        // check if manually halted (see AbstractSearch)
+        if (!super.canContinue())
+        {
+                return false;
+        }
+        // check runtime limit
+        if (runtimeLimit != INVALID_TIME && getSearchTime() > runtimeLimit)
+        {
+                fireSearchMessage("Stopping... Runtime limit exceeded.");
+                return false;
+        }
+        // check time without improvement
+        if (maximumTimeWithoutImprovement != INVALID_TIME
+            && getBestSolutionTime() > maximumTimeWithoutImprovement)
+        {
+                fireSearchMessage("Stopping... Maximum time without improvement exceeded.");
+                return false;
+        }
+        // check number of steps
+        if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && stepsTaken >= maximumNumberOfSteps)
+        {
+                fireSearchMessage("Stopping... Maximum number of steps exceeded.");
+                return false;
+        }
+        // check min progression (of last new best solution)
+        if (getLastBestSolutionScoreDelta() < minimumProgression)
+        {
+                fireSearchMessage("Stopping... Required minimum progression not obtained.");
+                return false;
+        }
+        // search not stopped
+        return true;
+   }
 
     @Override
     protected void validate() throws CoreHunterException {
         super.validate();
 
+        // validate stop criteria
+        
+        if (runtimeLimit != INVALID_TIME && runtimeLimit <= 0) {
+            throw new CoreHunterException( "Runtime can not be less than or equal to zero!");
+        }
+        if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && maximumNumberOfSteps <= 0) {
+            throw new CoreHunterException("Number of Steps can not be less than or equal to zero!");
+        }
+        if (maximumTimeWithoutImprovement != INVALID_TIME && maximumTimeWithoutImprovement <= 0) {
+            throw new CoreHunterException("Max time without improvement can not be less than or equal to zero!");
+        }
+        if (minimumProgression < 0) {
+            throw new CoreHunterException("Minimum Progression can not be less than zero!");
+        }
+
+        // validate neighbourhood
+        
         if (neighbourhood == null) {
             throw new CoreHunterException("No neighbourhood defined!");
         }
 
         neighbourhood.validate();
+        
     }
 }

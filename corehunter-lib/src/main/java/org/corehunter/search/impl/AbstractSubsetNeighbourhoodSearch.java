@@ -184,25 +184,32 @@ public abstract class AbstractSubsetNeighbourhoodSearch<
     protected void validate() throws CoreHunterException {
         
         super.validate();
-        
+                
         if (indices == null) {
           throw new CoreHunterException("Indices must be defined!");
         }
         
         if(getNeighbourhood() == null){
-            throw new CoreHunterException("Neighbourhood undefine!");
+            throw new CoreHunterException("Neighbourhood undefined!");
         }
         
-        // check min/max subset size compared to full dataset size
-        if (getNeighbourhood().getSubsetMinimumSize() >= getIndices().size()) {
-            throw new CoreHunterException("Subset minimum size must be less than the dataset size!");
+        // check min/max subset size (compared to full dataset size) -- require at least two items in subset
+        // for the distance measures to be computable
+        if (getNeighbourhood().getSubsetMinimumSize() < 2) {
+            throw new CoreHunterException("Subset minimum size must be at least two!");
+        }
+        if (getNeighbourhood().getSubsetMinimumSize() > getIndices().size()) {
+            throw new CoreHunterException("Subset minimum size must be less than or equal to the dataset size!");
+        }
+        if (getNeighbourhood().getSubsetMaximumSize() < 2) {
+            throw new CoreHunterException("Subset maximum size must be at least two!");
         }
         if (getNeighbourhood().getSubsetMaximumSize() > getIndices().size()) {
             throw new CoreHunterException("Subset maximum size must be less than or equal to the dataset size!");
         }
         
         int size = getCurrentSolution().getSubsetSize();
-
+        
         // ensure initial solution is within maximum and minimum
         if (size < getNeighbourhood().getSubsetMinimumSize()) {
             // randomly increase subset until it reaches minimum
@@ -215,5 +222,6 @@ public abstract class AbstractSubsetNeighbourhoodSearch<
                 getCurrentSolution().removeRandomIndex(getRandom());
             }
         }
+        
     }
 }

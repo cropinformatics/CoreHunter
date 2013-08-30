@@ -18,7 +18,7 @@ import static org.junit.Assert.fail;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.search.impl.IntegerSubsetGenerator;
+import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.corehunter.search.impl.RandomSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
@@ -29,15 +29,10 @@ public class SSRRandomSearchTest extends SubsetSearchTest<Integer, SubsetSolutio
 
     @Test
     public void testDefaults() {
-        RandomSearch<Integer, SubsetSolution<Integer>> search = 
-        		new RandomSearch<Integer, SubsetSolution<Integer>>();
+        RandomSearch<Integer, SubsetSolution<Integer>> search = new RandomSearch<Integer, SubsetSolution<Integer>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
-            integerSubsetGenerator.setSubsetSize(2);
-            integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
-
-            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
+            search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices()));
 
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);

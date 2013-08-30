@@ -14,11 +14,7 @@
 
 package org.corehunter.search.impl;
 
-import static org.corehunter.Constants.INVALID_NUMBER_OF_STEPS;
-import static org.corehunter.Constants.INVALID_TIME;
-
 import java.util.Random;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.impl.EntityImpl;
 import org.corehunter.search.Search;
@@ -45,12 +41,6 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 	private long	                              endTime	                        = -1;
 	private long	                              bestSolutionTime	              = -1;
 
-	// stop criteria
-	private long	                              runtimeLimit	                  = INVALID_TIME;
-	private long	                              maximumTimeWithoutImprovement	      = INVALID_TIME;
-	private long	                              maximumNumberOfSteps	                  = INVALID_NUMBER_OF_STEPS;
-	private double	                            minimumProgression	            = 0;
-
 	// min delta for new best solution
 	private static final double	                MIN_DELTA_FOR_NEW_BEST_SOLUTION	= 1e-10;
 
@@ -72,33 +62,12 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		status = SearchStatus.NOT_STARTED;
 		searchListenerHandler = new SearchListenerHandler<SolutionType>(this);
 
-		// set initial and best solution + evaluations
-		setInitialSolution((SolutionType) search.getCurrentSolution().copy());
+		// set current and best solution + evaluations
+		setCurrentSolution((SolutionType) search.getCurrentSolution().copy());
 		setCurrentSolutionEvaluation(search.getCurrentSolutionEvaluation());
 		setBestSolution((SolutionType) search.getBestSolution().copy());
 		setBestSolutionEvaluation(search.getBestSolutionEvaluation());
 
-		// set stop criteria
-		setRuntimeLimit(search.getRuntimeLimit());
-		setMaxTimeWithoutImprovement(search.getMaxTimeWithoutImprovement());
-		setMaximumNumberOfSteps(search.getMaximumumberOfSteps());
-		setMinimumProgression(search.getMinimumProgression());
-	}
-
-	/**
-	 * Sets the initial solution under evaluation
-	 * 
-	 * @throws CoreHunterException
-	 *           if the search is in progress
-	 */
-	public final void setInitialSolution(SolutionType solution)
-	    throws CoreHunterException
-	{
-		if (this.solution != solution)
-		{
-			setCurrentSolution(solution);
-			handleInitialSolutionSet();
-		}
 	}
 
 	@Override
@@ -141,171 +110,22 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		{
 			endTime = System.nanoTime();
 			fireSearchStopped();
-			status = SearchStatus.STOPPED;
 		}
 	}
 
 	/**
-	 * Check whether the search is allowed to continue, w.r.t to its stop
-	 * criteria.
-	 * 
-	 * @param currentStep
-	 *          Current step number (counted from 1)
-	 * @return
+	 * Check whether the search has been stopped manually.
 	 */
-	protected boolean canContinue(long currentStep)
+	protected boolean canContinue()
 	{
-		// check if search was stopped externally
+		// check if search was stopped manually
 		if (status.equals(SearchStatus.STOPPED))
 		{
 			fireSearchMessage("Stopping... Search engine terminated.");
 			return false;
 		}
-		// check runtime limit
-		if (runtimeLimit != INVALID_TIME && getSearchTime() > runtimeLimit)
-		{
-			fireSearchMessage("Stopping... Runtime limit exceeded.");
-			return false;
-		}
-		// check time without improvement
-		if (maximumTimeWithoutImprovement != INVALID_TIME
-		    && getBestSolutionTime() > maximumTimeWithoutImprovement)
-		{
-			fireSearchMessage("Stopping... Maximum time without improvement exceeded.");
-			return false;
-		}
-		// check number of steps
-		if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && currentStep > maximumNumberOfSteps)
-		{
-			fireSearchMessage("Stopping... Maximum number of steps exceeded.");
-			return false;
-		}
-		// check min progression (of last new best solution)
-		if (getLastBestSolutionScoreDelta() < minimumProgression)
-		{
-			fireSearchMessage("Stopping... Required minimum progression not obtained.");
-			return false;
-		}
-		// all stop criteria ok
+		// search not stopped
 		return true;
-	}
-
-	public final long getRuntimeLimit()
-	{
-		return runtimeLimit;
-	}
-
-	public final void setRuntimeLimit(long runtimeLimit)
-	    throws CoreHunterException
-	{
-		if (this.runtimeLimit != runtimeLimit)
-		{
-			this.runtimeLimit = runtimeLimit;
-			handleRuntimeLimitSet();
-		}
-	}
-
-	public final long getMaximumumberOfSteps()
-	{
-		return maximumNumberOfSteps;
-	}
-
-	public final void setMaximumNumberOfSteps(long maximumNumberOfSteps)
-	    throws CoreHunterException
-	{
-		if (this.maximumNumberOfSteps != maximumNumberOfSteps)
-		{
-			this.maximumNumberOfSteps = maximumNumberOfSteps;
-			handleMaximumNumberOfStepsSet();
-		}
-	}
-
-	public final long getMaxTimeWithoutImprovement()
-	{
-		return maximumTimeWithoutImprovement;
-	}
-
-	public final void setMaxTimeWithoutImprovement(long maxTimeWithoutImprovement)
-	    throws CoreHunterException
-	{
-		if (this.maximumTimeWithoutImprovement != maxTimeWithoutImprovement)
-		{
-			this.maximumTimeWithoutImprovement = maxTimeWithoutImprovement;
-			handleMaximumTimeWithoutImprovementSet();
-		}
-	}
-
-	public final double getMinimumProgression()
-	{
-		return minimumProgression;
-	}
-
-	public final void setMinimumProgression(double minimumProgression)
-	    throws CoreHunterException
-	{
-		if (this.minimumProgression != minimumProgression)
-		{
-			this.minimumProgression = minimumProgression;
-			handleMinimumProgressionSet();
-		}
-	}
-
-	protected void handleRuntimeLimitSet() throws CoreHunterException
-	{
-		if (SearchStatus.STARTED.equals(getStatus()))
-		{
-			throw new CoreHunterException(
-			    "Runtime can not be set while search in process");
-		}
-		if (runtimeLimit != INVALID_TIME && runtimeLimit <= 0)
-		{
-			throw new CoreHunterException(
-			    "Runtime can not be less than or equal to zero!");
-		}
-	}
-
-	protected void handleMaximumNumberOfStepsSet() throws CoreHunterException
-	{
-		if (SearchStatus.STARTED.equals(getStatus()))
-		{
-			throw new CoreHunterException(
-			    "Number of steps can not be set while search in process");
-		}
-		if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && maximumNumberOfSteps <= 0)
-		{
-			throw new CoreHunterException(
-			    "Number of steps can not be less than or equal to zero!");
-		}
-	}
-
-	protected void handleMaximumTimeWithoutImprovementSet()
-	    throws CoreHunterException
-	{
-		if (SearchStatus.STARTED.equals(getStatus()))
-		{
-			throw new CoreHunterException(
-			    "Maximum time without improvement can not be set can not be set while search in process");
-		}
-		if (maximumTimeWithoutImprovement != INVALID_TIME
-		    && maximumTimeWithoutImprovement <= 0)
-		{
-			throw new CoreHunterException(
-			    "Maximum time without improvement can not be less than or equal to zero!");
-		}
-	}
-
-	protected void handleMinimumProgressionSet() throws CoreHunterException
-	{
-		if (SearchStatus.STARTED.equals(getStatus()))
-		{
-			throw new CoreHunterException(
-			    "Minimum Progression can not be set while search in process");
-		}
-		if (minimumProgression < 0)
-		{
-			throw new CoreHunterException(
-			    "Minimum Progression can not be less than zero!");
-		}
 	}
 
 	@Override
@@ -319,6 +139,29 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 			searchListenerHandler.dispose();
 		}
 	}
+        
+        /**
+         * Sets the initial solution under evaluation. For neighborhood searches, this solution is required to be of
+         * valid size (between specified min. and max. size). For non neighborhood searches, this is not required; for
+         * example the initial solution might be empty here.
+         *
+         * @throws CoreHunterException if the search is in progress
+         */
+        public final void setInitialSolution(SolutionType solution) throws CoreHunterException {
+           if (getCurrentSolution() != solution) {
+               setCurrentSolution(solution);
+               handleInitialSolutionSet();
+           }
+        }
+
+        protected void handleInitialSolutionSet() throws CoreHunterException {
+           if (SearchStatus.STARTED.equals(getStatus())) {
+               throw new CoreHunterException("Initial solution can not be set while search in process");
+           }
+           if (getCurrentSolution() == null) {
+               throw new CoreHunterException("No initial solution defined!");
+           }
+        }
 
 	@Override
 	public final SolutionType getBestSolution()
@@ -375,6 +218,9 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		return endTime < 0 ? System.nanoTime() - startTime : endTime - startTime;
 	}
 
+        /**
+         * Returns the time in nanoseconds since a new best solution was found.
+         */
 	@Override
 	public final long getBestSolutionTime()
 	{
@@ -393,30 +239,8 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 
 	protected void validate() throws CoreHunterException
 	{
-
-		if (runtimeLimit != INVALID_TIME && runtimeLimit <= 0)
-		{
-			throw new CoreHunterException(
-			    "Runtime can not be less than or equal to zero!");
-		}
-		if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && maximumNumberOfSteps <= 0)
-		{
-			throw new CoreHunterException(
-			    "Number of Steps can not be less than or equal to zero!");
-		}
-		if (maximumTimeWithoutImprovement != INVALID_TIME
-		    && maximumTimeWithoutImprovement <= 0)
-		{
-			throw new CoreHunterException(
-			    "Max time without improvement can not be less than or equal to zero!");
-		}
-		if (minimumProgression < 0)
-		{
-			throw new CoreHunterException(
-			    "Minimum Progression can not be less than zero!");
-		}
-
-		if (SearchStatus.DISPOSED.equals(status))
+                
+                if (SearchStatus.DISPOSED.equals(status))
 		{
 			throw new CoreHunterException(
 			    "Solution can not be started if aleady disposed!");
@@ -425,31 +249,20 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		if (SearchStatus.FAILED.equals(status))
 		{
 			throw new CoreHunterException(
-			    "Solution can not be started previously failed!");
+			    "Solution can not be started if previously failed!");
 		}
+                
+                // validate initial solution
+                        
+                if (getCurrentSolution() == null) {
+                    throw new CoreHunterException("No start solution defined!");
+                }
 
-		if (solution == null)
-		{
-			throw new CoreHunterException("No start solution defined!");
-		}
+                getCurrentSolution().validate();
 
-		solution.validate();
 	}
 
 	protected abstract void runSearch() throws CoreHunterException;
-
-	protected void handleInitialSolutionSet() throws CoreHunterException
-	{
-		if (SearchStatus.STARTED.equals(status))
-		{
-			throw new CoreHunterException(
-			    "Initial solution can not be set while search in process");
-		}
-		if (solution == null)
-		{
-			throw new CoreHunterException("No initial solution defined!");
-		}
-	}
 
 	@SuppressWarnings("unchecked")
 	protected void handleNewBestSolution(SolutionType bestSolution,
@@ -475,14 +288,14 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 	}
 
 	/**
-	 * Implementation should take care of maximisation vs minimisation of the
+	 * Implementation should take care of maximization vs minimization of the
 	 * evaluation. Positive delta for better evaluation, negative for worse.
 	 */
 	protected abstract double getDeltaScore(double newEvalution,
 	    double oldEvalution);
 
 	/**
-	 * Implementation should take care of maximisation vs minimisation of the
+	 * Implementation should take care of maximization vs minimization of the
 	 * evaluation.
 	 */
 	protected abstract double getWorstEvaluation();
@@ -511,7 +324,7 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		return lastBestSolutionEvaluationDelta;
 	}
 
-	protected void setCurrentSolution(SolutionType solution)
+	protected final void setCurrentSolution(SolutionType solution)
 	{
 		this.solution = solution;
 	}

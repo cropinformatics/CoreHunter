@@ -16,15 +16,12 @@ package org.corehunter.search.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;
 
-public class RandomSearch<
-	IndexType,
-	SolutionType extends SubsetSolution<IndexType>> 
-	extends AbstractSubsetSearch<IndexType, SolutionType>
+public class RandomSearch<IndexType, SolutionType extends SubsetSolution<IndexType>> 
+                                            extends AbstractSubsetSearch<IndexType, SolutionType>
 {
 	private boolean continueSearch ;
 
@@ -33,13 +30,10 @@ public class RandomSearch<
 		super();
 	}
 	
-	protected RandomSearch(
-			RandomSearch<IndexType, SolutionType> search) throws CoreHunterException
+	protected RandomSearch(RandomSearch<IndexType, SolutionType> search) throws CoreHunterException
   {
 		super(search);
 		
-		setSubsetMinimumSize(search.getSubsetMinimumSize()) ;
-		setSubsetMaximumSize(search.getSubsetMaximumSize()) ;
   }
 	
 	@Override
@@ -66,8 +60,9 @@ public class RandomSearch<
 		}
 		
 		getCurrentSolution().setSubsetIndices(subsetIndices) ;
+                setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
 		// register solution
-		handleNewBestSolution(getCurrentSolution(), getObjectiveFunction().calculate(getCurrentSolution()));
+		handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
 	}
 	
 }

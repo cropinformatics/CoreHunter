@@ -32,7 +32,7 @@ import org.corehunter.objectivefunction.DuplicateMeasureException;
 import org.corehunter.objectivefunction.MultipleObjectiveFunction;
 import org.corehunter.objectivefunction.UnknownMeasureException;
 import org.corehunter.objectivefunction.ssr.MeasureFactorySSR;
-import org.corehunter.search.impl.IntegerSubsetGenerator;
+import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 
@@ -127,7 +127,7 @@ public final class CoreanalyserTextRunner
 	    		}
 	    	}
 	    	
-	    	IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator() ;
+	    	IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator() ;
 	    	integerSubsetGenerator.setSubsetSize(2) ;
 
 	    	SubsetSolution<Integer> solution = new IntegerSubsetSolution(dataset.getIndices(), integerSubsetGenerator.first()) ;

@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.Random;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.impl.AbstractFileUtility;
@@ -34,7 +35,6 @@ import org.corehunter.search.Search;
 import org.corehunter.search.SearchListener;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
-import org.corehunter.search.impl.IntegerSubsetGenerator;
 import org.corehunter.search.impl.PrintWriterSubsetSearchListener;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
@@ -57,6 +57,8 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
     protected static AccessionSSRMarkerMatrix<Integer> dataFull;
     private static final String SSR_DATA_NAME_10 = "bul10.csv";
     protected static AccessionSSRMarkerMatrix<Integer> data10;
+    
+    protected static final Random rg = new Random();
 
     @BeforeClass
     public static void beforeClass() {
@@ -119,43 +121,17 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
         return search.getBestSolution();
     }
 
-    public static final ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> getExhaustiveSubsetSearch(int size, AccessionSSRMarkerMatrix<Integer> data) {
-        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
-
-        try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
-            integerSubsetGenerator.setSubsetSize(2);
-            integerSubsetGenerator.setCompleteSet(data.getIndices());
-
-            search.setInitialSolution(new IntegerSubsetSolution(data.getIndices(), integerSubsetGenerator.next()));
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data);
-            search.setSubsetMinimumSize(size);
-            search.setSubsetMaximumSize(size);
-            search.setSubsetGenerator(new IntegerSubsetGenerator());
-
-        } catch (CoreHunterException e) {
-            e.printStackTrace();
-            fail(e.getLocalizedMessage());
-        }
-
-        return search;
-    }
-
     public static final ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> getExhaustiveSubsetSearch(int minimumSize, int maximumSize, AccessionSSRMarkerMatrix<Integer> data) {
         ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
 
         try {
-            IntegerSubsetGenerator integerSubsetGenerator = new IntegerSubsetGenerator();
-            integerSubsetGenerator.setSubsetSize(2);
-            integerSubsetGenerator.setCompleteSet(data.getIndices());
-
-            search.setInitialSolution(new IntegerSubsetSolution(data.getIndices(), integerSubsetGenerator.next()));
+            
+            search.setInitialSolution(new IntegerSubsetSolution(data.getIndices()));
             search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
             ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data);
             search.setSubsetMinimumSize(minimumSize);
             search.setSubsetMaximumSize(maximumSize);
-            search.setSubsetGenerator(new IntegerSubsetGenerator());
+            search.setIndices(data.getIndices());
 
         } catch (CoreHunterException e) {
             e.printStackTrace();

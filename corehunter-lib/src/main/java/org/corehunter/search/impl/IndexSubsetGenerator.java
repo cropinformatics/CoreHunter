@@ -26,28 +26,28 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.search.SubsetGenerator;
 
 /**
- * Generates all possible subsets of a given set of integers, of fixed size.
+ * Generates all possible subsets of a given set of indices, of fixed size.
  * Implementation is NOT synchronized.
  * 
  * @author hermandebeukelaer
  */
-public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
+public class IndexSubsetGenerator<IndexType> implements SubsetGenerator<IndexType>
 {
-	private List<Integer> completeSet;
+	private List<IndexType> completeSet;
 	private int subsetSize = INVALID_SIZE;
-        private int[] curSelectedIndices; // indices of currently selected elements
+        private int[] curSelectedIndices; // indices (int) of currently selected elements
                                           // of list representation of complete set,
-                                          // not to be confused with the selected elements
-                                          // themselves
+                                          // not to be confused with the selected
+                                          // elements (of type IndexType) themselves
         private long cachedNumberOfSubsets = -1;
 
-	public IntegerSubsetGenerator()
+	public IndexSubsetGenerator()
 	{
                 
 	}
 	
 	@Override
-  public List<Integer> getCompleteSet()
+  public List<IndexType> getCompleteSet()
   {
 	  return completeSet;
   }
@@ -60,10 +60,10 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
          * @throws CoreHunterException 
          */
 	@Override
-  public void setCompleteSet(Collection<Integer> completeSet) throws CoreHunterException
+  public void setCompleteSet(Collection<IndexType> completeSet) throws CoreHunterException
   {
 		if (completeSet != null){
-                    this.completeSet = new ArrayList<Integer>(completeSet) ;
+                    this.completeSet = new ArrayList<IndexType>(completeSet) ;
                     restart();
                 } else {
                     throw new CoreHunterException("Complete set must be defined!") ;
@@ -139,10 +139,10 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
          * @return
          * @throws CoreHunterException 
          */
-        private List<Integer> first()
+        private List<IndexType> first()
 	{
 		// Generate first subset
-		List<Integer> first = new ArrayList<Integer>(subsetSize);
+		List<IndexType> first = new ArrayList<IndexType>(subsetSize);
                 curSelectedIndices = new int[subsetSize];
 		
 		for (int i = 0; i < subsetSize; i++)
@@ -162,7 +162,7 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
          * @throws CoreHunterException 
          */
 	@Override
-        public List<Integer> next() throws CoreHunterException
+        public List<IndexType> next() throws CoreHunterException
 	{
             
                 // validate generator
@@ -220,7 +220,7 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
 			}
 		}
 
-		List<Integer> next = new ArrayList<Integer>(subsetSize);
+		List<IndexType> next = new ArrayList<IndexType>(subsetSize);
                 
                 for (int i = 1; i < subsetSize + 1; i++)
 		{
@@ -255,10 +255,10 @@ public class IntegerSubsetGenerator implements SubsetGenerator<Integer>
 	}
 
     @Override
-    public SubsetGenerator<Integer> copy() throws CoreHunterException {
+    public SubsetGenerator<IndexType> copy() throws CoreHunterException {
         validate();
         // create new generator with same complete set and subset size
-        SubsetGenerator<Integer> copy = new IntegerSubsetGenerator();
+        SubsetGenerator<IndexType> copy = new IndexSubsetGenerator<IndexType>();
         copy.setCompleteSet(completeSet);
         copy.setSubsetSize(subsetSize);
         return copy;

@@ -100,8 +100,7 @@ public class MetropolisSearch<
             handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
         }
         
-        long currentStep = 1;
-        while (canContinue(currentStep)) {
+        while (canContinue()) {
             
             size = getCurrentSolution().getSubsetSize();
             evaluation = getCurrentSolutionEvaluation();
@@ -140,7 +139,7 @@ public class MetropolisSearch<
                 // no neighbour found
                 stop();
             }
-            currentStep++;
+            incStepsTaken();
         }
     }
 
