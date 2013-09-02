@@ -35,11 +35,15 @@ public abstract class AbstractObjectiveFunction<
 	public AbstractObjectiveFunction(String name, String description)
 	{
 		super (name, name, description) ;
+                // TO DO
+                //flushCachedResults();
 	}
 	
 	protected AbstractObjectiveFunction(AbstractObjectiveFunction<SolutionType, DataType> objectiveFuncton)
 	{
 		super(objectiveFuncton) ;
+                // TO DO
+                //flushCachedResults();
 	}
 
 	/* (non-Javadoc)
@@ -75,6 +79,9 @@ public abstract class AbstractObjectiveFunction<
   {
 	  if (data == null)
 	  	throw new CoreHunterException("No data defined!") ;
+          
+          // flush cached results upon switching datasets
+          flushCachedResults();
   }
 
 	@Override

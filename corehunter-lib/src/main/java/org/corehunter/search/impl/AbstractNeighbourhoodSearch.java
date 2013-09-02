@@ -46,6 +46,7 @@ public abstract class AbstractNeighbourhoodSearch<
         super();
     }
 
+    @SuppressWarnings("unchecked")
     protected AbstractNeighbourhoodSearch(AbstractNeighbourhoodSearch<SolutionType, MoveType, NeighbourhoodType> search) throws CoreHunterException {
         super(search);
         // set neighbourhood

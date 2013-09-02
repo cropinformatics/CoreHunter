@@ -63,6 +63,11 @@ public class MeanGowerDistanceVariable extends AbstractSubsetObjectiveFunction<I
 			}
 		}
   }
+        
+        @Override
+        public void flushCachedResults() throws CoreHunterException {
+            throw new UnsupportedOperationException("Not yet implemented.");
+        }
 
 	@SuppressWarnings("rawtypes")
   private boolean isDiscriminateVariable(Variable variable)

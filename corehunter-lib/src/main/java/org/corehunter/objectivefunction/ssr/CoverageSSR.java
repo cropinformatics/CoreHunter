@@ -56,4 +56,9 @@ public final class CoverageSSR<IndexType> extends AbstractAccessionSSRObjectiveF
 	{
 		return 1.0 - pn.calculate(solution);
 	}
+        
+        @Override
+        public void flushCachedResults() throws CoreHunterException {
+            pn.flushCachedResults();
+        }
 }

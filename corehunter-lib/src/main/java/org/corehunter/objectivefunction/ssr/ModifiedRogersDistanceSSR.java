@@ -28,7 +28,7 @@ import org.corehunter.search.solution.SubsetSolution;
  * @author Chris Thachuk <chris.thachuk@gmail.com>
  * @version $Rev$
  */
-public final class ModifiedRogersDistanceSSR extends AbstractAccessionSSRDistanceMeasure
+public final class ModifiedRogersDistanceSSR<IndexType> extends AbstractAccessionSSRDistanceMeasure<IndexType>
 {
 
 	public ModifiedRogersDistanceSSR()
@@ -48,19 +48,19 @@ public final class ModifiedRogersDistanceSSR extends AbstractAccessionSSRDistanc
 		super(name, description, type);
 	}
 	
-	protected ModifiedRogersDistanceSSR(ModifiedRogersDistanceSSR objectiveFunction) 
+	protected ModifiedRogersDistanceSSR(ModifiedRogersDistanceSSR<IndexType> objectiveFunction) 
 	{
 		super(objectiveFunction) ;
 	}
 	
 	@Override
-  public final ObjectiveFunction<SubsetSolution<Integer>> copy()
-  {
-	  return new ModifiedRogersDistanceSSR(this);
-  }
+        public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
+        {
+                return new ModifiedRogersDistanceSSR<IndexType>(this);
+        }
 
 	@Override
-	public double calculate(Integer index1, Integer index2) throws UnknownIndexException 
+	public double calculate(IndexType index1, IndexType index2) throws UnknownIndexException 
 	{
 		double value = getMemoizedValue(index1, index2);
 		if (value != MISSING_VAL)

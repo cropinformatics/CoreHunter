@@ -46,6 +46,11 @@ public final class ShannonsDiversitySSR<IndexType> extends AbstractAccessionSSRO
 	{
 		super(objectiveFunction) ;
 	}
+        
+        @Override
+        public void flushCachedResults() throws CoreHunterException {
+            throw new UnsupportedOperationException("Not yet implemented.");
+        }
 	
 	@Override
   public ObjectiveFunction<SubsetSolution<IndexType>> copy()

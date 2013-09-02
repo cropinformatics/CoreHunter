@@ -11,4 +11,6 @@ public interface ObjectiveFunctionWithData<SolutionType extends Solution, DataTy
 	public DataType getData();
 
 	public void setData(DataType data) throws CoreHunterException;
+        
+        public void flushCachedResults() throws CoreHunterException;
 }

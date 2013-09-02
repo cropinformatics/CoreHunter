@@ -46,6 +46,11 @@ public final class HeterozygousLociDiversitySSR<IndexType> extends AbstractAcces
 	{
 		super(objectiveFunction) ;
 	}
+        
+        @Override
+        public void flushCachedResults() throws CoreHunterException {
+            throw new UnsupportedOperationException("Not yet implemented.");
+        }
 	
 	@Override
   public final ObjectiveFunction<SubsetSolution<IndexType>> copy()

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.corehunter.objectivefunction.DistanceMeasureType;
 
 import org.corehunter.objectivefunction.ssr.AbstractAccessionSSRDistanceMeasure;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
@@ -27,13 +28,13 @@ import org.junit.Test;
 public final class TestModifiedRogersDistanceSSR
 {
 	private static final double	precision	= 0.00001;
-	private AccessionSSRMarkerMatrixListImplWrapperForTests	        ssrData;
-	private AbstractAccessionSSRDistanceMeasure	    mr;
+	private AccessionSSRMarkerMatrixListImplWrapperForTests	        ssrData, singleAccessionSSRData;
+	private AbstractAccessionSSRDistanceMeasure<Integer>	    mr;
 
 	@Before
 	public void setUpBefore() throws Exception
 	{
-		mr = new ModifiedRogersDistanceSSR();
+		mr = new ModifiedRogersDistanceSSR<Integer>();
 
 		Collection<String> accessionNames = new HashSet<String>();
 		accessionNames.add("A1");
@@ -85,7 +86,31 @@ public final class TestModifiedRogersDistanceSSR
 		ssrData.setValue("A4", "M2", "allele2", 0.5);
 		
 		mr.setData(ssrData) ;
+                
+                // single accession dataset
+                
+		accessionNames = new HashSet<String>();
+		accessionNames.add("A1");
 
+		markersToAlleles = new HashMap<String, List<String>>();
+		markersToAlleles.put("M1", new ArrayList<String>());
+		markersToAlleles.get("M1").add("allele1");
+		markersToAlleles.get("M1").add("allele2");
+		markersToAlleles.get("M1").add("allele3");
+		markersToAlleles.put("M2", new ArrayList<String>());
+		markersToAlleles.get("M2").add("allele1");
+		markersToAlleles.get("M2").add("allele2");
+                
+                singleAccessionSSRData = new AccessionSSRMarkerMatrixListImplWrapperForTests(accessionNames, markersToAlleles);
+                
+                // A1
+		singleAccessionSSRData.setValue("A1", "M1", "allele1", 0.3);
+		singleAccessionSSRData.setValue("A1", "M1", "allele2", 0.2);
+		singleAccessionSSRData.setValue("A1", "M1", "allele3", 0.5);
+
+		singleAccessionSSRData.setValue("A1", "M2", "allele1", 0.8);
+		singleAccessionSSRData.setValue("A1", "M2", "allele2", 0.2);
+                
  	}
 
 	@Test
@@ -137,5 +162,36 @@ public final class TestModifiedRogersDistanceSSR
                 // again compute overall average MR to check cache funtionality
                 assertEquals(0.322580592628, mr.calculate(null), precision);
 	}
+        
+        @Test
+	public void verifyZeroDistanceForSingleAccession() throws Exception
+	{
+            
+            // 1) average MR
+            
+            ModifiedRogersDistanceSSR<Integer> mrSingleAccession = new ModifiedRogersDistanceSSR<Integer>();
+            mrSingleAccession.setData(singleAccessionSSRData);
+            // compute average MR on dataset with one single accession -- should be zero
+            assertEquals(0.0, mrSingleAccession.calculate(null), precision);
+            // compute average MR of empty subset -- should also be zero
+            assertEquals(0.0, mrSingleAccession.calculate(new IntegerSubsetSolution(singleAccessionSSRData.getIndices())), precision);
+            
+            
+            // 2) repeat experiments for min MR
+            
+            mrSingleAccession = new ModifiedRogersDistanceSSR<Integer>(DistanceMeasureType.MIN_DISTANCE);
+            mrSingleAccession.setData(singleAccessionSSRData);
+            // compute minimum MR on dataset with one single accession -- should be zero
+            assertEquals(0.0, mrSingleAccession.calculate(null), precision);
+            // compute minimum MR of empty subset -- should also be zero
+            assertEquals(0.0, mrSingleAccession.calculate(new IntegerSubsetSolution(singleAccessionSSRData.getIndices())), precision);
+            
+        }
+        
+        @Test
+	public void testCacheFlushUponNewData() throws Exception
+	{
+            // TO DO test cache flush upon setting new dataset
+        }
 
 }

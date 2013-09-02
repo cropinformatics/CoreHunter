@@ -32,7 +32,7 @@ public abstract class AbstractObjectiveSearch<SolutionType extends Solution>
 
     protected AbstractObjectiveSearch(AbstractObjectiveSearch<SolutionType> search) throws CoreHunterException {
         super(search);
-        setObjectiveFunction(search.getObjectiveFunction());        
+        setObjectiveFunction(search.getObjectiveFunction().copy());        
     }
     
     @Override

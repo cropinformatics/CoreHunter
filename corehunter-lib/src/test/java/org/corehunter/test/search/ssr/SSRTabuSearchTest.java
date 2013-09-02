@@ -41,14 +41,14 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
         TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             neighbourhood.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
@@ -81,14 +81,14 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
         try {
             int size = (int) (0.2 * dataFull.getSize());
             
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(size);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(size);
             neighbourhood.setSubsetMaximumSize(size);
@@ -119,14 +119,14 @@ public class SSRTabuSearchTest extends SubsetSearchTest<Integer, SubsetSolution<
         TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new TabuSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             neighbourhood.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);

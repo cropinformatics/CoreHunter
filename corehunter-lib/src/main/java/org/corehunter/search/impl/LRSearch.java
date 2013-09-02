@@ -88,33 +88,6 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
         }
     }
     
-    @Override
-    protected void validate() throws CoreHunterException {
-        super.validate();
-        
-        // check L and R
-        if(l < 0){
-            throw new CoreHunterException("L can not be less than zero");
-        }
-        if(r < 0){
-            throw new CoreHunterException("R can not be less than zero");
-        }
-        if(l == r){
-            throw new CoreHunterException("L and R can not be equal");
-        }
-        
-        // if subset size is increasing, initial size can not be too large
-        if(increasingSubsetSize() && getCurrentSolution().getSubsetSize() > getSubsetMaximumSize()){
-            throw new CoreHunterException("L > R (increasing subset size): initial subset size can not be larger than maximum subset size");
-        }
-        
-        // if subset size is decreasing, initial size can not be too small
-        if(decreasingSubsetSize() && getCurrentSolution().getSubsetSize() < getSubsetMinimumSize()){
-            throw new CoreHunterException("L < R (decreasing subset size): initial subset size can not be smaller than minimum subset size");
-        }
-        
-    }
-    
     /**
      * Check whether subset size is increasing (L > R).
      */
@@ -129,8 +102,54 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
         return r > l;
     }
     
+    /**
+     * Indicates whether the current subset will be too large (if increasing)
+     * or too small (if decreasing) after the next step, which adds/removes |L-R| items.
+     */
+    private boolean willLeaveValidSizeRegion(){
+        return increasingSubsetSize() && getCurrentSolution().getSubsetSize() + getDelta() > getSubsetMaximumSize()
+                || decreasingSubsetSize() && getCurrentSolution().getSubsetSize() - getDelta() < getSubsetMinimumSize();
+    }
+    
+    private boolean insideValidSizeRegion(){
+        return getCurrentSolution().getSubsetSize() >= getSubsetMinimumSize()
+                && getCurrentSolution().getSubsetSize() <= getSubsetMaximumSize();
+    }
+    
+    private int getDelta(){
+        return Math.abs(l-r);
+    }
+    
     @Override
     protected void runSearch() throws CoreHunterException {
+        
+        // continue until the next step will leave the valid size region
+        while(!willLeaveValidSizeRegion()){
+            
+            // take next step
+            
+            // ...
+            
+            // if valid solution obtained: check if new best solution
+            
+            // ...
+            
+            // if next step will jump over valid size region: adjust L and R
+            // so that |L-R| = 1, to obtain valid solution(s)
+            
+            // ...
+            
+            
+        }
+        
+        
+        
+        
+        
+        // FROM HERE: old code ...
+        
+        
+        
 //        continueSearch = true;
 //        
 //        double evaluation, newEvaluation, bestNewEvaluation, deltaEvaluation;
@@ -150,11 +169,7 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 //            getCurrentSolution().addAllIndices();
 //            skipadd = true;
 //        }
-//        
-//        // check if at least 2 indices contained in subset
-//        if(getCurrentSolution().getSize() < 2) {
-//            throw new CoreHunterException("Seed engine should select at least 2 indices");
-//        }
+//                
 //        
 //        evaluation = getObjectiveFunction().calculate(getCurrentSolution());
 //        bestNewEvaluation = evaluation;
@@ -273,6 +288,38 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 //            
 //            handleNewBestSolution(getCurrentSolution(), evaluation);
 //        }
+    }
+    
+    @Override
+    protected void validate() throws CoreHunterException {
+        super.validate();
+        
+        // check L and R
+        if(l < 0){
+            throw new CoreHunterException("L can not be less than zero");
+        }
+        if(r < 0){
+            throw new CoreHunterException("R can not be less than zero");
+        }
+        if(l == r){
+            throw new CoreHunterException("L and R can not be equal");
+        }
+        
+        // initial subset should contain at least two indices, for the distance measures to be computable
+        if(getCurrentSolution().getSubsetSize() < 2) {
+            throw new CoreHunterException("Initial subset should contain at least 2 indices");
+        }
+        
+        // if subset size is increasing, initial size can not be too large
+        if(increasingSubsetSize() && getCurrentSolution().getSubsetSize() > getSubsetMaximumSize()){
+            throw new CoreHunterException("L > R (increasing subset size): initial subset size can not be larger than maximum subset size");
+        }
+        
+        // if subset size is decreasing, initial size can not be too small
+        if(decreasingSubsetSize() && getCurrentSolution().getSubsetSize() < getSubsetMinimumSize()){
+            throw new CoreHunterException("L < R (decreasing subset size): initial subset size can not be smaller than minimum subset size");
+        }
+        
     }
     
 }

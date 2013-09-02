@@ -28,7 +28,7 @@ import org.corehunter.search.solution.SubsetSolution;
  * @author Chris Thachuk <chris.thachuk@gmail.com>
  * @version $Rev$
  */
-public final class CavalliSforzaEdwardsDistanceSSR extends AbstractAccessionSSRDistanceMeasure
+public final class CavalliSforzaEdwardsDistanceSSR<IndexType> extends AbstractAccessionSSRDistanceMeasure<IndexType>
 {
 
 	public CavalliSforzaEdwardsDistanceSSR()
@@ -48,19 +48,19 @@ public final class CavalliSforzaEdwardsDistanceSSR extends AbstractAccessionSSRD
 		super(name, description, type);
 	}
 	
-	protected CavalliSforzaEdwardsDistanceSSR(CavalliSforzaEdwardsDistanceSSR objectiveFunction) 
+	protected CavalliSforzaEdwardsDistanceSSR(CavalliSforzaEdwardsDistanceSSR<IndexType> objectiveFunction) 
 	{
 		super(objectiveFunction) ;
 	}
 	
 	@Override
-  public final ObjectiveFunction<SubsetSolution<Integer>> copy()
+  public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
   {
-	  return new CavalliSforzaEdwardsDistanceSSR(this);
+	  return new CavalliSforzaEdwardsDistanceSSR<IndexType>(this);
   }
 
 	@Override
-	public final double calculate(Integer index1, Integer index2) throws UnknownIndexException
+	public final double calculate(IndexType index1, IndexType index2) throws UnknownIndexException
 	{
 		double value = getMemoizedValue(index1, index2);
 		if (value != MISSING_VAL)

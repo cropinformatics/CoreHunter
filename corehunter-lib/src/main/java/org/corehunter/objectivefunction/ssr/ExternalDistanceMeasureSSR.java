@@ -14,6 +14,7 @@
 
 package org.corehunter.objectivefunction.ssr;
 
+import org.corehunter.CoreHunterException;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.solution.SubsetSolution;
 
@@ -65,4 +66,9 @@ public class ExternalDistanceMeasureSSR<IndexType> extends AbstractAccessionSSRO
 		}
 		return -1;
 	}
+        
+        @Override
+        public void flushCachedResults() throws CoreHunterException {
+            throw new UnsupportedOperationException("Not yet implemented.");
+        }
 }

@@ -34,14 +34,14 @@ public class SSRMixedReplicaSearchSearchTest extends SubsetSearchTest<Integer, S
         		new MixedReplicaSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             neighbourhood.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);

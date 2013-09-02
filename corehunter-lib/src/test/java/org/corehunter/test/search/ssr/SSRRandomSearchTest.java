@@ -34,8 +34,8 @@ public class SSRRandomSearchTest extends SubsetSearchTest<Integer, SubsetSolutio
         try {
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             search.setIndices(dataFull.getIndices()) ;
             search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);

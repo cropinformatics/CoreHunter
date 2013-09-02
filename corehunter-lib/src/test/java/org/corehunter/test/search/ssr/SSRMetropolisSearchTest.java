@@ -43,14 +43,14 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             neighbourhood.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
@@ -82,14 +82,14 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(2);
             neighbourhood.setSubsetMaximumSize(5);
@@ -121,14 +121,14 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
             search.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices(), integerSubsetGenerator.next()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(2);
             neighbourhood.setSubsetMaximumSize(5);
@@ -160,14 +160,14 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(data10.getIndices());
 
             search.setInitialSolution(new IntegerSubsetSolution(data10.getIndices(), integerSubsetGenerator.next()));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data10);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(data10);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(2);
             neighbourhood.setSubsetMaximumSize(5);
@@ -199,14 +199,14 @@ public class SSRMetropolisSearchTest extends SubsetSearchTest<Integer, SubsetSol
         		new MetropolisSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 
         try {
-            IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
+            IndexSubsetGenerator<Integer> integerSubsetGenerator = new IndexSubsetGenerator<Integer>();
             integerSubsetGenerator.setSubsetSize(2);
             integerSubsetGenerator.setCompleteSet(data10.getIndices());
 
             search.setInitialSolution(findOptimalSolution(2, 5, data10));
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data10);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(data10);
             ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood = new ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>();
             neighbourhood.setSubsetMinimumSize(2);
             neighbourhood.setSubsetMaximumSize(5);

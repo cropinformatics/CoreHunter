@@ -35,22 +35,22 @@ public final class MeasureFactorySSR
 	{
 		if (measureName.equals("MR"))
 		{
-			return new ModifiedRogersDistanceSSR();
+			return new ModifiedRogersDistanceSSR<Integer>();
 		}
 		else
 			if (measureName.equals("MRmin"))
 			{
-				return new ModifiedRogersDistanceSSR(DistanceMeasureType.MIN_DISTANCE);
+				return new ModifiedRogersDistanceSSR<Integer>(DistanceMeasureType.MIN_DISTANCE);
 			}
 			else
 				if (measureName.equals("CE"))
 				{
-					return new CavalliSforzaEdwardsDistanceSSR();
+					return new CavalliSforzaEdwardsDistanceSSR<Integer>();
 				}
 				else
 					if (measureName.equals("CEmin"))
 					{
-						return new CavalliSforzaEdwardsDistanceSSR(DistanceMeasureType.MIN_DISTANCE);
+						return new CavalliSforzaEdwardsDistanceSSR<Integer>(DistanceMeasureType.MIN_DISTANCE);
 					}
 					else
 						if (measureName.equals("SH"))

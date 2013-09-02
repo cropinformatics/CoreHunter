@@ -56,6 +56,11 @@ public final class UncachedModifiedRogersDistanceSSR extends AbstractSubsetObjec
 
         this.type = objectiveFunction.getType();
     }
+    
+    @Override
+    public void flushCachedResults() throws CoreHunterException {
+        // nothing to flush here!
+    }
 
     @Override
     public final ObjectiveFunction<SubsetSolution<Integer>> copy() {

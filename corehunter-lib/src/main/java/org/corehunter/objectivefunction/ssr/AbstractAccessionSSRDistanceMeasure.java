@@ -15,9 +15,10 @@
 package org.corehunter.objectivefunction.ssr;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.UnknownIndexException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
@@ -32,16 +33,16 @@ import org.corehunter.search.solution.SubsetSolution;
  * @author Chris Thachuk <chris.thachuk@gmail.com>
  * @version $Rev$
  */
-// TODO separate into two sub-classes one for MEAN_DISTANCE and one for MIN_DISTANCE
-public abstract class AbstractAccessionSSRDistanceMeasure extends 
-	AbstractSubsetObjectiveFunction<Integer, AccessionSSRMarkerMatrix<Integer>> implements SSROjectiveFunction<Integer>
+// TODO separate into two sub-classes; one for MEAN_DISTANCE and one for MIN_DISTANCE
+public abstract class AbstractAccessionSSRDistanceMeasure<IndexType> extends 
+	AbstractSubsetObjectiveFunction<IndexType, AccessionSSRMarkerMatrix<IndexType>> implements SSROjectiveFunction<IndexType>
 {
-	private double[][] M;
-	private DistanceCachedResult	cachedResults;
+	private Map<IndexType, Map<IndexType, Double>> M; // pairwise distance cache            -- NOT synchronized
+	private DistanceCachedResult        cachedResult; // cached solution distance score     -- NOT synchronized
 
 	protected static final double	MISSING_VAL	= -1.0;
 
-	protected DistanceMeasureType	type;	            // states
+	protected DistanceMeasureType	type;	            // minimum/mean distance
 																																// whether mean
 																																// or min
 																																// distance
@@ -58,38 +59,21 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 	    DistanceMeasureType type)
 	{
 		super(name, description);
-		
 		this.type = type;
 	}
 
 	protected AbstractAccessionSSRDistanceMeasure(
-			AbstractAccessionSSRDistanceMeasure objectiveFuncton)
+			AbstractAccessionSSRDistanceMeasure<IndexType> objectiveFuncton)
   {
-	  super(objectiveFuncton);
-	  
+                super(objectiveFuncton);
 		setType(objectiveFuncton.getType()) ;
   }
-
-	@Override
-  protected void handleDataSet() throws CoreHunterException
-  {
-	  super.handleDataSet();
-	  
-		// M = new ArrayList<List<Double>>(accessionCount);
-		/*
-		 * for(int i=0; i<accessionCount; i++) { M.add(new ArrayList<Double>(i+1));
-		 * for(int j=0; j<=i; j++) { M.get(i).add(new Double(MISSING_VAL)); } }
-		 */
-		M = new double[getData().getSize()][];
-		for (int i = 0; i < getData().getSize(); i++)
-		{
-			M[i] = new double[i + 1];
-			for (int j = 0; j <= i; j++)
-			{
-				M[i][j] = MISSING_VAL;
-			}
-		}
-  }
+        
+        @Override
+        public void flushCachedResults(){
+            cachedResult = new DistanceCachedResult();
+            M = new HashMap<IndexType, Map<IndexType, Double>>();
+        }
 
         /**
          * Calculate distance measure score for given integer subset solution. If
@@ -100,15 +84,10 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
          * @throws CoreHunterException 
          */
 	@Override
-	public final double calculate(SubsetSolution<Integer> solution) throws CoreHunterException
+	public final double calculate(SubsetSolution<IndexType> solution) throws CoreHunterException
 	{
-            
-                // create cache upon first call
-		if(cachedResults == null) {
-                    cachedResults = new DistanceCachedResult() ;
-                }
                 
-                Collection<Integer> indices;
+                Collection<IndexType> indices;
                 // if solution is null, compute for entire dataset
                 if(solution == null){
                     indices = getData().getIndices();
@@ -116,21 +95,21 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
                     indices = solution.getSubsetIndices();
                 }
 		
-		List<Integer> aIndices = cachedResults.getAddedIndices(indices);
-		List<Integer> rIndices = cachedResults.getRemovedIndices(indices);
-		List<Integer> cIndices = cachedResults.getCommonIndices(indices);
+		List<IndexType> aIndices = cachedResult.getAddedIndices(indices);
+		List<IndexType> rIndices = cachedResult.getRemovedIndices(indices);
+		List<IndexType> cIndices = cachedResult.getCommonIndices(indices);
 
 		double dist;
 
 		if (type == DistanceMeasureType.MEAN_DISTANCE)
 		{
 
-			double total = cachedResults.getTotal();
-			double count = cachedResults.getCount();
+			double total = cachedResult.getTotal();
+			double count = cachedResult.getCount();
 
-			for (Integer a : aIndices)
+			for (IndexType a : aIndices)
 			{
-				for (Integer b : cIndices)
+				for (IndexType b : cIndices)
 				{
 					dist = calculate(a, b);
 					total += dist;
@@ -149,9 +128,9 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 				}
 			}
 
-			for (Integer a : rIndices)
+			for (IndexType a : rIndices)
 			{
-				for (Integer b : cIndices)
+				for (IndexType b : cIndices)
 				{
 					dist = calculate(a, b);
 					total -= dist;
@@ -171,24 +150,29 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 			}
 
 			// recache our results under this id
-			cachedResults.setTotal(total);
-			cachedResults.setCount(count);
-			cachedResults.setIndices(indices);
+			cachedResult.setTotal(total);
+			cachedResult.setCount(count);
+			cachedResult.setIndices(indices);
 
-			return total / count;
+                        // return 0.0 if no distances left (< 2 items)
+                        if(count == 0){
+                            return 0.0;
+                        } else {
+                            return total / count;
+                        }
 
 		}
 		else
 			if (type == DistanceMeasureType.MIN_DISTANCE)
 			{
 
-				TreeMap<Double, Integer> minFreqTable = cachedResults.getMinFreqTable();
+				TreeMap<Double, Integer> minFreqTable = cachedResult.getMinFreqTable();
 
 				// add new distances
 
-				for (Integer a : aIndices)
+				for (IndexType a : aIndices)
 				{
-					for (Integer b : cIndices)
+					for (IndexType b : cIndices)
 					{
 						dist = calculate(a, b);
 						Integer freq = minFreqTable.get(dist);
@@ -223,9 +207,9 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 
 				// remove old distances
 
-				for (Integer a : rIndices)
+				for (IndexType a : rIndices)
 				{
-					for (Integer b : cIndices)
+					for (IndexType b : cIndices)
 					{
 						dist = calculate(a, b);
 						Integer freq = minFreqTable.get(dist);
@@ -273,10 +257,14 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 				}
 
 				// recache results
-				cachedResults.setIndices(indices);
+				cachedResult.setIndices(indices);
 
 				// System.out.println("Min cache size: " + minFreqTable.size());
-				return minFreqTable.firstKey();
+                                if(!minFreqTable.isEmpty()){
+                                    return minFreqTable.firstKey();
+                                } else {
+                                    return 0.0;
+                                }
 
 				/*
 				 * //implementation without cache double minDist = Double.MAX_VALUE; int
@@ -298,7 +286,7 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 
 	}
 
-	public abstract double calculate(Integer index1, Integer index2) throws UnknownIndexException;
+	public abstract double calculate(IndexType index1, IndexType index2) throws UnknownIndexException;
 	
 	public final DistanceMeasureType getType()
 	{
@@ -310,50 +298,28 @@ public abstract class AbstractAccessionSSRDistanceMeasure extends
 		this.type = type;
 	}
 
-	protected double getMemoizedValue(int id1, int id2)
+	protected double getMemoizedValue(IndexType id1, IndexType id2)
 	{
-
-		int a = Math.max(id1, id2);
-		int b = Math.min(id1, id2);
-
-		/*
-		 * double ret; if (a >= M.size()) { ret = MISSING_VAL; } else { ret =
-		 * M.get(a).get(b).doubleValue(); } return ret;
-		 */
-
-		if (a >= M.length)
-		{
-			return MISSING_VAL;
-		}
-		else
-		{
-			return M[a][b];
-		}
+                if(M.containsKey(id1) && M.get(id1).containsKey(id2)){
+                    return M.get(id1).get(id2);
+                } else if(M.containsKey(id2) && M.get(id2).containsKey(id1)){
+                    return M.get(id2).get(id1);
+                } else {
+                    return MISSING_VAL;
+                }
 	}
 
-	protected void setMemoizedValue(int id1, int id2, double v)
+	protected void setMemoizedValue(IndexType id1, IndexType id2, double v)
 	{
-
-		int a = Math.max(id1, id2);
-		int b = Math.min(id1, id2);
-
-		/*
-		 * if (a >= M.size()) { if (a >= MAX_ACCESSION_COUNT) { return; } for(int
-		 * i=M.size(); i<=a; i++) { M.add( new ArrayList<Double>(i+1) ); for(int
-		 * j=0; j<=i; j++) { M.get(i).add(new Double(MISSING_VAL)); } } }
-		 * M.get(a).set(b, new Double(v));
-		 */
-		if (a >= M.length)
-		{
-			return;
-		}
-		else
-		{
-			M[a][b] = v;
-		}
+                if(getMemoizedValue(id1, id2) != MISSING_VAL){
+                    if(!M.containsKey(id1)){
+                        M.put(id1, new HashMap<IndexType, Double>());
+                    }
+                    M.get(id1).put(id2, v);
+                }
 	}
 
-	private class DistanceCachedResult extends CachedResult<Integer>
+	private class DistanceCachedResult extends CachedResult<IndexType>
 	{
 		private double		               pTotal;
 		private double		               pCnt;

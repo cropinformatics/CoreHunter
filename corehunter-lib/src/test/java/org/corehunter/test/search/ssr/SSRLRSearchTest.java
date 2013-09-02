@@ -41,8 +41,8 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
             
             RandomSearch<Integer, SubsetSolution<Integer>> random = new RandomSearch<Integer, SubsetSolution<Integer>>();
             random.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices()));
-            random.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)random.getObjectiveFunction()).setData(dataFull);
+            random.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)random.getObjectiveFunction()).setData(dataFull);
             random.setIndices(dataFull.getIndices());
             random.setSubsetMinimumSize(2);
             random.setSubsetMaximumSize(2);
@@ -55,8 +55,8 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
             
             search.setInitialSolution(seed);
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             search.setIndices(dataFull.getIndices()) ;
             search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
@@ -81,8 +81,8 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
             
             ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> exh = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
             exh.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices()));
-            exh.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)exh.getObjectiveFunction()).setData(dataFull);
+            exh.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)exh.getObjectiveFunction()).setData(dataFull);
             exh.setIndices(dataFull.getIndices());
             exh.setSubsetMinimumSize(2);
             exh.setSubsetMaximumSize(2);
@@ -95,8 +95,8 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
 
             search.setInitialSolution(seed);
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
             search.setIndices(dataFull.getIndices()) ;
             search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
             search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
@@ -140,8 +140,8 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
                 search = new LRSearch<Integer, SubsetSolution<Integer>>();
                 search.setInitialSolution(subset);
                 
-                search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-                ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+                search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+                ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
                 search.setIndices(dataFull.getIndices());
                 search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
                 search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
@@ -180,8 +180,8 @@ public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<In
                 search = new LRSearch<Integer, SubsetSolution<Integer>>();
                 search.setInitialSolution(subset);
                 
-                search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-                ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(dataFull);
+                search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+                ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
                 search.setIndices(dataFull.getIndices());
                 search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
                 search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);

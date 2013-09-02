@@ -45,8 +45,8 @@ public class SSRExhaustiveSearchTest extends SubsetSearchTest<Integer, SubsetSol
 
         try {
             search.setInitialSolution(new IntegerSubsetSolution(data10.getIndices()));
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data10);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(data10);
             search.setIndices(data10.getIndices()) ;
             search.setSubsetMinimumSize(minimumSize);
             search.setSubsetMaximumSize(maximumSize);

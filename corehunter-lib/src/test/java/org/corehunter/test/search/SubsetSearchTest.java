@@ -127,8 +127,8 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
         try {
             
             search.setInitialSolution(new IntegerSubsetSolution(data.getIndices()));
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR());
-            ((ModifiedRogersDistanceSSR)search.getObjectiveFunction()).setData(data);
+            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(data);
             search.setSubsetMinimumSize(minimumSize);
             search.setSubsetMaximumSize(maximumSize);
             search.setIndices(data.getIndices());

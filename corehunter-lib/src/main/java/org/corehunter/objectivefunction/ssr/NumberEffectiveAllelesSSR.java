@@ -47,6 +47,11 @@ public final class NumberEffectiveAllelesSSR<IndexType> extends AbstractAccessio
 	{
 		super(objectiveFunction) ;
 	}
+        
+        @Override
+        public void flushCachedResults() throws CoreHunterException {
+            throw new UnsupportedOperationException("Not yet implemented.");
+        }
 	
 	@Override
   public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
