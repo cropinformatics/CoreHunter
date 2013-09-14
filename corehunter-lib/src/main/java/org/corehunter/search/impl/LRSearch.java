@@ -14,6 +14,8 @@
 package org.corehunter.search.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -21,10 +23,13 @@ import java.util.Stack;
 import static org.corehunter.Constants.INVALID_SIZE;
 
 import org.corehunter.CoreHunterException;
+import org.corehunter.neighbourhood.EvaluatedIndexedMove;
 import org.corehunter.neighbourhood.EvaluatedMove;
 import org.corehunter.neighbourhood.IndexedMove;
+import org.corehunter.neighbourhood.impl.AdditionEvaluatedMove;
 import org.corehunter.neighbourhood.impl.AdditionMove;
 import org.corehunter.neighbourhood.impl.DeletionMove;
+import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchException;
 import org.corehunter.search.SearchStatus;
@@ -134,8 +139,7 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 	protected void runSearch() throws CoreHunterException
 	{
 		int difference  = l - r ;
-		IndexedMove<IndexType, SolutionType> move;
-		
+
 		if (difference > 0) 
 		{
 			// Increasing core size, stop if can not continue or next step will go over maximum
@@ -143,22 +147,12 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 			{
 				for (int i = 0 ; i < l ; ++i)
 				{
-					move = findBestAddMove() ;
-					
-					if (move != null)
-					{
-						performMove(move) ;
-					}
+					performBestAdditionMove() ;
 				}
 				
 				for (int i = 0 ; i < r ; ++i)
 				{
-					move = findBestRemoveMove() ;
-					
-					if (move != null)
-					{
-						performMove(move) ;
-					}
+					performBestDeletionMove() ;
 				}
 			}
 		}
@@ -171,22 +165,12 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 				{
 					for (int i = 0 ; i < r ; ++i)
 					{
-						move = findBestRemoveMove() ;
-						
-						if (move != null)
-						{
-							performMove(move) ;
-						}
+						performBestDeletionMove() ;
 					}
 					
 					for (int i = 0 ; i < l ; ++i)
 					{
-						move = findBestAddMove() ;
-						
-						if (move != null)
-						{
-							performMove(move) ;
-						}
+						performBestAdditionMove() ;
 					}
 				}
 			}
@@ -218,32 +202,36 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 			// ...
 
 	}
-	
-	private IndexedMove<IndexType, SolutionType> findBestRemoveMove()
-  {
-	  // TODO Auto-generated method stub
-	  return null;
-  }
 
-	private IndexedMove<IndexType, SolutionType> findBestAddMove()
+	// this code is similar to some Neighbourhood it should be combine, once this is working well
+	private void performBestAdditionMove() throws CoreHunterException
   {
-	  // TODO Auto-generated method stub
-	  return null;
+    Collection<IndexType> unselected = new HashSet<IndexType>(getCurrentSolution().getRemainingIndices());
+    
+		ExactSingleNeighbourhood<IndexType, SolutionType> exactSingleNeighbourhood = new ExactSingleNeighbourhood<IndexType, SolutionType>() ; // perhaps can be reused
+		
+		EvaluatedIndexedMove<IndexType, SolutionType> bestMove = exactSingleNeighbourhood.findBestAdditionMove(getCurrentSolution(), getObjectiveFunction(), null, getCurrentSolutionEvaluation(), unselected) ;
+	
+    performMove(bestMove) ;
+  }
+	
+	private void performBestDeletionMove() throws CoreHunterException
+  {
+    Collection<IndexType> selected = new HashSet<IndexType>(getCurrentSolution().getSubsetIndices());
+    
+		ExactSingleNeighbourhood<IndexType, SolutionType> exactSingleNeighbourhood = new ExactSingleNeighbourhood<IndexType, SolutionType>() ; // perhaps can be reused
+		
+		EvaluatedIndexedMove<IndexType, SolutionType> bestMove = exactSingleNeighbourhood.findBestDeletionMove(getCurrentSolution(), getObjectiveFunction(), null, getCurrentSolutionEvaluation(), selected) ;
+	
+    performMove(bestMove) ;
   }
 
 	@SuppressWarnings("rawtypes")
-  private void performMove(IndexedMove<IndexType, SolutionType> move) throws CoreHunterException
+  private void performMove(EvaluatedMove<SolutionType> move) throws CoreHunterException
   {
 		move.apply(getCurrentSolution());
 		
-		if (move instanceof EvaluatedMove)
-		{
-			setCurrentSolutionEvaluation(((EvaluatedMove)move).getEvaluation());
-		}
-		else
-		{
-			getObjectiveFunction().calculate(getCurrentSolution()) ;
-		}
+		setCurrentSolutionEvaluation(((EvaluatedMove)move).getEvaluation());
 		
 		if (insideValidSizeRegion(getCurrentSolution()) && isNewBestSolution(getCurrentSolutionEvaluation(), getCurrentSolution().getSize()))
 		{
@@ -251,6 +239,7 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 		}
   }
 
+	
 	@Override
 	protected void validate() throws CoreHunterException
 	{

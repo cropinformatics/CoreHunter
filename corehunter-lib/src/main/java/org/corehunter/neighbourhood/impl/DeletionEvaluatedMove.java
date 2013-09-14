@@ -1,17 +1,24 @@
 package org.corehunter.neighbourhood.impl;
 
+import org.corehunter.neighbourhood.EvaluatedIndexedMove;
 import org.corehunter.neighbourhood.EvaluatedMove;
 import org.corehunter.search.solution.SubsetSolution;
 
 public class DeletionEvaluatedMove<IndexType, SolutionType extends SubsetSolution<IndexType>> extends
 	DeletionMove<IndexType, SolutionType> implements
-    EvaluatedMove<SolutionType>
+		EvaluatedIndexedMove<IndexType,SolutionType>
 {
 	private double evaluation ;
+	private boolean evaluationSet;
 	
-	public DeletionEvaluatedMove(IndexType addedIndex, double evaluation)
+	public DeletionEvaluatedMove(IndexType removedIndex)
   {
-	  super(addedIndex);
+	  super(removedIndex);
+  }
+	
+	public DeletionEvaluatedMove(IndexType removedIndex, double evaluation)
+  {
+	  super(removedIndex);
 	 
 	  setEvaluation(evaluation) ;
   }
@@ -25,6 +32,13 @@ public class DeletionEvaluatedMove<IndexType, SolutionType extends SubsetSolutio
 	public final void setEvaluation(double evaluation)
 	{
 		this.evaluation = evaluation;
+		
+		evaluationSet = true ;
 	}
 
+	@Override
+	public final boolean isEvaluationSet()
+	{
+		return evaluationSet;
+	}
 }

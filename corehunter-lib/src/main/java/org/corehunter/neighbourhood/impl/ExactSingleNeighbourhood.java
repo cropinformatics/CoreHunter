@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.corehunter.CoreHunterException;
+import org.corehunter.neighbourhood.EvaluatedIndexedMove;
+import org.corehunter.neighbourhood.EvaluatedMove;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.solution.SubsetSolution;
@@ -59,6 +61,8 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
      * @return The move that was applied, or null if no non-tabu move was found
      * @throws CoreHunterException 
      */
+    
+    // TODO need to simplify this once all is working tabu manager should only be in sub-class and used by tubu search, time to use Aspects
     @Override
     public IndexedMove<IndexType, SolutionType> performBestMove(SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
                     IndexedTabuManager<IndexType, SolutionType> tabuManager, double currentBestEvaluation) throws CoreHunterException {
@@ -66,9 +70,9 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
         // search for best neighbour by perturbing solution
         // in all possible ways (deletion, addition or swap)
         
-        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing()), neighbourEvaluation;
-        int bestNeighbourSize = getWorstSize(), neighbourSize;
-        IndexedMove<IndexType, SolutionType> bestMove = null, move;
+        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing());
+        int bestNeighbourSize = getWorstSize();
+        EvaluatedIndexedMove<IndexType, SolutionType> bestMove = null;
         
         // get selected and unselected indices (cached copies, see interface SubsetSolution)
         Collection<IndexType> selected = new HashSet<IndexType>(solution.getSubsetIndices());
@@ -78,57 +82,176 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
         /* Try all deletion moves, if minimum size not reached */
         /*******************************************************/
         
-        if (solution.getSubsetSize() > getSubsetMinimumSize()) {
-            Iterator<IndexType> selectedIterator = selected.iterator();
-            IndexType index;
-            while (selectedIterator.hasNext()) {
-                index = selectedIterator.next();
-                // create deletion move
-                move = new DeletionMove<IndexType, SolutionType>(index);
-                // apply move
-                move.apply(solution);
-                // compute new score and size
-                neighbourEvaluation = objectiveFunction.calculate(solution);
-                neighbourSize = solution.getSubsetSize();
-                // check score improvement and tabu
-                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
-                        && (tabuManager == null || tabuManager.moveAllowed(move, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
-                    bestNeighbourEvaluation = neighbourEvaluation;
-                    bestNeighbourSize = neighbourSize;
-                    bestMove = move;
-                }
-                // undo move
-                move.undo(solution);
-            }
+        if (solution.getSubsetSize() > getSubsetMinimumSize())
+        {
+        	EvaluatedIndexedMove<IndexType, SolutionType> bestDeletionMove = findBestDeletionMove(solution, objectiveFunction, tabuManager, currentBestEvaluation, selected) ;
+        	
+        	if (isBetterNeighbour(objectiveFunction.isMinimizing(), bestDeletionMove.getEvaluation(), bestNeighbourEvaluation, bestNeighbourSize -1, bestNeighbourSize)) 
+        		bestMove = bestDeletionMove ;
         }
         
         /*******************************************************/
         /* Try all addition moves, if maximum size not reached */
         /*******************************************************/
-        
-        if (solution.getSubsetSize() < getSubsetMaximumSize()) {
-            Iterator<IndexType> unselectedIterator = unselected.iterator();
-            IndexType index;
-            while (unselectedIterator.hasNext()) {
-                index = unselectedIterator.next();
-                // create addition move
-                move = new AdditionMove<IndexType, SolutionType>(index);
-                // apply move
-                move.apply(solution);
-                // compute new score and size
-                neighbourEvaluation = objectiveFunction.calculate(solution);
-                neighbourSize = solution.getSubsetSize();
-                // check score improvement and tabu
-                if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
-                        && (tabuManager == null || tabuManager.moveAllowed(move, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
-                    bestNeighbourEvaluation = neighbourEvaluation;
-                    bestNeighbourSize = neighbourSize;
-                    bestMove = move;
-                }
-                // undo move
-                move.undo(solution);
-            }
+        if (solution.getSubsetSize() > getSubsetMinimumSize())
+        {
+        	EvaluatedIndexedMove<IndexType, SolutionType> bestAdditionMove = findBestAdditionMove(solution, objectiveFunction, tabuManager, currentBestEvaluation, unselected) ;
+        	
+        	if (isBetterNeighbour(objectiveFunction.isMinimizing(), bestAdditionMove.getEvaluation(), bestNeighbourEvaluation, bestNeighbourSize +1, bestNeighbourSize)) 
+        		bestMove = bestAdditionMove ;
         }
+        
+        /**********************/
+        /* Try all swap moves */
+        /**********************/
+        EvaluatedIndexedMove<IndexType, SolutionType> bestSwapMove = findBestSwapMove(solution, objectiveFunction, tabuManager, currentBestEvaluation, selected, unselected) ;
+        
+      	if (isBetterNeighbour(objectiveFunction.isMinimizing(), bestSwapMove.getEvaluation(), bestNeighbourEvaluation, bestNeighbourSize, bestNeighbourSize)) 
+      		bestMove = bestSwapMove ;
+        
+        /***********************/
+        /* Apply the best move */
+        /***********************/
+
+        // apply best move (if at least one non-tabu neighbour found)
+        if(bestMove != null){
+            bestMove.apply(solution);
+        }
+        
+        // return best move
+        return bestMove;
+    }
+
+    /**
+     * Check all possible moves obtained by adding, removing or swapping one index
+     * and apply the best one.
+     * 
+     * @param solution
+     * @param objectiveFunction
+     * @param tabuManager
+     * @param currentBestEvaluation
+     * @return The move that was applied, or null if no non-tabu move was found
+     * @throws CoreHunterException 
+     */
+    
+    // TODO need to simplify this once all is working tabu manager should only be in sub-class and used by tubu search, time to use Aspects
+    public EvaluatedIndexedMove<IndexType, SolutionType> findBestDeletionMove(SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
+                    IndexedTabuManager<IndexType, SolutionType> tabuManager, double currentBestEvaluation, Collection<IndexType> selected) throws CoreHunterException {
+
+        // search for best neighbour by perturbing solution
+        // in all possible ways (deletion, addition or swap)
+        
+        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing()), neighbourEvaluation;
+        int bestNeighbourSize = getWorstSize(), neighbourSize;
+        DeletionEvaluatedMove<IndexType, SolutionType> bestMove = null, move;
+  
+        /*******************************************************/
+        /* Try all deletion moves, if minimum size not reached */
+        /*******************************************************/
+        
+        Iterator<IndexType> selectedIterator = selected.iterator();
+        IndexType index;
+        while (selectedIterator.hasNext()) {
+        	index = selectedIterator.next();
+        	// create deletion move
+        	move = new DeletionEvaluatedMove<IndexType, SolutionType>(index);
+        	// apply move
+        	move.apply(solution);
+        	// compute new score and size
+        	neighbourEvaluation = objectiveFunction.calculate(solution);
+        	neighbourSize = solution.getSubsetSize();
+        	// check score improvement and tabu
+        	if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
+        			&& (tabuManager == null || tabuManager.moveAllowed(move, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
+        		bestNeighbourEvaluation = neighbourEvaluation;
+        		bestNeighbourSize = neighbourSize;
+        		bestMove = move;
+            bestMove.setEvaluation(bestNeighbourEvaluation);
+        	}
+        	// undo move
+        	move.undo(solution);
+        }
+       
+        // return best move
+        return bestMove;
+    }
+    
+    /**
+     * Check all possible moves obtained by adding, removing or swapping one index
+     * and apply the best one.
+     * 
+     * @param solution
+     * @param objectiveFunction
+     * @param tabuManager
+     * @param currentBestEvaluation
+     * @return The move that was applied, or null if no non-tabu move was found
+     * @throws CoreHunterException 
+     */
+    
+    // TODO need to simplify this once all is working tabu manager should only be in sub-class and used by tubu search, time to use Aspects
+    public EvaluatedIndexedMove<IndexType, SolutionType> findBestAdditionMove(SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
+                    IndexedTabuManager<IndexType, SolutionType> tabuManager, double currentBestEvaluation, Collection<IndexType> unselected) throws CoreHunterException {
+
+        // search for best neighbour by perturbing solution
+        // in all possible ways (deletion, addition or swap)
+        
+        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing()), neighbourEvaluation;
+        int bestNeighbourSize = getWorstSize(), neighbourSize;
+        AdditionEvaluatedMove<IndexType, SolutionType> bestMove = null, move;
+        
+        /*******************************************************/
+        /* Try all addition moves, if maximum size not reached */
+        /*******************************************************/
+        
+        Iterator<IndexType> unselectedIterator = unselected.iterator();
+        IndexType index;
+        while (unselectedIterator.hasNext()) {
+        	index = unselectedIterator.next();
+        	// create addition move
+        	move = new AdditionEvaluatedMove<IndexType, SolutionType>(index);
+        	// apply move
+        	move.apply(solution);
+        	// compute new score and size
+        	neighbourEvaluation = objectiveFunction.calculate(solution);
+        	neighbourSize = solution.getSubsetSize();
+        	// check score improvement and tabu
+        	if (isBetterNeighbour(objectiveFunction.isMinimizing(), neighbourEvaluation, bestNeighbourEvaluation, neighbourSize, bestNeighbourSize)
+        			&& (tabuManager == null || tabuManager.moveAllowed(move, neighbourEvaluation, currentBestEvaluation, objectiveFunction.isMinimizing()))) {
+        		bestNeighbourEvaluation = neighbourEvaluation;
+        		bestNeighbourSize = neighbourSize;
+        		bestMove = move;
+            bestMove.setEvaluation(bestNeighbourEvaluation);
+        	}
+        	// undo move
+        	move.undo(solution);
+        }
+       
+        // return best move
+        return bestMove;
+    }
+    
+    /**
+     * Check all possible moves obtained by swapping one index
+     * and apply the best one.
+     * 
+     * @param solution
+     * @param objectiveFunction
+     * @param tabuManager
+     * @param currentBestEvaluation
+     * @return The move that was applied, or null if no non-tabu move was found
+     * @throws CoreHunterException 
+     */
+    // TODO need to simplify this once all is working tabu manager should only be in sub-class and used by tubu search, time to use Aspects
+    public EvaluatedIndexedMove<IndexType, SolutionType> findBestSwapMove(SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
+                    IndexedTabuManager<IndexType, SolutionType> tabuManager, double currentBestEvaluation, Collection<IndexType> selected, Collection<IndexType> unselected) throws CoreHunterException {
+
+        // search for best neighbour by perturbing solution
+        // in all possible ways (deletion, addition or swap)
+        
+        double bestNeighbourEvaluation = getWorstEvaluation(objectiveFunction.isMinimizing()), neighbourEvaluation;
+        int bestNeighbourSize = getWorstSize(), neighbourSize;
+        SwapEvaluatedMove<IndexType, SolutionType> bestMove = null, move;
+        
         
         /**********************/
         /* Try all swap moves */
@@ -148,7 +271,7 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
                 // index to remove
                 indexToRemove = selectedIterator.next();
                 // create swap move
-                move = new SwapMove<IndexType, SolutionType>(indexToAdd, indexToRemove);
+                move = new SwapEvaluatedMove<IndexType, SolutionType>(indexToAdd, indexToRemove);
                 // apply move
                 move.apply(solution);
                 // compute new score and size
@@ -160,22 +283,15 @@ public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolu
                     bestNeighbourEvaluation = neighbourEvaluation;
                     bestNeighbourSize = neighbourSize;
                     bestMove = move;
+                    bestMove.setEvaluation(bestNeighbourEvaluation);
                 }
                 // undo swap
                 move.undo(solution);
             }
         }
         
-        /***********************/
-        /* Apply the best move */
-        /***********************/
-
-        // apply best move (if at least one non-tabu neighbour found)
-        if(bestMove != null){
-            bestMove.apply(solution);
-        }
         // return best move
         return bestMove;
     }
-
+    
 }
