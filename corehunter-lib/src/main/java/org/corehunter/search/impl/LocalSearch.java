@@ -20,71 +20,103 @@ import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;
 
-public class LocalSearch<
-	IndexType,
-        SolutionType extends SubsetSolution<IndexType>,
-        NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
-            extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType> {
+/**
+ * Performs a local search by making a random move and accepting that move if better than current move.
+ * 
+ * @author Guy Davenport
+ * @author Herman De Beukelaer
+ * @param <IndexType>
+ *          The type used to index the elements in the subset, e.g. Integer or
+ *          String
+ * @param <SolutionType>
+ *          The type of solution used, must be a SubsetSolution
+ * @param <NeighbourhoodType>
+ *          The Neighbourhood Type used by search, must be a SubsetNeighbourhood
+ */
+public class LocalSearch<IndexType, SolutionType extends SubsetSolution<IndexType>, NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
+    extends
+    AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType>
+{
 
-    public LocalSearch() {
-        super();
-    }
+	public LocalSearch()
+	{
+		super();
+	}
 
-    protected LocalSearch(LocalSearch<IndexType, SolutionType, NeighbourhoodType> search) throws CoreHunterException {
-        super(search);
-    }
+	protected LocalSearch(
+	    LocalSearch<IndexType, SolutionType, NeighbourhoodType> search)
+	    throws CoreHunterException
+	{
+		super(search);
+	}
 
-    @Override
-    public Search<SolutionType> copy() throws CoreHunterException {
-        return new LocalSearch<IndexType, SolutionType, NeighbourhoodType>(this);
-    }
+	@Override
+	public Search<SolutionType> copy() throws CoreHunterException
+	{
+		return new LocalSearch<IndexType, SolutionType, NeighbourhoodType>(this);
+	}
 
-    @Override
-    protected void runSearch() throws CoreHunterException {
-        
-        double newEvaluation, evaluation;
-        int newSize, size;
+	@Override
+	protected void runSearch() throws CoreHunterException
+	{
 
-        // accept current solution
-        setCurrentSolutionEvaluation(getObjectiveFunction().calculate(getCurrentSolution()));
-        // check if current solution is new best solution (may not be the case if this
-        // is not the first run of this search engine)
-        if(isNewBestSolution(getCurrentSolutionEvaluation(), getCurrentSolution().getSubsetSize())){
-            handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
-        }
+		double newEvaluation, evaluation;
+		int newSize, size;
 
-        IndexedMove<IndexType, SolutionType> move;
+		// accept current solution
+		setCurrentSolutionEvaluation(getObjectiveFunction().calculate(
+		    getCurrentSolution()));
+		// check if current solution is new best solution (may not be the case if
+		// this
+		// is not the first run of this search engine)
+		if (isNewBestSolution(getCurrentSolutionEvaluation(), getCurrentSolution()
+		    .getSubsetSize()))
+		{
+			handleNewBestSolution(getCurrentSolution(),
+			    getCurrentSolutionEvaluation());
+		}
 
-        while (canContinue()) {
-            
-            // run Local Search step
-            
-            size = getCurrentSolution().getSubsetSize();
-            evaluation = getCurrentSolutionEvaluation();
-            
-            move = getNeighbourhood().performRandomMove(getCurrentSolution());
-            if(move != null){
-                newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
-                newSize = getCurrentSolution().getSubsetSize();
-                // check if improvement
-                if (isBetterSolution(newEvaluation, evaluation, newSize, size)) {
-                    // accept new solution
-                    setCurrentSolutionEvaluation(newEvaluation);
-                    // check if new best solution
-                    if(isNewBestSolution(newEvaluation, newSize)){
-                        // handle new best solution
-                        handleNewBestSolution(getCurrentSolution(), newEvaluation);
-                    }
-                } else {
-                    // reject new solution (undo move)
-                    move.undo(getCurrentSolution());
-                }
-            } else {
-                stop();
-            }
-            incStepsTaken();
-        }
-        
-    }
+		IndexedMove<IndexType, SolutionType> move;
+
+		while (canContinue())
+		{
+			// run Local Search step
+
+			size = getCurrentSolution().getSubsetSize();
+			evaluation = getCurrentSolutionEvaluation();
+
+			move = getNeighbourhood().performRandomMove(getCurrentSolution());
+			
+			if (move != null)
+			{
+				newEvaluation = getObjectiveFunction().calculate(getCurrentSolution());
+				newSize = getCurrentSolution().getSubsetSize();
+				// check if improvement
+				if (isBetterSolution(newEvaluation, evaluation, newSize, size))
+				{
+					// accept new solution
+					setCurrentSolutionEvaluation(newEvaluation);
+					// check if new best solution
+					if (isNewBestSolution(newEvaluation, newSize))
+					{
+						// handle new best solution
+						handleNewBestSolution(getCurrentSolution(), newEvaluation);
+					}
+				}
+				else
+				{
+					// reject new solution (undo move)
+					move.undo(getCurrentSolution());
+				}
+			}
+			else
+			{
+				stop();
+			}
+			
+			incStepsTaken();
+		}
+
+	}
 
 }

@@ -30,6 +30,9 @@ import org.junit.Test;
 
 public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>> {
 
+  protected final int DEFAULT_MINIMUM_SIZE = 5;
+  protected final int DEFAULT_MAXIMUM_SIZE = 5;
+  
     @Test
     public void lr21SearchTestWithRandomSeed() {
         

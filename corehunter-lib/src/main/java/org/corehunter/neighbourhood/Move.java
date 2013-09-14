@@ -18,6 +18,8 @@ import org.corehunter.search.solution.Solution;
 
 public interface Move<SolutionType extends Solution>
 {
-        public abstract void apply(SolutionType solution);
+	// TODO discussion point : change this to 'perform' or 'do' or 'execute' ?
+  public abstract void apply(SolutionType solution);
+  
 	public abstract void undo(SolutionType solution);
 }

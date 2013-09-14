@@ -49,8 +49,19 @@ public interface Search<SolutionType extends Solution> extends Entity
 	 */
 	public Search<SolutionType> copy() throws CoreHunterException;
 
+	/**
+	 * Gets the best solution, or <code>null</code> if no best solution has been found.
+	 * The solution must be valid for the given problem.
+	 * @return gets the best solution, or <code>null</code> if no best solution has been found
+	 */
 	public SolutionType getBestSolution();
 
+	/**
+	 * Gets the evaluation of the current best solution. 
+	 * If no best solution has been found returns INTEGER.MAX_VALUE if minimising 
+	 * or INTEGER.MIN_VALUE if maximising
+	 * @return the evaluation of the current best solution.
+	 */
 	public double getBestSolutionEvaluation(); // TODO move to ObjectiveSearch?
 	
 	/**
@@ -61,6 +72,11 @@ public interface Search<SolutionType extends Solution> extends Entity
 	 */
 	public long getBestSolutionTime(); // TODO move to ObjectiveSearch?
 
+	/**
+	 * Gets the current status of the search
+	 * 
+	 * @return the current status of the search
+	 */
 	public SearchStatus getStatus();
 
 	public void addSearchListener(SearchListener<SolutionType> searchListener);

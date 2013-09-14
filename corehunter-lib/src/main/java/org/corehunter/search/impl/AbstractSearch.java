@@ -67,7 +67,6 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		setCurrentSolutionEvaluation(search.getCurrentSolutionEvaluation());
 		setBestSolution((SolutionType) search.getBestSolution().copy());
 		setBestSolutionEvaluation(search.getBestSolutionEvaluation());
-
 	}
 
 	@Override
@@ -109,6 +108,9 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		if (SearchStatus.STARTED.equals(status))
 		{
 			endTime = System.nanoTime();
+			
+			fireSearchMessage("Stopping... Search engine terminated.");
+			
 			fireSearchStopped();
 		}
 	}
@@ -118,14 +120,9 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 	 */
 	protected boolean canContinue()
 	{
-		// check if search was stopped manually
-		if (status.equals(SearchStatus.STOPPED))
-		{
-			fireSearchMessage("Stopping... Search engine terminated.");
-			return false;
-		}
-		// search not stopped
-		return true;
+		// check if has not been stopped, completed or failed for any reason
+		// Note status should never be SearchStatus.NOT_STARTED at this point
+		return !status.equals(SearchStatus.STARTED) ;
 	}
 
 	@Override
@@ -140,28 +137,28 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		}
 	}
         
-        /**
-         * Sets the initial solution under evaluation. For neighborhood searches, this solution is required to be of
-         * valid size (between specified min. and max. size). For non neighborhood searches, this is not required; for
-         * example the initial solution might be empty here.
-         *
-         * @throws CoreHunterException if the search is in progress
-         */
-        public final void setInitialSolution(SolutionType solution) throws CoreHunterException {
-           if (getCurrentSolution() != solution) {
-               setCurrentSolution(solution);
-               handleInitialSolutionSet();
-           }
-        }
+	/**
+	 * Sets the initial solution under evaluation. For neighbourhood searches, this solution is required to be of
+	 * valid size (between specified min. and max. size). For non neighbourhood searches, this is not required; for
+	 * example the initial solution might be empty here.
+	 *
+	 * @throws CoreHunterException if the search is in progress
+	 */
+	public final void setInitialSolution(SolutionType solution) throws CoreHunterException {
+		if (getCurrentSolution() != solution) {
+			setCurrentSolution(solution);
+			handleInitialSolutionSet();
+		}
+	}
 
-        protected void handleInitialSolutionSet() throws CoreHunterException {
-           if (SearchStatus.STARTED.equals(getStatus())) {
-               throw new CoreHunterException("Initial solution can not be set while search in process");
-           }
-           if (getCurrentSolution() == null) {
-               throw new CoreHunterException("No initial solution defined!");
-           }
-        }
+	protected void handleInitialSolutionSet() throws CoreHunterException {
+		if (SearchStatus.STARTED.equals(getStatus())) {
+			throw new CoreHunterException("Initial solution can not be set while search in process");
+		}
+		if (getCurrentSolution() == null) {
+			throw new CoreHunterException("No initial solution defined!");
+		}
+	}
 
 	@Override
 	public final SolutionType getBestSolution()
@@ -177,8 +174,8 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 
 	/**
 	 * Gets the current solution under evaluation, which may not be the best
-	 * solution found so far. To get the 'best' solution use
-	 * {@link #getBestSolution()}
+	 * solution found so far. In some searches it may not even by a valid solution!
+	 * To get the 'best' solution use {@link #getBestSolution()}, this must not be a valid solution. 
 	 * 
 	 * @return the current solution under evaluation
 	 */
@@ -239,27 +236,26 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 
 	protected void validate() throws CoreHunterException
 	{
-                
-                if (SearchStatus.DISPOSED.equals(status))
+
+		if (SearchStatus.DISPOSED.equals(status))
 		{
 			throw new CoreHunterException(
-			    "Solution can not be started if aleady disposed!");
+					"Solution can not be started if aleady disposed!");
 		}
 
 		if (SearchStatus.FAILED.equals(status))
 		{
 			throw new CoreHunterException(
-			    "Solution can not be started if previously failed!");
+					"Solution can not be started if previously failed!");
 		}
-                
-                // validate initial solution
-                        
-                if (getCurrentSolution() == null) {
-                    throw new CoreHunterException("No start solution defined!");
-                }
 
-                getCurrentSolution().validate();
+		// validate initial solution
 
+		if (getCurrentSolution() == null) {
+			throw new CoreHunterException("No start solution defined!");
+		}
+
+		getCurrentSolution().validate();
 	}
 
 	protected abstract void runSearch() throws CoreHunterException;

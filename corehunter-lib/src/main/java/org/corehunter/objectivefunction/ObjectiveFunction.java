@@ -9,6 +9,7 @@ public interface ObjectiveFunction<SolutionType extends Solution> extends Entity
 {
 	public boolean isMinimizing();
 
+	// TODO discussion point should this be called 'evaluate'
 	public double calculate(SolutionType solution) throws CoreHunterException ;
 	
 	/**
