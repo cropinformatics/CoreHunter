@@ -14,21 +14,15 @@
 
 package org.corehunter.test.search.ssr;
 
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
-import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
-import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.objectivefunction.impl.ObjectiveFunctionWithData;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.corehunter.search.impl.LRSearch;
-import org.corehunter.search.impl.MetropolisSearch;
-import org.corehunter.search.impl.RandomSearch;
-import org.corehunter.search.solution.Solution;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.test.search.SubsetSearchTest;

@@ -1,7 +1,6 @@
 package org.corehunter.neighbourhood.impl;
 
 import org.corehunter.neighbourhood.EvaluatedIndexedMove;
-import org.corehunter.neighbourhood.EvaluatedMove;
 import org.corehunter.search.solution.SubsetSolution;
 
 public class AdditionEvaluatedMove<IndexType, SolutionType extends SubsetSolution<IndexType>> extends

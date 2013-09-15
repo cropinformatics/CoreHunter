@@ -23,7 +23,6 @@ import org.corehunter.neighbourhood.impl.IndexedTabuManager;
 import org.corehunter.objectivefunction.impl.ObjectiveFunctionWithData;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.impl.IndexSubsetGenerator;
-import org.corehunter.search.impl.REMCSearch;
 import org.corehunter.search.impl.TabuSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;

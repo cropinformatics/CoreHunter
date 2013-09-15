@@ -24,7 +24,6 @@ import org.corehunter.objectivefunction.impl.ObjectiveFunctionWithData;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.SearchListener;
 import org.corehunter.search.impl.IndexSubsetGenerator;
-import org.corehunter.search.impl.LocalSearch;
 import org.corehunter.search.impl.REMCSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
@@ -54,7 +53,7 @@ public class SSRREMCSearchTest extends
 			integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 			
 			testSearch(createREMCSearch(DEFAULT_MINIMUM_SIZE, DEFAULT_MINIMUM_SIZE, new ModifiedRogersDistanceSSR<Integer>(), dataFull, new IntegerSubsetSolution(
-			    dataFull.getIndices(), integerSubsetGenerator.next()), 10, 4));
+			    dataFull.getIndices(), integerSubsetGenerator.next()), 10l, 4));
 		}
 		catch (CoreHunterException e)
 		{
@@ -79,7 +78,7 @@ public class SSRREMCSearchTest extends
 			integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
 			testSearch(createREMCSearch(2, 5, new ModifiedRogersDistanceSSR<Integer>(), dataFull, new IntegerSubsetSolution(
-			    dataFull.getIndices(), integerSubsetGenerator.next()), 10, 4));
+			    dataFull.getIndices(), integerSubsetGenerator.next()), 10l, 4));
 		
 		}
 		catch (CoreHunterException e)
@@ -105,7 +104,7 @@ public class SSRREMCSearchTest extends
 			integerSubsetGenerator.setCompleteSet(dataFull.getIndices());
 
 			testSearch(createREMCSearch(2, 5, new UncachedModifiedRogersDistanceSSR(), dataFull, new IntegerSubsetSolution(
-			    dataFull.getIndices(), integerSubsetGenerator.next()), 10, 4));
+			    dataFull.getIndices(), integerSubsetGenerator.next()), 10l, 4));
 		}
 		catch (CoreHunterException e)
 		{
@@ -117,7 +116,7 @@ public class SSRREMCSearchTest extends
 	protected final REMCSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> createREMCSearch(
 			int minimumSize, int maximumSize,
 			ObjectiveFunctionWithData<SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> objectiveFunction,
-			AccessionSSRMarkerMatrix<Integer> data, SubsetSolution<Integer> seed, int numberOfMetropolisStepsPerRound, int numberOfReplicas)
+			AccessionSSRMarkerMatrix<Integer> data, SubsetSolution<Integer> seed, Long numberOfMetropolisStepsPerRound, int numberOfReplicas)
 					throws CoreHunterException
 	{
 		REMCSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = new REMCSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();

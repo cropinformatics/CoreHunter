@@ -16,6 +16,7 @@ package org.corehunter.search.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.Search;
 import org.corehunter.search.solution.SubsetSolution;

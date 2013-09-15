@@ -14,8 +14,6 @@
 
 package org.corehunter.search.impl;
 
-import static org.corehunter.Constants.INVALID_SIZE;
-
 import java.util.Collection;
 
 import org.corehunter.CoreHunterException;
@@ -23,6 +21,7 @@ import org.corehunter.search.PreferredSize;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetSearch;
 import org.corehunter.search.solution.SubsetSolution;
+import static org.corehunter.Constants.INVALID_SIZE ;
 
 public abstract class AbstractSubsetSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
         extends AbstractObjectiveSearch<SolutionType>

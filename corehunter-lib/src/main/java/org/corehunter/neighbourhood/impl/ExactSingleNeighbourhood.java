@@ -20,7 +20,6 @@ import java.util.Iterator;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.EvaluatedIndexedMove;
-import org.corehunter.neighbourhood.EvaluatedMove;
 import org.corehunter.neighbourhood.IndexedMove;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.solution.SubsetSolution;

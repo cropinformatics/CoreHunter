@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 
 import org.corehunter.CoreHunterException;
@@ -76,7 +75,7 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 
             @Override
             public void searchMessage(Search<SolutionType> search, String message) {
-                fireSearchMessage(message);
+                //fireSearchMessage(message); // TODO disabled, perhaps remove
             }
         };
 

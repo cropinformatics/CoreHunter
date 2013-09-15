@@ -14,16 +14,18 @@
 
 package org.corehunter.test.search.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Random;
-import org.corehunter.CoreHunterException;
-import org.corehunter.search.impl.IndexSubsetGenerator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
+
+import org.corehunter.CoreHunterException;
+import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.junit.Test;
 
 public class IndexSubsetGeneratorTest

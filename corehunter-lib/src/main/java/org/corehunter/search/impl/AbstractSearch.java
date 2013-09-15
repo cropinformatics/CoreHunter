@@ -15,6 +15,7 @@
 package org.corehunter.search.impl;
 
 import java.util.Random;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.impl.EntityImpl;
 import org.corehunter.search.Search;

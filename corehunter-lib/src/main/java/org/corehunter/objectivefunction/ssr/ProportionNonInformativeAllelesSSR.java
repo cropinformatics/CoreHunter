@@ -14,6 +14,7 @@
 package org.corehunter.objectivefunction.ssr;
 
 import java.util.List;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.UnknownIndexException;
 import org.corehunter.objectivefunction.ObjectiveFunction;

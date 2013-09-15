@@ -15,6 +15,7 @@ package org.corehunter.search;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.corehunter.CoreHunterException;
 import org.corehunter.model.Validatable;
 

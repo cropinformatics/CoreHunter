@@ -19,9 +19,6 @@ public class Constants
 	public final static double	K_b2	= 1.360572e-9;
 	
 	public final static int INVALID_SIZE = -1 ;
-	public final static int INVALID_TEMPERATURE = -1 ;
-	public final static int INVALID_TIME = -2 ;
-	public final static long INVALID_NUMBER_OF_STEPS = -1 ;
         	
 	public final static long MILLISECOND = 1000000 ;
 	public final static long SECOND = 1000 * MILLISECOND ;

@@ -14,9 +14,9 @@
 package org.corehunter.search.impl;
 
 import java.util.List;
+
 import org.apache.commons.math.util.MathUtils;
 import org.corehunter.CoreHunterException;
-import org.corehunter.search.SearchStatus;
 import org.corehunter.search.SubsetGenerator;
 import org.corehunter.search.solution.SubsetSolution;
 

@@ -14,8 +14,6 @@
 
 package org.corehunter.neighbourhood.impl;
 
-import static org.corehunter.Constants.INVALID_SIZE;
-
 import java.util.Random;
 
 import org.corehunter.CoreHunterException;
@@ -24,6 +22,7 @@ import org.corehunter.neighbourhood.SubsetNeighbourhood;
 import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.search.PreferredSize;
 import org.corehunter.search.solution.SubsetSolution;
+import static org.corehunter.Constants.INVALID_SIZE ;
 
 /**
  * Implements an abstract neighbourhood which defines the neighbours of a given
@@ -33,8 +32,8 @@ import org.corehunter.search.solution.SubsetSolution;
 public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extends SubsetSolution<IndexType>> implements SubsetNeighbourhood<IndexType, SolutionType> {
 
     private Random random = new Random();
-    private int subsetMinimumSize = INVALID_SIZE;
-    private int subsetMaximumSize = INVALID_SIZE;
+    private int subsetMinimumSize = -1 ;
+    private int subsetMaximumSize = -1 ;
     private PreferredSize subsetPreferredSize = PreferredSize.DONT_CARE;
 
     public AbstractSubsetNeighbourhood() {

@@ -14,8 +14,6 @@
 
 package org.corehunter.search.impl;
 
-import static org.corehunter.Constants.INVALID_TEMPERATURE;
-
 import java.text.DecimalFormat;
 
 import org.corehunter.CoreHunterException;
@@ -35,7 +33,7 @@ public class MetropolisSearch<
             extends AbstractSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType> {
 
     private final static double K_b = 7.213475e-7;
-    private double temperature = INVALID_TEMPERATURE;
+    private double temperature = -1;
 
     public MetropolisSearch() {
     }

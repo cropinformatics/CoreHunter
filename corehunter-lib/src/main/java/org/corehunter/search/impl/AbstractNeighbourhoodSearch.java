@@ -14,7 +14,6 @@
 
 package org.corehunter.search.impl;
 
-import static org.corehunter.Constants.*;
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.Move;
 import org.corehunter.neighbourhood.Neighbourhood;
@@ -34,9 +33,9 @@ public abstract class AbstractNeighbourhoodSearch<
     private NeighbourhoodType neighbourhood;
     
     // stop criteria
-    private long runtimeLimit = INVALID_TIME;
-    private long maximumTimeWithoutImprovement = INVALID_TIME;
-    private long maximumNumberOfSteps = INVALID_NUMBER_OF_STEPS;
+    private Long runtimeLimit = null;
+    private Long maximumTimeWithoutImprovement = null;
+    private Long maximumNumberOfSteps = null;
     private double minimumProgression = 0;
     
     // number of steps already performed
@@ -89,33 +88,33 @@ public abstract class AbstractNeighbourhoodSearch<
         }
     }
     
-    public final long getRuntimeLimit() {
+    public final Long getRuntimeLimit() {
         return runtimeLimit;
     }
 
-    public final void setRuntimeLimit(long runtimeLimit) throws CoreHunterException {
+    public final void setRuntimeLimit(Long runtimeLimit) throws CoreHunterException {
         if (this.runtimeLimit != runtimeLimit) {
             this.runtimeLimit = runtimeLimit;
             handleRuntimeLimitSet();
         }
     }
 
-    public final long getMaximumumberOfSteps() {
+    public final Long getMaximumumberOfSteps() {
         return maximumNumberOfSteps;
     }
 
-    public final void setMaximumNumberOfSteps(long maximumNumberOfSteps) throws CoreHunterException {
+    public final void setMaximumNumberOfSteps(Long maximumNumberOfSteps) throws CoreHunterException {
         if (this.maximumNumberOfSteps != maximumNumberOfSteps) {
             this.maximumNumberOfSteps = maximumNumberOfSteps;
             handleMaximumNumberOfStepsSet();
         }
     }
 
-    public final long getMaxTimeWithoutImprovement() {
+    public final Long getMaxTimeWithoutImprovement() {
         return maximumTimeWithoutImprovement;
     }
 
-    public final void setMaxTimeWithoutImprovement(long maxTimeWithoutImprovement) throws CoreHunterException {
+    public final void setMaxTimeWithoutImprovement(Long maxTimeWithoutImprovement) throws CoreHunterException {
         if (this.maximumTimeWithoutImprovement != maxTimeWithoutImprovement) {
             this.maximumTimeWithoutImprovement = maxTimeWithoutImprovement;
             handleMaximumTimeWithoutImprovementSet();
@@ -137,7 +136,7 @@ public abstract class AbstractNeighbourhoodSearch<
         if (SearchStatus.STARTED.equals(getStatus())) {
             throw new CoreHunterException("Runtime can not be set while search in process");
         }
-        if (runtimeLimit != INVALID_TIME && runtimeLimit <= 0) {
+        if (runtimeLimit != null && runtimeLimit <= 0) {
             throw new CoreHunterException("Runtime can not be less than or equal to zero!");
         }
     }
@@ -146,7 +145,7 @@ public abstract class AbstractNeighbourhoodSearch<
         if (SearchStatus.STARTED.equals(getStatus())) {
             throw new CoreHunterException("Number of steps can not be set while search in process");
         }
-        if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && maximumNumberOfSteps <= 0) {
+        if (maximumNumberOfSteps != null && maximumNumberOfSteps <= 0) {
             throw new CoreHunterException("Number of steps can not be less than or equal to zero!");
         }
     }
@@ -156,7 +155,7 @@ public abstract class AbstractNeighbourhoodSearch<
         if (SearchStatus.STARTED.equals(getStatus())) {
             throw new CoreHunterException("Maximum time without improvement can not be set can not be set while search in process");
         }
-        if (maximumTimeWithoutImprovement != INVALID_TIME
+        if (maximumTimeWithoutImprovement != null
                 && maximumTimeWithoutImprovement <= 0) {
             throw new CoreHunterException( "Maximum time without improvement can not be less than or equal to zero!");
         }
@@ -196,20 +195,20 @@ public abstract class AbstractNeighbourhoodSearch<
                 return false;
         }
         // check runtime limit
-        if (runtimeLimit != INVALID_TIME && getSearchTime() > runtimeLimit)
+        if (runtimeLimit != null && getSearchTime() > runtimeLimit)
         {
                 fireSearchMessage("Stopping... Runtime limit exceeded.");
                 return false;
         }
         // check time without improvement
-        if (maximumTimeWithoutImprovement != INVALID_TIME
+        if (maximumTimeWithoutImprovement != null
             && getBestSolutionTime() > maximumTimeWithoutImprovement)
         {
                 fireSearchMessage("Stopping... Maximum time without improvement exceeded.");
                 return false;
         }
         // check number of steps
-        if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && stepsTaken >= maximumNumberOfSteps)
+        if (maximumNumberOfSteps != null && stepsTaken >= maximumNumberOfSteps)
         {
                 fireSearchMessage("Stopping... Maximum number of steps exceeded.");
                 return false;
@@ -230,13 +229,13 @@ public abstract class AbstractNeighbourhoodSearch<
 
         // validate stop criteria
         
-        if (runtimeLimit != INVALID_TIME && runtimeLimit <= 0) {
+        if (runtimeLimit != null && runtimeLimit <= 0) {
             throw new CoreHunterException( "Runtime can not be less than or equal to zero!");
         }
-        if (maximumNumberOfSteps != INVALID_NUMBER_OF_STEPS && maximumNumberOfSteps <= 0) {
+        if (maximumNumberOfSteps != null && maximumNumberOfSteps <= 0) {
             throw new CoreHunterException("Number of Steps can not be less than or equal to zero!");
         }
-        if (maximumTimeWithoutImprovement != INVALID_TIME && maximumTimeWithoutImprovement <= 0) {
+        if (maximumTimeWithoutImprovement != null && maximumTimeWithoutImprovement <= 0) {
             throw new CoreHunterException("Max time without improvement can not be less than or equal to zero!");
         }
         if (minimumProgression < 0) {

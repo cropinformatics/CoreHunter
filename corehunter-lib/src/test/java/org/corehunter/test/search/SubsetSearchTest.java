@@ -14,8 +14,6 @@
 
 package org.corehunter.test.search;
 
-import static org.corehunter.Constants.INVALID_NUMBER_OF_STEPS;
-import static org.corehunter.Constants.INVALID_TIME;
 import static org.corehunter.Constants.SECOND;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -29,9 +27,7 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.model.impl.AbstractFileUtility;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileReader;
-import org.corehunter.objectivefunction.ObjectiveFunction;
 import org.corehunter.objectivefunction.impl.ObjectiveFunctionWithData;
-import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.ObjectiveSearch;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchListener;
@@ -47,14 +43,14 @@ import org.junit.BeforeClass;
 public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSolution<IndexType>> {
 
     protected final long DEFAULT_RUNTIME = 2*SECOND;
-    protected final long DEFAULT_STUCKTIME = INVALID_TIME;
+    protected final Long DEFAULT_STUCKTIME = null;
     protected final double DEFAULT_MINIMUM_PROGRESSION = 0;
     protected final int DEFAULT_MINIMUM_SIZE = 20;
     protected final int DEFAULT_MAXIMUM_SIZE = 50;
     protected final int DEFAULT_TABU_HIST_SIZE = 20;
     protected final double DEFAULT_MINIMUM_TEMPERATURE = 50.0;
     protected final double DEFAULT_MAXIMUM_TEMPERATURE = 200.0;
-    protected final long DEFAULT_NUMBER_OF_STEPS = INVALID_NUMBER_OF_STEPS;
+    protected final Long DEFAULT_NUMBER_OF_STEPS = null;
     protected final int DEFAULT_NUMBER_OF_REPLICAS = 20;
     private static final String SSR_DATA_NAME_FULL = "bul.csv";
     protected static AccessionSSRMarkerMatrix<Integer> dataFull;

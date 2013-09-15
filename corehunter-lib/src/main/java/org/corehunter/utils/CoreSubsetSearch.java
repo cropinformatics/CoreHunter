@@ -49,7 +49,7 @@ public final class CoreSubsetSearch
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
 	    int sampleMinimum, int sampleMaximum, long runtime,
 	    double minimumProgression, long stuckTime, int numberOfReplicas,
-	    double minimumTemperature, double maximumTemperature, int steps)
+	    double minimumTemperature, double maximumTemperature, long steps)
 	    throws CoreHunterException
 	{
 		REMCSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new REMCSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
@@ -76,7 +76,7 @@ public final class CoreSubsetSearch
 	    AccessionSSRMarkerMatrix<Integer> data,
 	    SubsetNeighbourhood<Integer, SubsetSolution<Integer>> neighbourhood,
 	    ObjectiveFunction<SubsetSolution<Integer>> objectiveFunction,
-	    int runtime, int numberOfSteps)
+	    Long runtime, Long numberOfSteps)
 	    throws CoreHunterException
 	{
 		MetropolisSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = 
@@ -209,7 +209,7 @@ public final class CoreSubsetSearch
 	    long minimumProgressionTime, long stuckTime, int numberOfTabuReplicas, int numberOfNonTabuReplicas,
 	    int roundsWithoutTabu, int numberOfTabuSteps, int tournamentSize,
 	    int tabuListSize, int boostNumber, long boostMinimumProgressionTime,
-	    int boostTimeFactor, long minBoostTime, double minMCTemp,
+	    int boostTimeFactor, Long minBoostTime, double minMCTemp,
 	    double maxMCTemp) throws CoreHunterException
 	{
 		MixedReplicaSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>> search = new MixedReplicaSearch<Integer, SubsetSolution<Integer>, SubsetNeighbourhood<Integer, SubsetSolution<Integer>>>();
@@ -233,7 +233,7 @@ public final class CoreSubsetSearch
 		search.setLrSearchTemplate(lrSearch(null, null, boostTimeFactor,
 		  boostTimeFactor, boostTimeFactor, boostTimeFactor));
 		search.setLocalSearchTemplate(localSearch(data, null, objectiveFunction, runtime, minimumProgressionTime, stuckTime));
-		search.setMetropolisSearchTemplate(metropolisSearch(data, null, objectiveFunction, boostTimeFactor, boostTimeFactor));
+		search.setMetropolisSearchTemplate(metropolisSearch(data, null, objectiveFunction, runtime, minBoostTime));
 		search.setTabuSearchTemplate(tabuSearch(data, null, objectiveFunction, runtime, minimumProgressionTime, stuckTime, boostTimeFactor));
 
 		return search;

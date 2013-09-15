@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
-import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.corehunter.search.impl.RandomSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;

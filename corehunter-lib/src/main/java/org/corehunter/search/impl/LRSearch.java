@@ -13,22 +13,12 @@
 // limitations under the License.
 package org.corehunter.search.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
-
-import static org.corehunter.Constants.INVALID_SIZE;
 
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.EvaluatedIndexedMove;
 import org.corehunter.neighbourhood.EvaluatedMove;
-import org.corehunter.neighbourhood.IndexedMove;
-import org.corehunter.neighbourhood.impl.AdditionEvaluatedMove;
-import org.corehunter.neighbourhood.impl.AdditionMove;
-import org.corehunter.neighbourhood.impl.DeletionMove;
 import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
 import org.corehunter.search.Search;
 import org.corehunter.search.SearchException;
@@ -39,8 +29,8 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
     extends AbstractSubsetSearch<IndexType, SolutionType>
 {
 
-	private int	l	= INVALID_SIZE;
-	private int	r	= INVALID_SIZE;
+	private int	l	= -1 ;
+	private int	r	= -1 ;
 
 	public LRSearch()
 	{

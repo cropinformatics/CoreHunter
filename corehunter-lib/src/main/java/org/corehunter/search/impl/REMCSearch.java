@@ -14,6 +14,8 @@
 
 package org.corehunter.search.impl;
 
+import static org.corehunter.Constants.K_b2;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,18 +26,15 @@ import org.corehunter.search.Search;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.SubsetSolution;
 
-import static org.corehunter.Constants.K_b2;
-import static org.corehunter.Constants.INVALID_TIME;
-
 public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType>, NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
     extends
     AbstractParallelSubsetNeighbourhoodSearch<IndexType, SolutionType, NeighbourhoodType, MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>>
 {
 
-	private int	   numberOfReplicas;
+	private int	    numberOfReplicas;
 	private double	minimumTemperature;
 	private double	maximumTemperature;
-	private int	   numberOfMetropolisStepsPerRound;
+	private Long	  numberOfMetropolisStepsPerRound;
 
 	public REMCSearch()
 	{
@@ -105,12 +104,12 @@ public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType
 		}
 	}
 
-	public final int getNumberOfMetropolisStepsPerRound()
+	public final Long getNumberOfMetropolisStepsPerRound()
 	{
 		return numberOfMetropolisStepsPerRound;
 	}
 
-	public final void setNumberOfMetropolisStepsPerRound(int numberOfSteps)
+	public final void setNumberOfMetropolisStepsPerRound(Long numberOfSteps)
 	    throws CoreHunterException
 	{
 		if (this.numberOfMetropolisStepsPerRound != numberOfSteps)
@@ -165,7 +164,7 @@ public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType
 	protected void handleNumberOfMetropolisStepsPerRoundSet()
 	    throws CoreHunterException
 	{
-		if (numberOfMetropolisStepsPerRound <= 0)
+		if (numberOfMetropolisStepsPerRound == null || numberOfMetropolisStepsPerRound <= 0)
 		{
 			throw new CoreHunterException(
 			    "Number of Metropolis Steps per Round can not be less than or equal to zero!");
@@ -230,7 +229,7 @@ public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType
 					getObjectiveFunction().copy(),
 			    (NeighbourhoodType) getNeighbourhood().copy(),
 			    numberOfMetropolisStepsPerRound, 
-			    INVALID_TIME, 
+			    null, 
 			    temperature));
 		}
 
@@ -294,11 +293,12 @@ public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType
 
 	protected MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> createMetropolisSearch(
 	    SolutionType solution, ObjectiveFunction<SolutionType> objectiveFunction,
-	    NeighbourhoodType neighbourhood, int numberOfSteps, int runtime,
+	    NeighbourhoodType neighbourhood, Long numberOfSteps, Long runtime,
 	    double temperature) throws CoreHunterException
 	{
 		MetropolisSearch<IndexType, SolutionType, NeighbourhoodType> subsearch = new MetropolisSearch<IndexType, SolutionType, NeighbourhoodType>();
 
+		subsearch.setIndices(getIndices());
 		subsearch.setInitialSolution(solution);
 		subsearch.setObjectiveFunction(objectiveFunction);
 		subsearch.setNeighbourhood(neighbourhood);

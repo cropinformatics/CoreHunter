@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.corehunter.objectivefunction.DistanceMeasureType;
 
+import org.corehunter.objectivefunction.DistanceMeasureType;
 import org.corehunter.objectivefunction.ssr.AbstractAccessionSSRDistanceMeasure;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.solution.SubsetSolution;

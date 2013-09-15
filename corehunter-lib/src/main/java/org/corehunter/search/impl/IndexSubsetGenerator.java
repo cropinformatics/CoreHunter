@@ -14,8 +14,6 @@
 
 package org.corehunter.search.impl;
 
-import static org.corehunter.Constants.INVALID_SIZE;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +22,7 @@ import java.util.NoSuchElementException;
 import org.apache.commons.math.util.MathUtils;
 import org.corehunter.CoreHunterException;
 import org.corehunter.search.SubsetGenerator;
+import static org.corehunter.Constants.INVALID_SIZE ;
 
 /**
  * Generates all possible subsets of a given set of indices, of fixed size.
