@@ -34,13 +34,13 @@ public class ExternalDistanceMeasureSSR<IndexType> extends AbstractAccessionSSRO
 		super(name, description);
 	}
 
-	protected ExternalDistanceMeasureSSR(ExternalDistanceMeasureSSR<IndexType> objectiveFunction) 
+	protected ExternalDistanceMeasureSSR(ExternalDistanceMeasureSSR<IndexType> objectiveFunction)  throws CoreHunterException
 	{
 		super(objectiveFunction) ;
 	}
 	
 	@Override
-  public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  public final ObjectiveFunction<SubsetSolution<IndexType>> copy() throws CoreHunterException
   {
 	  return new ExternalDistanceMeasureSSR<IndexType>(this);
   }

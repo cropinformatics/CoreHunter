@@ -29,6 +29,13 @@ public class SSRRandomSearchTest extends SubsetSearchTest<Integer, SubsetSolutio
 
     @Test
     public void testDefaults() {
+    	
+      System.out.println("");
+      System.out.println("##############################################################");
+      System.out.println("# SSR Random Search - Defaults                  -- Data Full #");
+      System.out.println("##############################################################");
+      System.out.println("");
+      
         RandomSearch<Integer, SubsetSolution<Integer>> search = new RandomSearch<Integer, SubsetSolution<Integer>>();
 
         try {

@@ -43,7 +43,7 @@ public final class NumberEffectiveAllelesSSR<IndexType> extends AbstractAccessio
 		super(name, description);
 	}
 	
-	protected NumberEffectiveAllelesSSR(NumberEffectiveAllelesSSR<IndexType> objectiveFunction) 
+	protected NumberEffectiveAllelesSSR(NumberEffectiveAllelesSSR<IndexType> objectiveFunction)  throws CoreHunterException
 	{
 		super(objectiveFunction) ;
 	}
@@ -54,7 +54,7 @@ public final class NumberEffectiveAllelesSSR<IndexType> extends AbstractAccessio
         }
 	
 	@Override
-  public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  public final ObjectiveFunction<SubsetSolution<IndexType>> copy() throws CoreHunterException
   {
 	  return new NumberEffectiveAllelesSSR<IndexType>(this);
   }

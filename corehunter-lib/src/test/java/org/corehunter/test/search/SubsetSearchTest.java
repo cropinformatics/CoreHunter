@@ -29,6 +29,8 @@ import org.corehunter.CoreHunterException;
 import org.corehunter.model.impl.AbstractFileUtility;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.model.ssr.impl.AccessionSSRMarkerMatrixListImplDataFileReader;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.objectivefunction.impl.ObjectiveFunctionWithData;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.ObjectiveSearch;
 import org.corehunter.search.Search;
@@ -36,6 +38,7 @@ import org.corehunter.search.SearchListener;
 import org.corehunter.search.SearchStatus;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.PrintWriterSubsetSearchListener;
+import org.corehunter.search.impl.RandomSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.test.search.ssr.SSRLocalSearchTest;
@@ -106,38 +109,44 @@ public abstract class SubsetSearchTest<IndexType, SolutionType extends SubsetSol
         }
     }
 
-    public static SubsetSolution<Integer> findOptimalSolution(int minimumSize, int maximumSize, AccessionSSRMarkerMatrix<Integer> data) {
-        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = 
-        		new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
-
-        try {
-            search = getExhaustiveSubsetSearch(minimumSize, maximumSize, data);
-            search.start();
-        } catch (CoreHunterException e) {
-            e.printStackTrace();
-            fail(e.getLocalizedMessage());
-        }
-
-        return search.getBestSolution();
+    protected final SubsetSolution<Integer> findOptimalSolution(int minimumSize, int maximumSize, ObjectiveFunctionWithData<SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> objectiveFunction, AccessionSSRMarkerMatrix<Integer> data) throws CoreHunterException
+    {
+        return findExhaustiveSolution(minimumSize, maximumSize, objectiveFunction, data);
     }
-
-    public static final ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> getExhaustiveSubsetSearch(int minimumSize, int maximumSize, AccessionSSRMarkerMatrix<Integer> data) {
-        ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> search = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
-
-        try {
-            
-            search.setInitialSolution(new IntegerSubsetSolution(data.getIndices()));
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
-            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(data);
-            search.setSubsetMinimumSize(minimumSize);
-            search.setSubsetMaximumSize(maximumSize);
-            search.setIndices(data.getIndices());
-
-        } catch (CoreHunterException e) {
-            e.printStackTrace();
-            fail(e.getLocalizedMessage());
-        }
-
-        return search;
+    
+    protected final SubsetSolution<Integer> findRandomSolution(int minimumSize, int maximumSize, ObjectiveFunctionWithData<SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> objectiveFunction, AccessionSSRMarkerMatrix<Integer> data) throws CoreHunterException
+    {
+      // sample random subset of set size
+      
+      RandomSearch<Integer, SubsetSolution<Integer>> randomSearch = new RandomSearch<Integer, SubsetSolution<Integer>>();
+      randomSearch.setInitialSolution(new IntegerSubsetSolution(data.getIndices()));
+      randomSearch.setObjectiveFunction(objectiveFunction);
+      objectiveFunction.setData(data);
+      randomSearch.setIndices(data.getIndices());
+      randomSearch.setSubsetMinimumSize(minimumSize);
+      randomSearch.setSubsetMaximumSize(maximumSize);
+      
+      randomSearch.start();
+      
+      return randomSearch.getBestSolution() ;
+      
+    }
+    
+    protected final SubsetSolution<Integer> findExhaustiveSolution(int minimumSize, int maximumSize, ObjectiveFunctionWithData<SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> objectiveFunction, AccessionSSRMarkerMatrix<Integer> data) throws CoreHunterException
+    {
+    	// exhaustively create best subset of set size
+      
+      ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> exhaustiveSubsetSearch = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
+      exhaustiveSubsetSearch.setInitialSolution(new IntegerSubsetSolution(data.getIndices()));
+      exhaustiveSubsetSearch.setObjectiveFunction(objectiveFunction);
+      objectiveFunction.setData(dataFull);
+      exhaustiveSubsetSearch.setIndices(data.getIndices());
+      exhaustiveSubsetSearch.setSubsetMinimumSize(minimumSize);
+      exhaustiveSubsetSearch.setSubsetMaximumSize(maximumSize);
+      
+      exhaustiveSubsetSearch.start();
+      
+      return exhaustiveSubsetSearch.getBestSolution() ;
+      
     }
 }

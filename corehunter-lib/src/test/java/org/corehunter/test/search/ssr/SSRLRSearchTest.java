@@ -18,194 +18,266 @@ import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
 
 import org.corehunter.CoreHunterException;
+import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
+import org.corehunter.neighbourhood.impl.ExactSingleNeighbourhood;
+import org.corehunter.objectivefunction.ObjectiveFunction;
+import org.corehunter.objectivefunction.impl.ObjectiveFunctionWithData;
 import org.corehunter.objectivefunction.ssr.ModifiedRogersDistanceSSR;
 import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.impl.IndexSubsetGenerator;
 import org.corehunter.search.impl.LRSearch;
+import org.corehunter.search.impl.MetropolisSearch;
 import org.corehunter.search.impl.RandomSearch;
+import org.corehunter.search.solution.Solution;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.test.search.SubsetSearchTest;
 import org.junit.Test;
 
-public class SSRLRSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>> {
+public class SSRLRSearchTest extends
+    SubsetSearchTest<Integer, SubsetSolution<Integer>>
+{
+	@Test
+	public void lr21SearchTestWithRandomSeed()
+	{
+		
+		System.out.println("");
+		System.out.println("######################################################################");
+		System.out.println("# SSR LR 21 Search - size 5 -- Data full                             #");
+		System.out.println("######################################################################");
+		System.out.println("");
+		
+		try
+		{
+			// sample random subset of size 2
+			SubsetSolution<Integer> seed = findRandomSolution(2, 2, new ModifiedRogersDistanceSSR<Integer>(),
+			    dataFull);
 
-  protected final int DEFAULT_MINIMUM_SIZE = 5;
-  protected final int DEFAULT_MAXIMUM_SIZE = 5;
-  
-    @Test
-    public void lr21SearchTestWithRandomSeed() {
-        
-        LRSearch<Integer, SubsetSolution<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>>();
+			// run LR search, seeded with random solution
+			testSearch(createLRSearch(5, 5,
+			    new ModifiedRogersDistanceSSR<Integer>(), dataFull, seed, 2, 1));
 
-        try {
-            
-            // sample random subset of size 2
-            
-            RandomSearch<Integer, SubsetSolution<Integer>> random = new RandomSearch<Integer, SubsetSolution<Integer>>();
-            random.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices()));
-            random.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
-            ((ModifiedRogersDistanceSSR<Integer>)random.getObjectiveFunction()).setData(dataFull);
-            random.setIndices(dataFull.getIndices());
-            random.setSubsetMinimumSize(2);
-            random.setSubsetMaximumSize(2);
-            
-            random.start();
-            
-            SubsetSolution<Integer> seed = random.getBestSolution();
-            
-            // run LR search, seeded with random solution
-            
-            search.setInitialSolution(seed);
+		}
+		catch (CoreHunterException e)
+		{
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
-            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
-            search.setIndices(dataFull.getIndices()) ;
-            search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
-            search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
-            search.setL(2);
-            search.setR(1);
-        } catch (CoreHunterException e) {
-            e.printStackTrace();
-            fail(e.getLocalizedMessage());
-        }
-        
-        testSearch(search);
-    }
+	@Test
+	public void lr21SearchSize5TestWithExhaustiveSeed()
+	{
+		try
+		{
+			System.out.println("");
+			System.out.println("######################################################################");
+			System.out.println("# SSR LR 21 Search - size 5 -- Data full                             #");
+			System.out.println("######################################################################");
+			System.out.println("");
+			
+			// exhaustively create best subset of size 2
+			SubsetSolution<Integer> seed = findExhaustiveSolution(2, 2,
+			    new ModifiedRogersDistanceSSR<Integer>(), dataFull);
 
-    @Test
-    public void lr21SearchTestWithExhaustiveSeed() {
-        
-        LRSearch<Integer, SubsetSolution<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>>();
+			// run LR search, seeded with exhaustive solution
+			testSearch(createLRSearch(5, 5,
+			    new ModifiedRogersDistanceSSR<Integer>(), dataFull, seed, 2, 1));
+		}
+		catch (CoreHunterException e)
+		{
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+	
+	@Test
+	public void lr21SearchSezie5to7TestWithExhaustiveSeed()
+	{
+		try
+		{
+			System.out.println("");
+			System.out.println("######################################################################");
+			System.out.println("# SSR LR 21 Search - size 5 to 7-- Data full                         #");
+			System.out.println("######################################################################");
+			System.out.println("");
+			
+			// exhaustively create best subset of size 2
+			SubsetSolution<Integer> seed = findExhaustiveSolution(2, 2,
+			    new ModifiedRogersDistanceSSR<Integer>(), dataFull);
 
-        try {
-            
-            // exhaustively create best subset of size 2
-            
-            ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>> exh = new ExhaustiveSubsetSearch<Integer, SubsetSolution<Integer>>();
-            exh.setInitialSolution(new IntegerSubsetSolution(dataFull.getIndices()));
-            exh.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
-            ((ModifiedRogersDistanceSSR<Integer>)exh.getObjectiveFunction()).setData(dataFull);
-            exh.setIndices(dataFull.getIndices());
-            exh.setSubsetMinimumSize(2);
-            exh.setSubsetMaximumSize(2);
-            
-            exh.start();
-            
-            SubsetSolution<Integer> seed = exh.getBestSolution();
+			// run LR search, seeded with exhaustive solution
+			
+			testSearch(createLRSearch(5, 7,
+			    new ModifiedRogersDistanceSSR<Integer>(), dataFull, seed, 2, 1));
+		}
+		catch (CoreHunterException e)
+		{
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
 
-            // run LR search, seeded with exhaustive solution
+	@Test
+	public void lr12SearchTestWithCompleteSeed()
+	{
+		try
+		{
+			System.out.println("");
+			System.out.println("######################################################################");
+			System.out.println("# SSR LR 12 Search - size 5 less than all -- Data full               #");
+			System.out.println("######################################################################");
+			System.out.println("");
+			
+			// start with all selected
+			SubsetSolution<Integer> seed = new IntegerSubsetSolution(dataFull.getIndices(), dataFull.getIndices());
+			
+			// run LR search, seeded with exhaustive solution
+			testSearch(createLRSearch(dataFull.getSize() - 5, dataFull.getSize() - 5,
+			    new ModifiedRogersDistanceSSR<Integer>(), dataFull, seed, 1, 2));
+		}
+		catch (CoreHunterException e)
+		{
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+	
+	@Test
+	public void lrSearchTestInvalidInitialSolution()
+	{
 
-            search.setInitialSolution(seed);
+		System.out.println("");
+		System.out.println("######################################################################");
+		System.out.println("# SSR LR Search - Invalid initial solution -- Data full              #");
+		System.out.println("######################################################################");
+		System.out.println("");
+		
+		LRSearch<Integer, SubsetSolution<Integer>> search;
 
-            search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
-            ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
-            search.setIndices(dataFull.getIndices()) ;
-            search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
-            search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
-            search.setL(2);
-            search.setR(1);
+		try
+		{
 
-        } catch (CoreHunterException e) {
-            e.printStackTrace();
-            fail(e.getLocalizedMessage());
-        }
+			/******************************/
+			/* Case 1: L > R (increasing) */
+			/******************************/
 
-        testSearch(search);
-    }
-    
-    @Test
-    public void lrSearchTestInvalidInitialSolution() {
+			for (int k = 0; k < 25; k++)
+			{
 
-        LRSearch<Integer, SubsetSolution<Integer>> search;
-                
-        try {
-        
-            /******************************/
-            /* Case 1: L > R (increasing) */
-            /******************************/
+				// random L and R; with L > R
 
-            for(int k=0; k<25; k++){
+				int r = rg.nextInt(10) + 1;
+				int l = 2 * r;
 
-                // random L and R; with L > R
-                
-                int r = rg.nextInt(10) + 1;
-                int l = 2*r;
+				// create too large initial subset
+				int size = rg.nextInt(dataFull.getSize() - DEFAULT_MAXIMUM_SIZE)
+				    + DEFAULT_MAXIMUM_SIZE + 1;
+				IndexSubsetGenerator<Integer> generator = new IndexSubsetGenerator<Integer>();
+				generator.setCompleteSet(dataFull.getIndices());
+				generator.setSubsetSize(size);
+				SubsetSolution<Integer> subset = new IntegerSubsetSolution(
+				    dataFull.getIndices(), generator.next());
 
-                // create too large initial subset
-                int size = rg.nextInt(dataFull.getSize() - DEFAULT_MAXIMUM_SIZE) + DEFAULT_MAXIMUM_SIZE + 1;
-                IndexSubsetGenerator<Integer> generator = new IndexSubsetGenerator<Integer>();
-                generator.setCompleteSet(dataFull.getIndices());
-                generator.setSubsetSize(size);
-                SubsetSolution<Integer> subset = new IntegerSubsetSolution(dataFull.getIndices(), generator.next());
-                
-                // seed LR with this subset
-                search = new LRSearch<Integer, SubsetSolution<Integer>>();
-                search.setInitialSolution(subset);
-                
-                search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
-                ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
-                search.setIndices(dataFull.getIndices());
-                search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
-                search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
-                search.setL(l);
-                search.setR(r);
-                
-                boolean thrown = false;
-                try{
-                    search.start();
-                } catch (CoreHunterException ex){
-                    thrown = true;
-                }
-                assertTrue(thrown);
+				// seed LR with this subset
+				search = new LRSearch<Integer, SubsetSolution<Integer>>();
+				search.setInitialSolution(subset);
 
-            }
-            
-            /******************************/
-            /* Case 2: R > L (decreasing) */
-            /******************************/
+				search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+				((ModifiedRogersDistanceSSR<Integer>) search.getObjectiveFunction())
+				    .setData(dataFull);
+				search.setIndices(dataFull.getIndices());
+				search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
+				search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
+				search.setL(l);
+				search.setR(r);
 
-            for(int k=0; k<25; k++){
+				boolean thrown = false;
+				try
+				{
+					search.start();
+				}
+				catch (CoreHunterException ex)
+				{
+					thrown = true;
+				}
+				assertTrue(thrown);
 
-                // random L and R; with L < R
-                
-                int l = rg.nextInt(10) + 1;
-                int r = 2*l;
+			}
 
-                // create too small initial subset
-                int size = rg.nextInt(DEFAULT_MINIMUM_SIZE-1) + 1;
-                IndexSubsetGenerator<Integer> generator = new IndexSubsetGenerator<Integer>();
-                generator.setCompleteSet(dataFull.getIndices());
-                generator.setSubsetSize(size);
-                SubsetSolution<Integer> subset = new IntegerSubsetSolution(dataFull.getIndices(), generator.next());
-                
-                // seed LR with this subset
-                search = new LRSearch<Integer, SubsetSolution<Integer>>();
-                search.setInitialSolution(subset);
-                
-                search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
-                ((ModifiedRogersDistanceSSR<Integer>)search.getObjectiveFunction()).setData(dataFull);
-                search.setIndices(dataFull.getIndices());
-                search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
-                search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
-                search.setL(l);
-                search.setR(r);
-                
-                boolean thrown = false;
-                try{
-                    search.start();
-                } catch (CoreHunterException ex){
-                    thrown = true;
-                }
-                assertTrue(thrown);
+			/******************************/
+			/* Case 2: R > L (decreasing) */
+			/******************************/
 
-            }
-        
-        } catch (CoreHunterException e) {
-            e.printStackTrace();
-            fail(e.getLocalizedMessage());
-        }
-        
-    }
-    
+			for (int k = 0; k < 25; k++)
+			{
+
+				// random L and R; with L < R
+
+				int l = rg.nextInt(10) + 1;
+				int r = 2 * l;
+
+				// create too small initial subset
+				int size = rg.nextInt(DEFAULT_MINIMUM_SIZE - 1) + 1;
+				IndexSubsetGenerator<Integer> generator = new IndexSubsetGenerator<Integer>();
+				generator.setCompleteSet(dataFull.getIndices());
+				generator.setSubsetSize(size);
+				SubsetSolution<Integer> subset = new IntegerSubsetSolution(
+				    dataFull.getIndices(), generator.next());
+
+				// seed LR with this subset
+				search = new LRSearch<Integer, SubsetSolution<Integer>>();
+				search.setInitialSolution(subset);
+
+				search.setObjectiveFunction(new ModifiedRogersDistanceSSR<Integer>());
+				((ModifiedRogersDistanceSSR<Integer>) search.getObjectiveFunction())
+				    .setData(dataFull);
+				search.setIndices(dataFull.getIndices());
+				search.setSubsetMinimumSize(DEFAULT_MINIMUM_SIZE);
+				search.setSubsetMaximumSize(DEFAULT_MAXIMUM_SIZE);
+				search.setL(l);
+				search.setR(r);
+
+				boolean thrown = false;
+				try
+				{
+					search.start();
+				}
+				catch (CoreHunterException ex)
+				{
+					thrown = true;
+				}
+				assertTrue(thrown);
+
+			}
+
+		}
+		catch (CoreHunterException e)
+		{
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+
+	}
+
+	protected final LRSearch<Integer, SubsetSolution<Integer>> createLRSearch(
+	    int minimumSize, int maximumSize,
+	    ObjectiveFunctionWithData<SubsetSolution<Integer>, AccessionSSRMarkerMatrix<Integer>> objectiveFunction,
+	    AccessionSSRMarkerMatrix<Integer> data, SubsetSolution<Integer> seed,
+	    int l, int r) throws CoreHunterException
+	{
+		LRSearch<Integer, SubsetSolution<Integer>> search = new LRSearch<Integer, SubsetSolution<Integer>>();
+		
+		search.setInitialSolution(seed);
+		search.setObjectiveFunction(objectiveFunction);
+		objectiveFunction.setData(data);
+		search.setIndices(data.getIndices());
+		search.setSubsetMinimumSize(minimumSize);
+		search.setSubsetMaximumSize(maximumSize);
+		search.setL(l);
+		search.setR(r);
+
+		return search;
+
+	}
 }

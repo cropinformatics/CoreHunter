@@ -14,6 +14,7 @@
 
 package org.corehunter.objectivefunction.impl;
 
+import org.corehunter.CoreHunterException;
 import org.corehunter.model.IndexedData;
 import org.corehunter.search.solution.SubsetSolution;
 
@@ -34,7 +35,7 @@ public abstract class AbstractSubsetObjectiveFunction<
 	}
 	
 	protected AbstractSubsetObjectiveFunction(
-			AbstractSubsetObjectiveFunction<IndexType, DatasetType> objectiveFuncton)
+			AbstractSubsetObjectiveFunction<IndexType, DatasetType> objectiveFuncton) throws CoreHunterException
   {
 	  super(objectiveFuncton);
   }

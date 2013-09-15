@@ -187,6 +187,7 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 			throw new SearchException("Search stopped before it could find a valid solution");
 		}
 		
+			// TODO remove these comments after checking it works as expected
 			// take next step
 
 			// ...
@@ -282,7 +283,5 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
 			throw new CoreHunterException(
 			    "L < R (decreasing subset size): initial subset size can not be smaller than minimum subset size");
 		}
-
 	}
-
 }

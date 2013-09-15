@@ -25,6 +25,7 @@ import org.corehunter.search.SearchStatus;
 import org.corehunter.search.solution.SubsetSolution;
 
 import static org.corehunter.Constants.K_b2;
+import static org.corehunter.Constants.INVALID_TIME;
 
 public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType>, NeighbourhoodType extends SubsetNeighbourhood<IndexType, SolutionType>>
     extends
@@ -229,7 +230,7 @@ public class REMCSearch<IndexType, SolutionType extends SubsetSolution<IndexType
 					getObjectiveFunction().copy(),
 			    (NeighbourhoodType) getNeighbourhood().copy(),
 			    numberOfMetropolisStepsPerRound, 
-			    -1, 
+			    INVALID_TIME, 
 			    temperature));
 		}
 

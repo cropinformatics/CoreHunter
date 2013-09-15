@@ -51,7 +51,7 @@ public final class UncachedModifiedRogersDistanceSSR extends AbstractSubsetObjec
         this.type = type;
     }
 
-    protected UncachedModifiedRogersDistanceSSR(UncachedModifiedRogersDistanceSSR objectiveFunction) {
+    protected UncachedModifiedRogersDistanceSSR(UncachedModifiedRogersDistanceSSR objectiveFunction)  throws CoreHunterException {
         super(objectiveFunction);
 
         this.type = objectiveFunction.getType();
@@ -63,7 +63,7 @@ public final class UncachedModifiedRogersDistanceSSR extends AbstractSubsetObjec
     }
 
     @Override
-    public final ObjectiveFunction<SubsetSolution<Integer>> copy() {
+    public final ObjectiveFunction<SubsetSolution<Integer>> copy()  throws CoreHunterException {
         return new UncachedModifiedRogersDistanceSSR(this);
     }
 

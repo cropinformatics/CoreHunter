@@ -14,6 +14,7 @@
 
 package org.corehunter.objectivefunction.ssr;
 
+import org.corehunter.CoreHunterException;
 import org.corehunter.model.ssr.AccessionSSRMarkerMatrix;
 import org.corehunter.objectivefunction.impl.AbstractSubsetObjectiveFunction;
 
@@ -33,7 +34,7 @@ public abstract class AbstractAccessionSSRObjectiveFunction<IndexType>
 	}
 
 	public AbstractAccessionSSRObjectiveFunction(
-      AbstractSubsetObjectiveFunction<IndexType, AccessionSSRMarkerMatrix<IndexType>> objectiveFuncton)
+      AbstractSubsetObjectiveFunction<IndexType, AccessionSSRMarkerMatrix<IndexType>> objectiveFuncton) throws CoreHunterException
   {
 	  super(objectiveFuncton);
   }

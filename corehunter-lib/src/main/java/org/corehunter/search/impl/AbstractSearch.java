@@ -122,7 +122,7 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 	{
 		// check if has not been stopped, completed or failed for any reason
 		// Note status should never be SearchStatus.NOT_STARTED at this point
-		return !status.equals(SearchStatus.STARTED) ;
+		return status.equals(SearchStatus.STARTED) ;
 	}
 
 	@Override
@@ -215,9 +215,9 @@ public abstract class AbstractSearch<SolutionType extends Solution>
 		return endTime < 0 ? System.nanoTime() - startTime : endTime - startTime;
 	}
 
-        /**
-         * Returns the time in nanoseconds since a new best solution was found.
-         */
+	/**
+	 * Returns the time in nanoseconds since a new best solution was found.
+	 */
 	@Override
 	public final long getBestSolutionTime()
 	{

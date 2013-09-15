@@ -627,7 +627,7 @@ public class MixedReplicaSearch<
         search.setObjectiveFunction(getObjectiveFunction()); // TODO perhaps a copy of the Objective function is required for optimisation
         search.setNeighbourhood((NeighbourhoodType) neighbourhood);
         search.setData(getData());
-        //search.setMaxNumberOfSteps(numberOfSteps) ; TODO
+        //search.setMaxNumberOfSteps(numberOfSteps) ; TODO uncomment?
 
         return (SubsetSearch<IndexType, SolutionType>) search;
     }

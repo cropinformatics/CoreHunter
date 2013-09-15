@@ -30,6 +30,14 @@ public class SSRSteepestDescentSearchTest extends SubsetSearchTest<Integer, Subs
 
     @Test
     public void testDefaults() {
+    	
+  		System.out.println("");
+  		System.out.println("######################################################################");
+  		System.out.println("# SSR Steepest Descent Search - Defaults                -- Data Full #");
+  		System.out.println("######################################################################");
+  		System.out.println("");
+  		
+  		
         SteepestDescentSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search =
         		new SteepestDescentSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
 

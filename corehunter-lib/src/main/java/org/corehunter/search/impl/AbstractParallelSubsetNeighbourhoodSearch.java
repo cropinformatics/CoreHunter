@@ -65,6 +65,7 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
                 if (cachedException == null) // ignore subsequent errors
                 {
                     cachedException = new CoreHunterException("Sub search failed due to : " + exception.getLocalizedMessage(), exception);
+                    handleSubSearchExcpetion(cachedException) ;
                 }
             }
 
@@ -94,7 +95,12 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
         futures = new HashMap<SubSearchType, Future<SubSearchType>>();
     }
 
-    protected final void checkForBestSolution(Search<SolutionType> search, SolutionType bestSolution, double bestSolutionEvaluation) {
+    protected void handleSubSearchExcpetion(CoreHunterException exception)
+    {
+    	executorService.shutdownNow() ;
+    }
+
+		protected final void checkForBestSolution(Search<SolutionType> search, SolutionType bestSolution, double bestSolutionEvaluation) {
         // TODO perhaps should getBestSolutionEvaluation() and getBestSolutionEvaluation() need to be syncrhonise to 
         // avoid them being changed by other replicas, the problem is that this results in the thread hanging!
         if (isBetterSolution(bestSolutionEvaluation, getBestSolutionEvaluation())
@@ -119,14 +125,12 @@ public abstract class AbstractParallelSubsetNeighbourhoodSearch<
 
         try {
             executorService.invokeAll(callables);
-        } catch (RejectedExecutionException exception) {
+        } catch (Exception exception) {
             if (cachedException != null) {
-                throw cachedException;
+                throw new CoreHunterException("One or more errors in subsearch, first reported was due to : "+ cachedException.getLocalizedMessage(), cachedException);
             } else {
                 throw new CoreHunterException("Error in thread pool: " + exception.getLocalizedMessage());
             }
-        } catch (InterruptedException exception) {
-            throw new CoreHunterException("Error in thread pool: " + exception.getLocalizedMessage());
         }
     }
 

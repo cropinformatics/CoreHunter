@@ -42,7 +42,7 @@ public final class HeterozygousLociDiversitySSR<IndexType> extends AbstractAcces
 		super(name, description);
 	}
 
-	protected HeterozygousLociDiversitySSR(HeterozygousLociDiversitySSR<IndexType> objectiveFunction) 
+	protected HeterozygousLociDiversitySSR(HeterozygousLociDiversitySSR<IndexType> objectiveFunction)  throws CoreHunterException
 	{
 		super(objectiveFunction) ;
 	}
@@ -53,7 +53,7 @@ public final class HeterozygousLociDiversitySSR<IndexType> extends AbstractAcces
         }
 	
 	@Override
-  public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  public final ObjectiveFunction<SubsetSolution<IndexType>> copy() throws CoreHunterException
   {
 	  return new HeterozygousLociDiversitySSR<IndexType>(this);
   }

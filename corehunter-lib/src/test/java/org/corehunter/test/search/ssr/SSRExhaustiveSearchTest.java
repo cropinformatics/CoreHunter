@@ -20,14 +20,23 @@ import org.corehunter.search.impl.ExhaustiveSubsetSearch;
 import org.corehunter.search.solution.SubsetSolution;
 import org.corehunter.search.solution.impl.IntegerSubsetSolution;
 import org.corehunter.test.search.SubsetSearchTest;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
 import org.junit.Test;
 
 public class SSRExhaustiveSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>> {
 
     @Test
-    public void exhaustiveSerchTest() {
+    public void exhaustiveSearchTest() {
+    	
+  		System.out.println("");
+  		System.out.println("######################################################################");
+  		System.out.println("# SSR Exhaustive -- Data Small																			 #");
+  		System.out.println("######################################################################");
+  		System.out.println("");
+  		
         SubsetSolution<Integer> solution1 = test(2, 5);
         SubsetSolution<Integer> solution2 = test(2, 5);
         SubsetSolution<Integer> solution3 = test(2, 3);

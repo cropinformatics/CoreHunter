@@ -63,7 +63,7 @@ public abstract class AbstractAccessionSSRDistanceMeasure<IndexType> extends
 	}
 
 	protected AbstractAccessionSSRDistanceMeasure(
-			AbstractAccessionSSRDistanceMeasure<IndexType> objectiveFuncton)
+			AbstractAccessionSSRDistanceMeasure<IndexType> objectiveFuncton) throws CoreHunterException
   {
                 super(objectiveFuncton);
 		setType(objectiveFuncton.getType()) ;

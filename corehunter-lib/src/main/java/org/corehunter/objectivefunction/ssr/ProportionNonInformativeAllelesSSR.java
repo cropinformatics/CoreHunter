@@ -38,7 +38,7 @@ public final class ProportionNonInformativeAllelesSSR<IndexType> extends Abstrac
         super(name, description);
     }
 
-    protected ProportionNonInformativeAllelesSSR(ProportionNonInformativeAllelesSSR<IndexType> objectiveFunction) {
+    protected ProportionNonInformativeAllelesSSR(ProportionNonInformativeAllelesSSR<IndexType> objectiveFunction)  throws CoreHunterException{
         super(objectiveFunction);
     }
 
@@ -48,7 +48,7 @@ public final class ProportionNonInformativeAllelesSSR<IndexType> extends Abstrac
     }
 
     @Override
-    public ObjectiveFunction<SubsetSolution<IndexType>> copy() {
+    public ObjectiveFunction<SubsetSolution<IndexType>> copy()  throws CoreHunterException {
         return new ProportionNonInformativeAllelesSSR<IndexType>(this);
     }
 

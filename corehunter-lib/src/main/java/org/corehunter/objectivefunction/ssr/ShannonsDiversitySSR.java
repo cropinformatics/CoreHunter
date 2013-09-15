@@ -42,7 +42,7 @@ public final class ShannonsDiversitySSR<IndexType> extends AbstractAccessionSSRO
 		super(name, description);
 	}
 	
-	protected ShannonsDiversitySSR(ShannonsDiversitySSR<IndexType> objectiveFunction) 
+	protected ShannonsDiversitySSR(ShannonsDiversitySSR<IndexType> objectiveFunction)  throws CoreHunterException
 	{
 		super(objectiveFunction) ;
 	}
@@ -53,7 +53,7 @@ public final class ShannonsDiversitySSR<IndexType> extends AbstractAccessionSSRO
         }
 	
 	@Override
-  public ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  public ObjectiveFunction<SubsetSolution<IndexType>> copy() throws CoreHunterException
   {
 	  return new ShannonsDiversitySSR<IndexType>(this);
   }

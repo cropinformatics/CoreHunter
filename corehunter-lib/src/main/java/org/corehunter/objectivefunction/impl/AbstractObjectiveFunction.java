@@ -35,15 +35,16 @@ public abstract class AbstractObjectiveFunction<
 	public AbstractObjectiveFunction(String name, String description)
 	{
 		super (name, name, description) ;
-                // TO DO
-                //flushCachedResults();
+                // TODO flushCachedResults();
 	}
 	
-	protected AbstractObjectiveFunction(AbstractObjectiveFunction<SolutionType, DataType> objectiveFuncton)
+	protected AbstractObjectiveFunction(AbstractObjectiveFunction<SolutionType, DataType> objectiveFuncton) throws CoreHunterException
 	{
 		super(objectiveFuncton) ;
-                // TO DO
-                //flushCachedResults();
+		
+		// Shared data
+		setData(objectiveFuncton.getData());
+                // TODO flushCachedResults();
 	}
 
 	/* (non-Javadoc)

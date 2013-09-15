@@ -17,6 +17,7 @@ package org.corehunter.objectivefunction.ssr;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.corehunter.CoreHunterException;
 import org.corehunter.model.UnknownIndexException;
 import org.corehunter.objectivefunction.DistanceMeasureType;
 import org.corehunter.objectivefunction.ObjectiveFunction;
@@ -48,13 +49,13 @@ public final class ModifiedRogersDistanceSSR<IndexType> extends AbstractAccessio
 		super(name, description, type);
 	}
 	
-	protected ModifiedRogersDistanceSSR(ModifiedRogersDistanceSSR<IndexType> objectiveFunction) 
+	protected ModifiedRogersDistanceSSR(ModifiedRogersDistanceSSR<IndexType> objectiveFunction) throws CoreHunterException 
 	{
 		super(objectiveFunction) ;
 	}
 	
 	@Override
-        public final ObjectiveFunction<SubsetSolution<IndexType>> copy()
+        public final ObjectiveFunction<SubsetSolution<IndexType>> copy() throws CoreHunterException
         {
                 return new ModifiedRogersDistanceSSR<IndexType>(this);
         }

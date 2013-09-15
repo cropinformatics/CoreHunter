@@ -40,13 +40,13 @@ public final class CoverageSSR<IndexType> extends AbstractAccessionSSRObjectiveF
 		pn = new ProportionNonInformativeAllelesSSR<IndexType>();
 	}
 
-	protected CoverageSSR(CoverageSSR<IndexType> objectiveFunction) 
+	protected CoverageSSR(CoverageSSR<IndexType> objectiveFunction) throws CoreHunterException 
 	{
 		super(objectiveFunction) ;
 	}
 	
 	@Override
-  public ObjectiveFunction<SubsetSolution<IndexType>> copy()
+  public ObjectiveFunction<SubsetSolution<IndexType>> copy() throws CoreHunterException
   {
 	  return new CoverageSSR<IndexType>(this);
   }

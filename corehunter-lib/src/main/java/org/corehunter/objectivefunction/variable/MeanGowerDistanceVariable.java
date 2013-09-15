@@ -103,7 +103,7 @@ public class MeanGowerDistanceVariable extends AbstractSubsetObjectiveFunction<I
 	  return rangedVariable.getMaximumValue().doubleValue() > rangedVariable.getMinimumValue().doubleValue();
   }
 
-	protected MeanGowerDistanceVariable(MeanGowerDistanceVariable objectiveFuncton)
+	protected MeanGowerDistanceVariable(MeanGowerDistanceVariable objectiveFuncton) throws CoreHunterException
   {
 	  super(objectiveFuncton);
   }
