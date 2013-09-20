@@ -37,7 +37,7 @@ public class SSRLRSearchTest extends
 		
 		System.out.println("");
 		System.out.println("######################################################################");
-		System.out.println("# SSR LR 21 Search - size 5 -- Data full                             #");
+		System.out.println("# SSR LR 21 Search - size 5 -- Data full -- Random Seed              #");
 		System.out.println("######################################################################");
 		System.out.println("");
 		
@@ -66,7 +66,7 @@ public class SSRLRSearchTest extends
 		{
 			System.out.println("");
 			System.out.println("######################################################################");
-			System.out.println("# SSR LR 21 Search - size 5 -- Data full                             #");
+			System.out.println("# SSR LR 21 Search - size 5 -- Data full -- Exh. Seed                #");
 			System.out.println("######################################################################");
 			System.out.println("");
 			
@@ -92,7 +92,7 @@ public class SSRLRSearchTest extends
 		{
 			System.out.println("");
 			System.out.println("######################################################################");
-			System.out.println("# SSR LR 21 Search - size 5 to 7-- Data full                         #");
+			System.out.println("# SSR LR 21 Search - size 5 to 7-- Data full -- Exh. Seed            #");
 			System.out.println("######################################################################");
 			System.out.println("");
 			
@@ -119,7 +119,7 @@ public class SSRLRSearchTest extends
 		{
 			System.out.println("");
 			System.out.println("######################################################################");
-			System.out.println("# SSR LR 12 Search - size 5 less than all -- Data full               #");
+			System.out.println("# SSR LR 12 Search - size 5 less than all -- Data full -- Full Seed  #");
 			System.out.println("######################################################################");
 			System.out.println("");
 			
@@ -129,6 +129,60 @@ public class SSRLRSearchTest extends
 			// run LR search, seeded with exhaustive solution
 			testSearch(createLRSearch(dataFull.getSize() - 5, dataFull.getSize() - 5,
 			    new ModifiedRogersDistanceSSR<Integer>(), dataFull, seed, 1, 2));
+		}
+		catch (CoreHunterException e)
+		{
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+        
+        @Test
+	public void lr62SearchTest()
+	{
+		
+		System.out.println("");
+		System.out.println("######################################################################");
+		System.out.println("# SSR LR 62 Search - size 8 -- Data full -- Empty Seed               #");
+		System.out.println("######################################################################");
+		System.out.println("");
+		
+		try
+		{
+			// create empty seed solution
+			SubsetSolution<Integer> seed = new IntegerSubsetSolution(dataFull.getIndices());
+
+			// run LR search, seeded with empty solution
+			testSearch(createLRSearch(8, 8,
+			    new ModifiedRogersDistanceSSR<Integer>(), dataFull, seed, 6, 2));
+
+		}
+		catch (CoreHunterException e)
+		{
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+	}
+        
+        @Test
+	public void lr62SearchTestSize57()
+	{
+		
+		System.out.println("");
+		System.out.println("######################################################################");
+		System.out.println("# SSR LR 62 Search - size 5-7 -- Data full -- Empty Seed             #");
+		System.out.println("######################################################################");
+		System.out.println("");
+		
+		try
+		{
+			// create empty seed solution
+			SubsetSolution<Integer> seed = new IntegerSubsetSolution(dataFull.getIndices());
+
+			// run LR search, seeded with empty solution
+			testSearch(createLRSearch(5, 7,
+			    new ModifiedRogersDistanceSSR<Integer>(), dataFull, seed, 6, 2));
+
 		}
 		catch (CoreHunterException e)
 		{

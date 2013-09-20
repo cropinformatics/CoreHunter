@@ -32,7 +32,7 @@ import org.corehunter.search.solution.SubsetSolution;
 public class ExactSingleNeighbourhood<IndexType, SolutionType extends SubsetSolution<IndexType>>
         extends SingleNeighbourhood<IndexType, SolutionType> {
 
-    public ExactSingleNeighbourhood() throws CoreHunterException {
+    public ExactSingleNeighbourhood() {
         super();
     }
 

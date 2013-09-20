@@ -168,7 +168,7 @@ public abstract class AbstractSubsetNeighbourhood<IndexType, SolutionType extend
     }
 
     protected double getWorstEvaluation(boolean isMinimizing) {
-        return isMinimizing ? Double.MAX_VALUE : Double.MIN_VALUE;
+        return isMinimizing ? Double.MAX_VALUE : -Double.MAX_VALUE;
     }
 
 }

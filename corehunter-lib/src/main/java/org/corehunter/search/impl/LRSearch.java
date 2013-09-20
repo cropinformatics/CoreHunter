@@ -15,7 +15,6 @@ package org.corehunter.search.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
-
 import org.corehunter.CoreHunterException;
 import org.corehunter.neighbourhood.EvaluatedIndexedMove;
 import org.corehunter.neighbourhood.EvaluatedMove;
@@ -29,249 +28,207 @@ public class LRSearch<IndexType, SolutionType extends SubsetSolution<IndexType>>
     extends AbstractSubsetSearch<IndexType, SolutionType>
 {
 
-	private int	l	= -1 ;
-	private int	r	= -1 ;
+    private int	l	= -1 ;
+    private int	r	= -1 ;
+    private ExactSingleNeighbourhood<IndexType, SolutionType> exactSingleNeighbourhood = new ExactSingleNeighbourhood<IndexType, SolutionType>();
 
-	public LRSearch()
-	{
-		super();
-	}
+    public LRSearch()
+    {
+            super();
+    }
 
-	protected LRSearch(LRSearch<IndexType, SolutionType> search)
-	    throws CoreHunterException
-	{
-		super(search);
-		setL(search.getL());
-		setR(search.getR());
-	}
+    protected LRSearch(LRSearch<IndexType, SolutionType> search)
+        throws CoreHunterException
+    {
+            super(search);
+            setL(search.getL());
+            setR(search.getR());
+    }
 
-	@Override
-	public Search<SolutionType> copy() throws CoreHunterException
-	{
-		return new LRSearch<IndexType, SolutionType>(this);
-	}
+    @Override
+    public Search<SolutionType> copy() throws CoreHunterException
+    {
+            return new LRSearch<IndexType, SolutionType>(this);
+    }
 
-	public final int getL()
-	{
-		return l;
-	}
+    public final int getL()
+    {
+            return l;
+    }
 
-	public final void setL(int l) throws CoreHunterException
-	{
-		if (this.l != l)
-		{
-			this.l = l;
-			handleLSet();
-		}
-	}
+    public final void setL(int l) throws CoreHunterException
+    {
+            if (this.l != l)
+            {
+                    this.l = l;
+                    handleLSet();
+            }
+    }
 
-	public final int getR()
-	{
-		return r;
-	}
+    public final int getR()
+    {
+            return r;
+    }
 
-	public final void setR(int r) throws CoreHunterException
-	{
-		if (this.r != r)
-		{
-			this.r = r;
-			handleRSet();
-		}
-	}
+    public final void setR(int r) throws CoreHunterException
+    {
+            if (this.r != r)
+            {
+                    this.r = r;
+                    handleRSet();
+            }
+    }
 
-	protected void handleLSet() throws CoreHunterException
-	{
-		if (SearchStatus.STARTED.equals(getStatus()))
-		{
-			throw new CoreHunterException("L can not be set while search in process");
-		}
-		if (l < 0)
-		{
-			throw new CoreHunterException("L can not be less than zero!");
-		}
-	}
+    protected void handleLSet() throws CoreHunterException
+    {
+            if (SearchStatus.STARTED.equals(getStatus()))
+            {
+                    throw new CoreHunterException("L can not be set while search in process");
+            }
+            if (l < 0)
+            {
+                    throw new CoreHunterException("L can not be less than zero!");
+            }
+    }
 
-	protected void handleRSet() throws CoreHunterException
-	{
-		if (SearchStatus.STARTED.equals(getStatus()))
-		{
-			throw new CoreHunterException("R can not be set while search in process");
-		}
-		if (r < 0)
-		{
-			throw new CoreHunterException("R can not be less than zero!");
-		}
-	}
+    protected void handleRSet() throws CoreHunterException
+    {
+            if (SearchStatus.STARTED.equals(getStatus()))
+            {
+                    throw new CoreHunterException("R can not be set while search in process");
+            }
+            if (r < 0)
+            {
+                    throw new CoreHunterException("R can not be less than zero!");
+            }
+    }
 
-	/**
-	 * Check whether subset size is increasing (L > R).
-	 */
-	private boolean increasingSubsetSize()
-	{
-		return l > r;
-	}
+    /**
+     * Check whether subset size is increasing (L > R).
+     */
+    private boolean increasingSubsetSize()
+    {
+            return l > r;
+    }
 
-	/**
-	 * Check whether subset size is decreasing (R > L).
-	 */
-	private boolean decreasingSubsetSize()
-	{
-		return r > l;
-	}
+    /**
+     * Check whether subset size is decreasing (R > L).
+     */
+    private boolean decreasingSubsetSize()
+    {
+            return r > l;
+    }
 
-	private boolean insideValidSizeRegion(SolutionType solution)
-	{
-		return solution.getSubsetSize() >= getSubsetMinimumSize()
-		    && solution.getSubsetSize() <= getSubsetMaximumSize();
-	}
-
-	@Override
-	protected void runSearch() throws CoreHunterException
-	{
-		int difference  = l - r ;
-
-		if (difference > 0) 
-		{
-			// Increasing core size, stop if can not continue or next step will go over maximum
-			while (canContinue() && getCurrentSolution().getSubsetSize() + difference <= getSubsetMinimumSize())
-			{
-				for (int i = 0 ; i < l ; ++i)
-				{
-					performBestAdditionMove() ;
-				}
-				
-				for (int i = 0 ; i < r ; ++i)
-				{
-					performBestDeletionMove() ;
-				}
-			}
-		}
-		else
-		{
-			if (difference < 0) 
-			{
-				// Decreasing core size, stop if can not continue or next step will go under minimum
-				while (getCurrentSolution().getSubsetSize() + difference >= getSubsetMinimumSize())
-				{
-					for (int i = 0 ; i < r ; ++i)
-					{
-						performBestDeletionMove() ;
-					}
-					
-					for (int i = 0 ; i < l ; ++i)
-					{
-						performBestAdditionMove() ;
-					}
-				}
-			}
-			else
-			{
-				// should not happen
-				throw new SearchException("L == R!!!!");
-			}
-		}
-		
-		// check if valid solution
-		if (getBestSolution() == null || !insideValidSizeRegion(getBestSolution()))
-		{
-			throw new SearchException("Search stopped before it could find a valid solution");
-		}
-		
-			// TODO remove these comments after checking it works as expected
-			// take next step
-
-			// ...
-
-			// if valid solution obtained: check if new best solution
-
-			// ...
-
-			// if next step will jump over valid size region: adjust L and R
-			// so that |L-R| = 1, to obtain valid solution(s)
-		  // NOTE this is not needed a valid solution will always be obtained if possible
-
-			// ...
-
-	}
-
-	// this code is similar to some Neighbourhood it should be combine, once this is working well
-	private void performBestAdditionMove() throws CoreHunterException
-  {
-    Collection<IndexType> unselected = new HashSet<IndexType>(getCurrentSolution().getRemainingIndices());
+    private boolean insideValidSizeRegion(SolutionType solution)
+    {
+            return solution.getSubsetSize() >= getSubsetMinimumSize()
+                && solution.getSubsetSize() <= getSubsetMaximumSize();
+    }
     
-		ExactSingleNeighbourhood<IndexType, SolutionType> exactSingleNeighbourhood = new ExactSingleNeighbourhood<IndexType, SolutionType>() ; // perhaps can be reused
-		
-		EvaluatedIndexedMove<IndexType, SolutionType> bestMove = exactSingleNeighbourhood.findBestAdditionMove(getCurrentSolution(), getObjectiveFunction(), null, getCurrentSolutionEvaluation(), unselected) ;
-	
-    performMove(bestMove) ;
-  }
-	
-	private void performBestDeletionMove() throws CoreHunterException
-  {
-    Collection<IndexType> selected = new HashSet<IndexType>(getCurrentSolution().getSubsetIndices());
-    
-		ExactSingleNeighbourhood<IndexType, SolutionType> exactSingleNeighbourhood = new ExactSingleNeighbourhood<IndexType, SolutionType>() ; // perhaps can be reused
-		
-		EvaluatedIndexedMove<IndexType, SolutionType> bestMove = exactSingleNeighbourhood.findBestDeletionMove(getCurrentSolution(), getObjectiveFunction(), null, getCurrentSolutionEvaluation(), selected) ;
-	
-    performMove(bestMove) ;
-  }
+    private boolean minMaxSubsetSizeReached(SolutionType solution){
+        if(increasingSubsetSize()){
+            return solution.getSubsetSize() >= getSubsetMaximumSize();
+        } else {
+            return solution.getSubsetSize() <= getSubsetMinimumSize();
+        }
+    }
 
-	@SuppressWarnings("rawtypes")
-  private void performMove(EvaluatedMove<SolutionType> move) throws CoreHunterException
-  {
-		move.apply(getCurrentSolution());
-		
-		setCurrentSolutionEvaluation(((EvaluatedMove)move).getEvaluation());
-		
-		if (insideValidSizeRegion(getCurrentSolution()) && isNewBestSolution(getCurrentSolutionEvaluation(), getCurrentSolution().getSize()))
-		{
-			handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
-		}
-  }
+    @Override
+    protected void runSearch() throws CoreHunterException
+    {
 
-	
-	@Override
-	protected void validate() throws CoreHunterException
-	{
-		super.validate();
+        // stop if can not continue or maxmimum/minimum subset size reached if increasing/decreasing respectively
+        while(canContinue() && !minMaxSubsetSizeReached(getCurrentSolution())){
+            
+            if(increasingSubsetSize()){
+                // increasing: first add l, then remove r
+                for (int i = 0 ; i < l ; ++i)
+                {
+                        performBestAdditionMove() ;
+                }
 
-		// check L and R
-		if (l < 0)
-		{
-			throw new CoreHunterException("L can not be less than zero");
-		}
-		if (r < 0)
-		{
-			throw new CoreHunterException("R can not be less than zero");
-		}
-		if (l == r)
-		{
-			throw new CoreHunterException("L and R can not be equal");
-		}
+                for (int i = 0 ; i < r ; ++i)
+                {
+                        performBestDeletionMove() ;
+                }
+            } else {
+                // decreasing: first remove r, then add l
+                for (int i = 0 ; i < r ; ++i)
+                {
+                        performBestDeletionMove() ;
+                }
 
-		// initial subset should contain at least two indices, for the distance
-		// measures to be computable
-		if (getCurrentSolution().getSubsetSize() < 2)
-		{
-			throw new CoreHunterException(
-			    "Initial subset should contain at least 2 indices");
-		}
+                for (int i = 0 ; i < l ; ++i)
+                {
+                        performBestAdditionMove() ;
+                }
+            }
 
-		// if subset size is increasing, initial size can not be too large
-		if (increasingSubsetSize()
-		    && getCurrentSolution().getSubsetSize() > getSubsetMaximumSize())
-		{
-			throw new CoreHunterException(
-			    "L > R (increasing subset size): initial subset size can not be larger than maximum subset size");
-		}
+        }
 
-		// if subset size is decreasing, initial size can not be too small
-		if (decreasingSubsetSize()
-		    && getCurrentSolution().getSubsetSize() < getSubsetMinimumSize())
-		{
-			throw new CoreHunterException(
-			    "L < R (decreasing subset size): initial subset size can not be smaller than minimum subset size");
-		}
-	}
+        // check if valid solution
+        if (getBestSolution() == null || !insideValidSizeRegion(getBestSolution()))
+        {
+                throw new SearchException("Search stopped before it could find a valid solution");
+        }
+
+    }
+
+    // this code is similar to some Neighbourhood it should be combine, once this is working well
+    private void performBestAdditionMove() throws CoreHunterException {
+        Collection<IndexType> unselected = new HashSet<IndexType>(getCurrentSolution().getRemainingIndices());
+
+        EvaluatedIndexedMove<IndexType, SolutionType> bestMove = exactSingleNeighbourhood.findBestAdditionMove(getCurrentSolution(), getObjectiveFunction(), null, getCurrentSolutionEvaluation(), unselected);
+
+        performMove(bestMove);
+    }
+
+    private void performBestDeletionMove() throws CoreHunterException {
+        Collection<IndexType> selected = new HashSet<IndexType>(getCurrentSolution().getSubsetIndices());
+
+        EvaluatedIndexedMove<IndexType, SolutionType> bestMove = exactSingleNeighbourhood.findBestDeletionMove(getCurrentSolution(), getObjectiveFunction(), null, getCurrentSolutionEvaluation(), selected);
+
+        performMove(bestMove);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private void performMove(EvaluatedMove<SolutionType> move) throws CoreHunterException {
+        move.apply(getCurrentSolution());
+
+        setCurrentSolutionEvaluation(((EvaluatedMove) move).getEvaluation());
+
+        if (insideValidSizeRegion(getCurrentSolution()) && isNewBestSolution(getCurrentSolutionEvaluation(), getCurrentSolution().getSize())) {
+            handleNewBestSolution(getCurrentSolution(), getCurrentSolutionEvaluation());
+        }
+    }
+
+    @Override
+    protected void validate() throws CoreHunterException {
+        super.validate();
+
+        // check L and R
+        if (l < 0) {
+            throw new CoreHunterException("L can not be less than zero");
+        }
+        if (r < 0) {
+            throw new CoreHunterException("R can not be less than zero");
+        }
+        if (l == r) {
+            throw new CoreHunterException("L and R can not be equal");
+        }
+
+        // if subset size is increasing, initial size can not be too large
+        if (increasingSubsetSize()
+                && getCurrentSolution().getSubsetSize() > getSubsetMaximumSize()) {
+            throw new CoreHunterException(
+                    "L > R (increasing subset size): initial subset size can not be larger than maximum subset size");
+        }
+
+        // if subset size is decreasing, initial size can not be too small
+        if (decreasingSubsetSize()
+                && getCurrentSolution().getSubsetSize() < getSubsetMinimumSize()) {
+            throw new CoreHunterException(
+                    "L < R (decreasing subset size): initial subset size can not be smaller than minimum subset size");
+        }
+    }
 }

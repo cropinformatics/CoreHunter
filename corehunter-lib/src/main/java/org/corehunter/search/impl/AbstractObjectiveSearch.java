@@ -61,7 +61,7 @@ public abstract class AbstractObjectiveSearch<SolutionType extends Solution>
 
     @Override
     protected double getWorstEvaluation() {
-        return getObjectiveFunction().isMinimizing() ? Double.MAX_VALUE : Double.MIN_VALUE;
+        return getObjectiveFunction().isMinimizing() ? Double.MAX_VALUE : -Double.MAX_VALUE;
     }
 
     protected void handleObjectiveFunctionSet() throws CoreHunterException {
