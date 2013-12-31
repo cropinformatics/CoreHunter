@@ -28,7 +28,7 @@ import org.junit.Test;
 
 public class SSRMixedReplicaSearchSearchTest extends SubsetSearchTest<Integer, SubsetSolution<Integer>> {
 
-    @Test
+    //@Test
     public void testDefaults() {
         MixedReplicaSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>> search = 
         		new MixedReplicaSearch<Integer, SubsetSolution<Integer>, ExactSingleNeighbourhood<Integer, SubsetSolution<Integer>>>();
