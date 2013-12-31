@@ -20,108 +20,108 @@
 library(rJava)
 .jinit() # this starts the JVM
 
-coresubset.random <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
+randomSubset <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
-	parameters <- .create.parameters.without.measure(x, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParametersWithoutMeasure(x, minSize=minSize, maxSize=maxSize, intensity=intensity)
 
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "randomSearch", parameters$collection, as.integer(parameters$minSize), as.integer(parameters$maxSize))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.exhaustive <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
+exhaustiveSubsetSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "exhaustiveSearch", parameters$collection, 
 			parameters$objective, as.integer(parameters$minSize), as.integer(parameters$maxSize))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.lr <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, l=2, r=1) 
+lrSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, l=2, r=1) 
 {
-	#if(Math.abs(lr_l-lr_r) > 1){
-	#System.err.println("\n!!! Warning: current (l,r) setting may result" +
-	#					"in core size slightly different from desired size");
-	#}
+	if(abs(l-r) > 1) {
+		warning("Warning: current (l,r) setting may result" +
+						"in core size slightly different from desired size");
+	}
 	
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "lrSearch", parameters$collection, 
 			parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), as.integer(l), as.integer(r))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.semiLr <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, l=2, r=1) 
+semiLrSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, l=2, r=1) 
 {
-	#if(Math.abs(lr_l-lr_r) > 1){
-	#System.err.println("\n!!! Warning: current (l,r) setting may result" +
-	#					"in core size slightly different from desired size");
-	#}
+	if(abs(l-r) > 1) {
+		warning("Warning: current (l,r) setting may result" +
+					"in core size slightly different from desired size");
+	}
 	
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "semiLrSearch", parameters$collection, 
 			parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), as.integer(l), as.integer(r))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.forward <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
+forwardSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "forwardSelection", parameters$collection, 
 			parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.semiForward <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
+semiForwardSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "semiForwardSelection", parameters$collection, 
 			parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.backward <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
+backwardSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "backwardSelection", parameters$collection, 
 			parameters$objective, as.integer(parameters$minSize), as.integer(parameters$maxSize))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.remc <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
+remcSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
 		runtime = 60.0, minProg = 0.0, stuckTime = 60.0, 
-		remcReplicas = 10, remcMinT = 50.0, remcMaxT = 200.0, remcMcSteps = 50) 
+		replicas = 10, minTemp = 50.0, maxTemp = 200.0, steps = 50) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
-	neighbourhood <- .create.random.neighourhood(parameters$minSize, parameters$maxSize) 
+	neighbourhood <- createRandomNeighourhood(parameters$minSize, parameters$maxSize) 
 	
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "remcSearch", parameters$collection, 
 			neighbourhood, parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), 
-			as.integer(runtime), as.integer(minProg), as.integer(stuckTime), as.integer(remcReplicas), 
-			remcMinT, remcMaxT, as.integer(remcMcSteps))
+			runtime, minProg, stuckTime, as.integer(replicas), 
+			minTemp, maxTemp, as.integer(steps))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.mixedReplica <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
+mixedReplicaSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
 		runtime = 60.0, minProg = 0.0, stuckTime = 60.0, nrOfTabuReplicas = 2, nrOfNonTabuReplicas = 3,
 		roundsWithoutTabu = 10, nrOfTabuSteps = 5, tournamentSize = 2, tabuListSize = NULL,
-		boostNr, boostMinProg = 10e-9, boostTimeFactor = 15, minBoostTime = 0.25,
-		minMCTemp = 50.0, maxMCTemp = 100.0) 
+		boostNr = 2, boostMinProg = 10e-9, boostTimeFactor = 15, minBoostTime = 0.25,
+		minTemp = 50.0, maxTemp = 100.0) 
 {	
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
 	if (!is.null(tabuListSize))
 	{
@@ -130,72 +130,70 @@ coresubset.mixedReplica <- function(x, measure, minSize=NULL, maxSize=NULL, inte
 	}
 	else
 	{
-		tabuListSize = 0.3 * sampleMin
+		tabuListSize = 0.3 * minSize
 		
 		if (tabuListSize < 1)
 			tabuListSize = 1
 	}
-	
-	neighbourhood <- .create.random.neighourhood(parameters$minSize, parameters$maxSize) 
-	
+
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "mixedReplicaSearch", parameters$collection, 
-			neighbourhood, parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), 
-			runtime, minProg, stuckTime, as.integer(mixrepNrOfTabuReplicas), as.integer(mixrepNrOfNonTabuReplicas),
-			as.integer(mixrepRoundsWithoutTabu), as.integer(mixrepNrOfTabuSteps), as.integer(mixrepTournamentSize), as.integer(tabuListSize),
-			as.integer(mixrepBoostNr), mixrepBoostMinProg, mixrepBoostTimeFactor, mixrepMinBoostTime,
-			mixrepMinMCTemp, mixrepMaxMCTemp)
+			parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), 
+			runtime, minProg, stuckTime, as.integer(nrOfTabuReplicas), as.integer(nrOfNonTabuReplicas),
+			as.integer(roundsWithoutTabu), as.integer(nrOfTabuSteps), as.integer(tournamentSize), as.integer(tabuListSize),
+			as.integer(boostNr), boostMinProg, as.integer(boostTimeFactor), minBoostTime,
+			minTemp, maxTemp)
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.local <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
+localSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
 		runtime = 60.0, minProg = 0.0, stuckTime = 60.0) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
-	neighbourhood <- .create.random.neighourhood(parameters$minSize, parameters$maxSize) 
+	neighbourhood <- createRandomNeighourhood(parameters$minSize, parameters$maxSize) 
 		
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "localSearch", parameters$collection, 
 			neighbourhood, parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), 
 			runtime, minProg, stuckTime)
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.steepestDescent <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
+steepestDescentSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
 		runtime = 60.0, minProg = 0.0) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
-	neighbourhood <- .create.random.neighourhood(parameters$minSize, parameters$maxSize) 
+	neighbourhood <- createRandomNeighourhood(parameters$minSize, parameters$maxSize) 
 
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "steepestDescentSearch", parameters$collection, 
 			neighbourhood, parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), 
 			runtime, minProg)
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.mstrat <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
+mstratSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
 		runtime = 60.0, minProg = 0.0) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
-	neighbourhood <- .create.heuristic.neighourhood(parameters$minSize, parameters$maxSize) 
+	neighbourhood <- createHeuristicNeighourhood(parameters$minSize, parameters$maxSize) 
 	
 	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "steepestDescentSearch", parameters$collection, 
 			neighbourhood, parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), 
 			runtime, minProg)
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 
-coresubset.tabu <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
+tabuSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL, 
 		runtime = 60.0, minProg = 0.0, stuckTime = 60, tabuListSize = NULL) 
 {
-	parameters <- .create.parameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
+	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)
 	
-	neighbourhood <- .create.random.neighourhood(parameters$minSize, parameters$maxSize) 
+	neighbourhood <- createRandomNeighourhood(parameters$minSize, parameters$maxSize) 
 	
 	if (!is.null(tabuListSize))
 	{
@@ -204,7 +202,7 @@ coresubset.tabu <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NU
 	}
 	else
 	{
-		tabuListSize = 0.3 * sampleMin
+		tabuListSize = 0.3 * minSize
 		
 		if (tabuListSize < 1)
 			tabuListSize = 1
@@ -214,6 +212,6 @@ coresubset.tabu <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NU
 			neighbourhood, parameters$objectiveFunction, as.integer(parameters$minSize), as.integer(parameters$maxSize), 
 			runtime, minProg, stuckTime, as.integer(tabuListSize))
 	
-	return(.create.coresubset(x, parameters, subset))
+	return(createCoresubset(x, parameters, subset))
 }
 

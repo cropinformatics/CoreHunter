@@ -13,41 +13,43 @@ library(rJava)
 
 library(testthat)
 
-setwd("/Users/daveneti/Repositories/CoreHunter/corehunter-r")
-.jaddClassPath("/Users/daveneti/Repositories/CoreHunter/corehunter-r/corehunter/inst/java/corehunter-cli.jar")
+packageDirectory <- "/Users/daveneti/Repositories/CoreHunter/corehunter-r" ;
 
-source("corehunter/R/utilities.R")
-source("corehunter/R/corehunter.R")
+setwd(packageDirectory)
+.jaddClassPath(file.path(packageDirectory, "corehunter", "inst", "java", "corehunter.jar")) 
 
-x <- read.csv("corehunter/data/bul.csv",header=T) 
+source(file.path("corehunter", "R", "utilities.R"))
+source(file.path("corehunter", "R", "corehunter.R")) 
 
-###############################################################################
-# Random Search
-###############################################################################
-
-core <- coresubset.random(x, minSize=2, maxSize=3)
-
-expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
-expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
-
-core <- coresubset.random(x, intensity=0.01)
-
-expect_that(nrow (subset (core, core$selected)) == 2, is_true())
-
-#core <- coresubset.exhaustive(x, minSize=2, maxSize=3, measure = "MR")
-
-#expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
-#expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+x <- read.csv(file.path("corehunter", "data", "bul.csv"),header=T) 
 
 measures = data.frame(c(0.5, 0.5)) 
 colnames(measures) <- c("weights")
 rownames(measures) <- c("MR", "CE")
 
 ###############################################################################
+# Random Search
+###############################################################################
+
+core <- randomSubset(x, minSize=2, maxSize=3)
+
+expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
+expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
+core <- randomSubset(x, intensity=0.01)
+
+expect_that(nrow (subset (core, core$selected)) == 2, is_true())
+
+###############################################################################
 # Exhaustive Search
 ###############################################################################
 
-#core <- coresubset.exhaustive(x, minSize=2, maxSize=3, measure = measures)
+#core <- exhaustiveSearch(x, minSize=2, maxSize=3, measure = "MR")
+
+#expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
+#expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
+#core <- exhaustiveSearch(x, minSize=2, maxSize=3, measure = measures)
 
 #expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 #expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -56,12 +58,12 @@ rownames(measures) <- c("MR", "CE")
 # LR Search
 ###############################################################################
 
-core <- coresubset.lr(x, minSize=2, maxSize=3, measure = "MR")
+core <- lrSearch(x, minSize=2, maxSize=3, measure = "MR")
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 
-core <- coresubset.lr(x, minSize=2, maxSize=3, measure = measures)
+core <- lrSearch(x, minSize=2, maxSize=3, measure = measures)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -70,12 +72,12 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # Semi-LR Search
 ###############################################################################
 
-core <- coresubset.semiLr(x, minSize=2, maxSize=3, measure = "MR")
+core <- semiLrSearch(x, minSize=2, maxSize=3, measure = "MR")
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 
-core <- coresubset.semiLr(x, minSize=2, maxSize=3, measure = measures)
+core <- semiLrSearch(x, minSize=2, maxSize=3, measure = measures)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -84,12 +86,12 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # Forward Search
 ###############################################################################
 
-core <- coresubset.forward(x, minSize=2, maxSize=3, measure = "MR")
+core <- forwardSearch(x, minSize=2, maxSize=3, measure = "MR")
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 
-core <- coresubset.forward(x, minSize=2, maxSize=3, measure = measures)
+core <- forwardSearch(x, minSize=2, maxSize=3, measure = measures)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -98,12 +100,12 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # Semi-Forward Search
 ###############################################################################
 
-core <- coresubset.semiForward(x, minSize=2, maxSize=3, measure = "MR")
+core <- semiForwardSearch(x, minSize=2, maxSize=3, measure = "MR")
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 
-core <- coresubset.semiForward(x, minSize=2, maxSize=3, measure = measures)
+core <- semiForwardSearch(x, minSize=2, maxSize=3, measure = measures)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -112,12 +114,12 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # Backward Search
 ###############################################################################
 
-core <- coresubset.backward(x, minSize=2, maxSize=3, measure = "MR")
+core <- backwardSearch(x, minSize=2, maxSize=3, measure = "MR")
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 
-core <- coresubset.backward(x, minSize=2, maxSize=3, measure = measures)
+core <- backwardSearch(x, minSize=2, maxSize=3, measure = measures)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -126,16 +128,27 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # REMC Search
 ###############################################################################
 
-core <- coresubset.remc(x, minSize=2, maxSize=3, measure = "MR")
+core <- remcSearch(x, minSize=2, maxSize=3, measure = "MR", runtime = 1)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
+core <- remcSearch(x, minSize=2, maxSize=3, measure = measures, runtime = 1)
+
+expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
+expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
 
 ###############################################################################
 # Mixed Replica Search
 ###############################################################################
 
-core <- coresubset.mixedReplica(x, minSize=2, maxSize=3, measure = "MR")
+core <- mixedReplicaSearch(x, minSize=2, maxSize=3, measure = "MR", runtime = 1)
+
+expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
+expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
+core <- mixedReplicaSearch(x, minSize=2, maxSize=3, measure = measures, runtime = 1)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -144,7 +157,12 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # Local Search
 ###############################################################################
 
-core <- coresubset.local(x, minSize=2, maxSize=3, measure = "MR")
+core <- localSearch(x, minSize=2, maxSize=3, measure = "MR", runtime = 1)
+
+expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
+expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
+core <- localSearch(x, minSize=2, maxSize=3, measure = measures, runtime = 1)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -153,7 +171,12 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # Steepest Descent Search
 ###############################################################################
 
-core <- coresubset.steepestDescent(x, minSize=2, maxSize=3, measure = "MR") 
+core <- steepestDescentSearch(x, minSize=2, maxSize=3, measure = "MR") 
+
+expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
+expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
+core <- steepestDescentSearch(x, minSize=2, maxSize=3, measure = measures) 
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -162,7 +185,12 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # MStrat Search
 ###############################################################################
 
-core <- coresubset.mstrat(x, minSize=2, maxSize=3, measure = "MR")
+core <- mstratSearch(x, minSize=2, maxSize=3, measure = "MR")
+
+expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
+expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
+core <- mstratSearch(x, minSize=2, maxSize=3, measure = measures)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
@@ -171,7 +199,12 @@ expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
 # Tabu Search
 ###############################################################################
 
-core <- coresubset.tabu(x, minSize=2, maxSize=3, measure = "MR")
+core <- tabuSearch(x, minSize=2, maxSize=3, measure = "MR")
+
+expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
+expect_that(nrow (subset (core, core$selected)) <= 3, is_true())
+
+core <- tabuSearch(x, minSize=2, maxSize=3, measure = measures)
 
 expect_that(nrow (subset (core, core$selected)) >= 2, is_true())
 expect_that(nrow (subset (core, core$selected)) <= 3, is_true())

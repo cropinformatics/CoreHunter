@@ -20,7 +20,7 @@
 library(rJava)
 .jinit() # this starts the JVM
 
-.create.parameters.without.measure <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
+createParametersWithoutMeasure <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
 	parameters <- list() 
 	
@@ -79,13 +79,13 @@ library(rJava)
 	return (parameters)
 }
 
-.create.parameters <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL, measure=NULL) 
+createParameters <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL, measure=NULL) 
 {
-	parameters <- .create.parameters.without.measure(x, minSize, maxSize, intensity) ;
+	parameters <- createParametersWithoutMeasure(x, minSize, maxSize, intensity) ;
 	
 	if (!is.null(measure))
 	{
-		parameters$objectiveFunction = .create.objectiveFunction(measure, collectionSize=parameters$collectionSize) ;
+		parameters$objectiveFunction = createObjectiveFunction(measure, collectionSize=parameters$collectionSize) ;
 	}
 	else
 	{
@@ -100,7 +100,7 @@ library(rJava)
 	return (parameters)
 }
 
-.create.coresubset <- function(x, parameters, subset)
+createCoresubset <- function(x, parameters, subset)
 {
 	selected <- .jrcall(subset, "getAccessionNamesAsArray") ;
 	
@@ -111,24 +111,27 @@ library(rJava)
 	return(core)
 }
 
-.create.random.neighourhood <- function(x, parameters, subset, minSize=NULL, maxSize=NULL)
+createRandomNeighourhood <- function(minSize=NULL, maxSize=NULL)
 {
 	neighborhood <- .jnew("org/corehunter/search/RandomSingleNeighborhood", as.integer(minSize), as.integer(maxSize)) ;
 
 	return(neighborhood)
 }
 
-.create.heuristic.neighourhood <- function(x, parameters, subset, minSize=NULL, max=NULL)
+createHeuristicNeighourhood <- function(minSize=NULL, max=NULL)
 {
 	neighborhood <- .jnew("org/corehunter/search/HeuristicSingleNeighborhood", as.integer(minSize), as.integer(maxSize)) ;
 	
 	return(neighborhood)
 }
 
-.create.objectiveFunction <- function(measure, collectionSize = NULL) 
+createObjectiveFunction <- function(measure, collectionSize = NULL) 
 {
 	measureNames <- .jrcall("org/corehunter/measures/MeasureFactory", "getMeasureNames") ;
 	availableMeasureNames <- measureNames
+	
+	if (is.null(measure))
+		stop("Measure not defined!") 
 	
 	if (is.null(collectionSize))
 		stop("Collection size not defined!") 
