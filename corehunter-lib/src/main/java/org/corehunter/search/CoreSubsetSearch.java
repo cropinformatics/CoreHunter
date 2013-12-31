@@ -41,7 +41,7 @@ public final class CoreSubsetSearch
 {
 
 	// Progress Writer settings
-	private final static boolean	WRITE_PROGRESS_FILE	 = true;
+	private final static boolean	WRITE_PROGRESS_FILE	 = false;
 	private final static String	 PROGRESS_FILE_PATH	   = "progress";
 	private final static long	   PROGRESS_WRITE_PERIOD	= 100;
 
