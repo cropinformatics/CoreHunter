@@ -1,0 +1,9 @@
+target/
+bin/
+.DS_Store
+.project
+.settings
+.classpath
+*.tar.gz
+*.jar
+*.zip
