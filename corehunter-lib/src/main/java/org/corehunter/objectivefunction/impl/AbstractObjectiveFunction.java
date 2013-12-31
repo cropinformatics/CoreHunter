@@ -81,8 +81,8 @@ public abstract class AbstractObjectiveFunction<
 	  if (data == null)
 	  	throw new CoreHunterException("No data defined!") ;
           
-          // flush cached results upon switching datasets
-          flushCachedResults();
+	  // flush cached results upon switching datasets
+    flushCachedResults();
   }
 
 	@Override
