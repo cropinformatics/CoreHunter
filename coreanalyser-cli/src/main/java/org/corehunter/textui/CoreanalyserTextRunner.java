@@ -130,7 +130,7 @@ public final class CoreanalyserTextRunner
 	    	IndexSubsetGenerator integerSubsetGenerator = new IndexSubsetGenerator() ;
 	    	integerSubsetGenerator.setSubsetSize(2) ;
 
-	    	SubsetSolution<Integer> solution = new IntegerSubsetSolution(dataset.getIndices(), integerSubsetGenerator.first()) ;
+	    	SubsetSolution<Integer> solution = new IntegerSubsetSolution(dataset.getIndices(), integerSubsetGenerator.next()) ;
 
 	    	Map<String, Double> scores = objectiveFunction.componentScores(solution);
 
