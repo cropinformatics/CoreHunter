@@ -23,8 +23,12 @@
 			<name>Herman De Beukelaer</name>
 			<email>herman.debeukelaer@ugent.be</email>
 		</developer>
+	    <developer>
+	      <id>daveneti</id>
+	      <name>Guy Davenport</name>
+	      <email>daveneti@gmail.com</email>
+	    </developer>
 	</developers>
-
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
