@@ -1,7 +1,7 @@
 # Base R functions for corehunter
 # 
 # Author: Guy Davenport, Herman De Beukelaer 2013
-#  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+#  Copyright 2013 Guy Davenport, Herman De Beukelaer
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,28 @@
 #  limitations under the License.
 ###############################################################################
 
+#' Performs an exhaustive subset search
+#' 
+#' Iterates through all subsets within the given size range, evaulating each subset
+#' using the given measure and returns the best subset
+#' 
+#' @param x A data frame containing the allele frequences for the each accession. The first
+#' column is the marker name, second column the allele name and one or more subsequent columns 
+#' providing the allele frequencies for one or more accessions.
+#' @param measure the code of the measure to use or a data frame containing two or measure codes 
+#' in the first column and the relative weights of the measure in the second column
+#' @param minSize the minimum size of the required subset.
+#' @param maxSize the maximum size of the required subset if a range of subsets sizes is required. 
+#' Can not be used in conjunction with intensity
+#' @param intensity the required subset as a relative proportion of the complete set size. Can not be 
+#' used in conjunction with minSize or maxSize
+#' 
+#' @return A data frame containing a row for each accession in the input file, with row names are
+#' the accessions names provided in the input file and the only column call 'selected' is
+#' is TRUE or FALSE if selected as part of the subset.
+#' @author Guy Davenport and Herman De Beukelaer
+#' @export
+#' 
 exhaustiveSubsetSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
 	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)

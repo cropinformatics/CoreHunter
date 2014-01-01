@@ -1,7 +1,7 @@
-# Base R functions for corehunter
+# Utility R functions for corehunter
 # 
 # Author: Guy Davenport, Herman De Beukelaer 2013
-#  Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+#  Copyright 2013 Guy Davenport, Herman De Beukelaer
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
