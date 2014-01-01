@@ -16,19 +16,6 @@
 #  limitations under the License.
 ###############################################################################
 
-
-library(rJava)
-.jinit() # this starts the JVM
-
-randomSubset <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
-{
-	parameters <- createParametersWithoutMeasure(x, minSize=minSize, maxSize=maxSize, intensity=intensity)
-
-	subset <- .jrcall("org/corehunter/search/CoreSubsetSearch", "randomSearch", parameters$collection, as.integer(parameters$minSize), as.integer(parameters$maxSize))
-	
-	return(createCoresubset(x, parameters, subset))
-}
-
 exhaustiveSubsetSearch <- function(x, measure, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
 	parameters <- createParameters(x, measure=measure, minSize=minSize, maxSize=maxSize, intensity=intensity)

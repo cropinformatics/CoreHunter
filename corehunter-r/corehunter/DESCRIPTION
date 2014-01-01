@@ -7,3 +7,8 @@ Author: Guy Davenport, Herman De Beukelaer
 Maintainer: Guy Davenport <guy@daveneti.com>
 Description: Core Hunter is a library for selecting and analysing genetic resources.
 License: LICENSE
+Depends: R (>= 2.12.1), rJava
+Suggests: testthat
+Collate:
+	'corehunter.R'
+	'utilities.R'

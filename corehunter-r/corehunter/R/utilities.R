@@ -16,9 +16,11 @@
 #  limitations under the License.
 ###############################################################################
 
-
-library(rJava)
-.jinit() # this starts the JVM
+.onLoad <- function(libname, pkgname) {
+	
+	rJava::.jpackage(pkgname, lib.loc = libname)
+	
+}
 
 createParametersWithoutMeasure <- function(x, minSize=NULL, maxSize=NULL, intensity=NULL) 
 {
