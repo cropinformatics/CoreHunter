@@ -1,4 +1,4 @@
-// Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer
+// Copyright 2008,2011 Chris Thachuk, Herman De Beukelaer, Guy Davenport
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -129,8 +129,11 @@ public final class SSRDataset extends AccessionDataset<List<Double>>
 				return null;
 			}
 
-			if (markerNames.length == alleleNames.length)
+			if (markerNames.length != alleleNames.length)
+			{
 				System.err.println("Dataset is not properly formatted, number of marker marker names must match number of allele names");
+				return null ;
+			}
 			
 			for (int i = 0 ; i < markerNames.length ; ++i)
 			{
@@ -141,8 +144,11 @@ public final class SSRDataset extends AccessionDataset<List<Double>>
 					markersToAlleles.get(markerNames[i]).add(alleleNames[i]);
 			}
 			
-			if (scores.length == alleleNames.length)
+			if (scores.length != alleleNames.length)
+			{
 				System.err.println("Dataset is not properly formatted, number of scores must match number of allele names");
+				return null ;
+			}
 
 			if (markersToAlleles.size() < 1)
 			{
@@ -160,8 +166,11 @@ public final class SSRDataset extends AccessionDataset<List<Double>>
 						String accession = accessions.get(i);
 						Double alleleValue = null;
 						
-						if (scores[i].length == accessions.size())
+						if (scores[i].length != accessions.size())
+						{
 							System.err.println("Dataset is not properly formatted, number of scores must match number of accessions at " + i);
+							return null ;
+						}
 
 						try
 						{
