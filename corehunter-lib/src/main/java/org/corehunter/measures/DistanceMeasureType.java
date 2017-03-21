@@ -21,7 +21,7 @@ package org.corehunter.measures;
 public enum DistanceMeasureType {
 
     MEAN_DISTANCE("",""), // for optimizing mean distance
-    ENE_DISTNACE("ene", "E-NE"), // for optimizing E-NE distance
+    ENE_DISTANCE("ene", "E-NE"), // for optimizing E-NE distance
     MIN_DISTANCE("min", " (minimum)"); // for optimizing minimum distance
 
 

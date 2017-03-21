@@ -224,7 +224,7 @@ public abstract class DistanceMeasure extends Measure {
             }
             return minDist;*/
 
-        } else if (type == DistanceMeasureType.ENE_DISTNACE) {
+        } else if (type == DistanceMeasureType.ENE_DISTANCE) {
 
             // entry-to-nearest-entry distance
 

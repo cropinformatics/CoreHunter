@@ -32,6 +32,8 @@ public final class MeasureFactory {
         return new ModifiedRogersDistance(accessionCount);
     } else if (measureName.equals("MRmin")) {
         return new ModifiedRogersDistance(accessionCount, DistanceMeasureType.MIN_DISTANCE);
+    } else if (measureName.equals("MRene")) {
+        return new ModifiedRogersDistance(accessionCount, DistanceMeasureType.ENE_DISTANCE);
     } else if (measureName.equals("CE")) {
         return new CavalliSforzaEdwardsDistance(accessionCount);
     } else if (measureName.equals("CEmin")) {

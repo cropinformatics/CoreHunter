@@ -45,7 +45,7 @@ import org.corehunter.search.RandomSingleNeighborhood;
  */
 public final class CorehunterTextRunner {
 
-    private final String[] measureNames = {"MR", "MRmin", "CE", "CEmin","SH", "HE", "NE", "PN", "CV", "EX"};
+    private final String[] measureNames = {"MR", "MRmin", "MRene", "CE", "CEmin","SH", "HE", "NE", "PN", "CV", "EX"};
 
     private final double DEFAULT_RUNTIME = 60.0;
     private final double DEFAULT_MINPROG = 0.0;
@@ -352,10 +352,14 @@ public final class CorehunterTextRunner {
 			    .hasArg()
 			    .withDescription("use mean Modified Rogers distance and specify weight")
 			    .create("MR") );
-        measuresOpts.addOption( OptionBuilder.withArgName("weight")
+		measuresOpts.addOption( OptionBuilder.withArgName("weight")
 			    .hasArg()
 			    .withDescription("use minimum Modified Rogers distance and specify weight")
 			    .create("MRmin") );
+        measuresOpts.addOption( OptionBuilder.withArgName("weight")
+                .hasArg()
+                .withDescription("use E-NE Modified Rogers distance and specify weight")
+                .create("MRene") );
 	measuresOpts.addOption( OptionBuilder.withArgName("weight")
 			    .hasArg()
 			    .withDescription("use mean Cavalli-Sforza and Edwards distance and specify weight")
