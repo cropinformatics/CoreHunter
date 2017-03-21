@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/coreanalyser-cli/coreanalyser-cli.iml" filepath="$PROJECT_DIR$/coreanalyser-cli/coreanalyser-cli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/corehunter.iml" filepath="$PROJECT_DIR$/corehunter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/corehunter-cli/corehunter-cli.iml" filepath="$PROJECT_DIR$/corehunter-cli/corehunter-cli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/corehunter-lib/corehunter-lib.iml" filepath="$PROJECT_DIR$/corehunter-lib/corehunter-lib.iml" />
+    </modules>
+  </component>
+</project>

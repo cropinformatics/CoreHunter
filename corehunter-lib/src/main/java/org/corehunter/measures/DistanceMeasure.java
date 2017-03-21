@@ -138,68 +138,68 @@ public abstract class DistanceMeasure extends Measure {
 
             return total/count;
 
-        } else if (type == DistanceMeasureType.MIN_DISTANCE){
+        } else if (type == DistanceMeasureType.MIN_DISTANCE) {
 
             TreeMap<Double, Integer> minFreqTable = cache.getMinFreqTable();
 
             // add new distances
 
-            for(Accession a : aAccessions) {
-                for(Accession b : cAccessions) {
-                    dist = calculate(a,b);
+            for (Accession a : aAccessions) {
+                for (Accession c : cAccessions) {
+                    dist = calculate(a, c);
                     Integer freq = minFreqTable.get(dist);
-                    if(freq == null){
+                    if (freq == null) {
                         minFreqTable.put(dist, 1);
                     } else {
-                        minFreqTable.put(dist, freq+1);
+                        minFreqTable.put(dist, freq + 1);
                     }
                 }
             }
 
             int size = aAccessions.size();
-            for(int i=0; i<size-1; i++) {
-                for(int j=i+1; j<size; j++) {
+            for (int i = 0; i < size - 1; i++) {
+                for (int j = i + 1; j < size; j++) {
                     dist = calculate(aAccessions.get(i), aAccessions.get(j));
                     Integer freq = minFreqTable.get(dist);
-                    if(freq == null){
+                    if (freq == null) {
                         minFreqTable.put(dist, 1);
                     } else {
-                        minFreqTable.put(dist, freq+1);
+                        minFreqTable.put(dist, freq + 1);
                     }
                 }
             }
 
             // remove old distances
 
-            for(Accession a : rAccessions) {
-                for(Accession b : cAccessions) {
-                    dist = calculate(a,b);
+            for (Accession r : rAccessions) {
+                for (Accession c : cAccessions) {
+                    dist = calculate(r, c);
                     Integer freq = minFreqTable.get(dist);
                     freq--;
-                    if(freq == 0){
+                    if (freq == 0) {
                         minFreqTable.remove(dist);
                     } else if (freq > 0) {
                         minFreqTable.put(dist, freq);
                     } else {
-                        System.err.println("Error in minimum distance cacheing scheme!"
-                                           + "\nThis is a bug, please contact authors!");
+                        System.err.println("Error in minimum distance caching scheme!"
+                                + "\nThis is a bug, please contact authors!");
                     }
                 }
             }
 
             size = rAccessions.size();
-            for(int i=0; i<size-1; i++) {
-                for(int j=i+1; j<size; j++) {
+            for (int i = 0; i < size - 1; i++) {
+                for (int j = i + 1; j < size; j++) {
                     dist = calculate(rAccessions.get(i), rAccessions.get(j));
                     Integer freq = minFreqTable.get(dist);
                     freq--;
-                    if(freq == 0){
+                    if (freq == 0) {
                         minFreqTable.remove(dist);
                     } else if (freq > 0) {
                         minFreqTable.put(dist, freq);
                     } else {
                         System.err.println("Error in minimum distance cacheing scheme!"
-                                           + "\nThis is a bug, please contact authors!");
+                                + "\nThis is a bug, please contact authors!");
                     }
                 }
             }
@@ -223,6 +223,27 @@ public abstract class DistanceMeasure extends Measure {
                 }
             }
             return minDist;*/
+
+        } else if (type == DistanceMeasureType.ENE_DISTNACE) {
+
+            // entry-to-nearest-entry distance
+
+            // TODO: use cache for efficient delta evaluation!!
+
+            double ene = 0.0;
+            for(int i = 0; i < accessions.size(); i++){
+                double min = Double.MAX_VALUE;
+                for(int j = 0; j < accessions.size(); j++){
+                    dist = calculate(accessions.get(i), accessions.get(j));
+                    if(j != i && dist < min){
+                        min = dist;
+                    }
+                }
+                ene += min;
+            }
+            ene /= accessions.size();
+
+            return ene;
 
         } else {
             // THIS SHOULD NOT HAPPEN
@@ -283,36 +304,35 @@ public abstract class DistanceMeasure extends Measure {
     }
 
     private class DistanceCachedResult extends CachedResult {
-	private double pTotal;
-	private double pCnt;
+	    private double pTotal;
+	    private double pCnt;
 
         private TreeMap<Double, Integer> minFreqTable;
 
-	public DistanceCachedResult(List<Accession> accessions) {
-	    super();
-	    pTotal = 0.0;
-	    pCnt = 0.0;
-
+        public DistanceCachedResult(List<Accession> accessions) {
+            super();
+            pTotal = 0.0;
+            pCnt = 0.0;
             minFreqTable = new TreeMap<Double, Integer>();
-	}
-
-	public double getTotal() {
-	    return pTotal;
-	}
-
-	public double getCount() {
-	    return pCnt;
-	}
-
-        public TreeMap<Double, Integer> getMinFreqTable(){
-            return minFreqTable;
         }
 
-	public void setTotal(double total) {
-	    pTotal = total;
-	}
+        public double getTotal() {
+            return pTotal;
+        }
 
-	public void setCount(double count) {
+        public double getCount() {
+            return pCnt;
+        }
+
+        public TreeMap<Double, Integer> getMinFreqTable(){
+                return minFreqTable;
+            }
+
+        public void setTotal(double total) {
+            pTotal = total;
+        }
+
+        public void setCount(double count) {
 	    pCnt = count;
 	}
 

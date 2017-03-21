@@ -3,3 +3,5 @@
 /coreanalyser-cli/target/
 /bin
 .DS_Store
+**/.idea/workspace.xml
+**/.idea/tasks.xml
