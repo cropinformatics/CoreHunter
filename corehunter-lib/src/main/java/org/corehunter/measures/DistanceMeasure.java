@@ -14,13 +14,9 @@
 
 package org.corehunter.measures;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.corehunter.Accession;
+
+import java.util.*;
 
 /**
  * <<Class summary>>
@@ -86,13 +82,14 @@ public abstract class DistanceMeasure extends Measure {
     }
 
     public double calculate(List<Accession> accessions, DistanceCachedResult cache) {
-        List<Accession> aAccessions = cache.getAddedAccessions(accessions);
-        List<Accession> rAccessions = cache.getRemovedAccessions(accessions);
-        List<Accession> cAccessions = cache.getCommonAccessions(accessions);
         
         double dist;
         
         if (type == DistanceMeasureType.MEAN_DISTANCE){
+
+            List<Accession> aAccessions = cache.getAddedAccessions(accessions);
+            List<Accession> rAccessions = cache.getRemovedAccessions(accessions);
+            List<Accession> cAccessions = cache.getCommonAccessions(accessions);
 
             double total = cache.getTotal();
             double count = cache.getCount();
@@ -139,6 +136,10 @@ public abstract class DistanceMeasure extends Measure {
             return total/count;
 
         } else if (type == DistanceMeasureType.MIN_DISTANCE) {
+
+            List<Accession> aAccessions = cache.getAddedAccessions(accessions);
+            List<Accession> rAccessions = cache.getRemovedAccessions(accessions);
+            List<Accession> cAccessions = cache.getCommonAccessions(accessions);
 
             TreeMap<Double, Integer> minFreqTable = cache.getMinFreqTable();
 
@@ -198,7 +199,7 @@ public abstract class DistanceMeasure extends Measure {
                     } else if (freq > 0) {
                         minFreqTable.put(dist, freq);
                     } else {
-                        System.err.println("Error in minimum distance cacheing scheme!"
+                        System.err.println("Error in minimum distance caching scheme!"
                                 + "\nThis is a bug, please contact authors!");
                     }
                 }
@@ -228,30 +229,119 @@ public abstract class DistanceMeasure extends Measure {
 
             // entry-to-nearest-entry distance
 
-            // TODO: use cache for efficient delta evaluation!!
+            // old code for full evaluation
 
-            double ene = 0.0;
-            for(int i = 0; i < accessions.size(); i++){
-                double min = Double.MAX_VALUE;
-                for(int j = 0; j < accessions.size(); j++){
-                    dist = calculate(accessions.get(i), accessions.get(j));
-                    if(j != i && dist < min){
-                        min = dist;
+//            double ene = 0.0;
+//            for(int i = 0; i < accessions.size(); i++){
+//                double min = Double.MAX_VALUE;
+//                for(int j = 0; j < accessions.size(); j++){
+//                    dist = calculate(accessions.get(i), accessions.get(j));
+//                    if(j != i && dist < min){
+//                        min = dist;
+//                    }
+//                }
+//                ene += min;
+//            }
+//            ene /= accessions.size();
+//
+//            return ene;
+
+            // code using cache for efficient delta evaluation
+
+            // find added and removed accessions (sets for efficiency!)
+            Set<Accession> aAccessions = new HashSet<Accession>(accessions);
+            for(Accession prev : cache.getAccessions()){
+                aAccessions.remove(prev);
+            }
+            Set<Accession> rAccessions = new HashSet<Accession>(cache.getAccessions());
+            for(Accession cur : accessions){
+                rAccessions.remove(cur);
+            }
+
+            // retrieve cached evaluation
+            NearestEntryEvaluation eval = cache.getEntryToNearestEntry();
+
+            // copy to initialize new evaluation
+            NearestEntryEvaluation newEval = new NearestEntryEvaluation(eval);
+
+            // discard contribution of removed items
+            for(Accession item : rAccessions){
+                newEval.remove(item);
+            }
+
+            // update closest items in new selection
+            for(Accession item : accessions){
+                NearestEntry curClosest = newEval.getClosest(item);
+                if(curClosest == null){
+                    // case 1: previously unselected or no closest item set (less than two items were selected);
+                    //         search for closest item in new selection
+                    NearestEntry newClosest = findClosest(item, accessions);
+                    // register, if any
+                    if(newClosest != null){
+                        newEval.add(item, newClosest);
+                    }
+                } else {
+                    // case 2: current closest item needs to be updated
+                    if(rAccessions.contains(curClosest.getAccession())){
+                        // case 2A: current closest item removed, rescan entire new selection
+                        NearestEntry newClosest = findClosest(item, accessions);
+                        // update, if any
+                        if(newClosest != null){
+                            newEval.update(item, newClosest);
+                        } else {
+                            // no closest item left (new selection consists of single item);
+                            // discard contribution
+                            newEval.remove(item);
+                        }
+                    } else {
+                        // case 2B: current closest item retained; only check if any newly
+                        //          added item is closer
+                        NearestEntry closestAddedItem = findClosest(item, aAccessions);
+                        if(closestAddedItem != null && closestAddedItem.getDistance() < curClosest.getDistance()){
+                            // update closest item
+                            newEval.update(item, closestAddedItem);
+                        }
                     }
                 }
-                ene += min;
             }
-            ene /= accessions.size();
 
-            return ene;
+            // recache results
+            cache.setAccessions(accessions);
+            cache.setEntryToNearestEntry(newEval);
+
+            return newEval.getValue();
 
         } else {
             // THIS SHOULD NOT HAPPEN
-            System.err.println("Unkown distance measure type -- this is a bug! Please contact authors.");
+            System.err.println("Unknown distance measure type -- this is a bug! Please contact authors.");
             System.exit(1);
             return -1;
         }
         
+    }
+
+    /**
+     * Find the item in the given group that is closest to and different from the given item.
+     *
+     * @param acc given accession
+     * @param group other accessions
+     * @return closest other accession and corresponding distance;
+     *         <code>null</code> if the group does not contain any items other than the given item
+     */
+    private NearestEntry findClosest(Accession acc, Collection<Accession> group){
+        double dist;
+        Double minDist = Double.POSITIVE_INFINITY;
+        Accession closest = null;
+        for(Accession other : group){
+            if(other != acc){
+                dist = calculate(acc, other);
+                if(dist < minDist){
+                    minDist = dist;
+                    closest = other;
+                }
+            }
+        }
+        return closest != null ? new NearestEntry(closest, minDist) : null;
     }
 	
     public abstract double calculate(Accession a1, Accession a2);
@@ -308,12 +398,14 @@ public abstract class DistanceMeasure extends Measure {
 	    private double pCnt;
 
         private TreeMap<Double, Integer> minFreqTable;
+        private NearestEntryEvaluation entryToNearestEntry;
 
         public DistanceCachedResult(List<Accession> accessions) {
             super();
             pTotal = 0.0;
             pCnt = 0.0;
             minFreqTable = new TreeMap<Double, Integer>();
+            entryToNearestEntry = new NearestEntryEvaluation(0.0);
         }
 
         public double getTotal() {
@@ -327,6 +419,14 @@ public abstract class DistanceMeasure extends Measure {
         public TreeMap<Double, Integer> getMinFreqTable(){
                 return minFreqTable;
             }
+
+        public NearestEntryEvaluation getEntryToNearestEntry(){
+            return entryToNearestEntry;
+        }
+
+        public void setEntryToNearestEntry(NearestEntryEvaluation ene){
+            entryToNearestEntry = ene;
+        }
 
         public void setTotal(double total) {
             pTotal = total;

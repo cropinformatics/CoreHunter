@@ -14,9 +14,10 @@
 
 package org.corehunter.measures;
 
+import org.corehunter.Accession;
+
 import java.util.List;
 import java.util.ListIterator;
-import org.corehunter.Accession;
 
 /**
  * <<Class summary>>
@@ -55,12 +56,12 @@ public final class ModifiedRogersDistance extends DistanceMeasure {
 	    
 	    double markerSqDiff = 0;
 	    while (a1Itr.hasNext() && a2Itr.hasNext()) {
-		Double Pxla = a1Itr.next(); 
-		Double Pyla = a2Itr.next();
-		
-		if( Pxla != null && Pyla != null ) {
-		    markerSqDiff += (Pxla - Pyla) * (Pxla - Pyla);
-		}
+			Double Pxla = a1Itr.next();
+			Double Pyla = a2Itr.next();
+
+			if( Pxla != null && Pyla != null ) {
+				markerSqDiff += (Pxla - Pyla) * (Pxla - Pyla);
+			}
 	    }
 	    
 	    sumMarkerSqDiff += markerSqDiff;
