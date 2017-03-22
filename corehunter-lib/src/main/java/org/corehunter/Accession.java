@@ -215,5 +215,9 @@ public /*final*/ class Accession implements Comparable<Accession> {
 	return alleleTotals;
     }
 
+	@Override
+	public String toString() {
+		return id + "";
+	}
 }
 

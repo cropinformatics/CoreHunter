@@ -257,6 +257,15 @@ public abstract class DistanceMeasure extends Measure {
             for(Accession cur : accessions){
                 rAccessions.remove(cur);
             }
+//            if(aAccessions.size() != 1 || rAccessions.size() != 1) {
+//            System.out.println("---");
+//            System.out.println(aAccessions.size() + ", " + rAccessions.size());
+//            System.out.println("Accessions: " + accessions);
+//            System.out.println("Cache: " + cache.getAccessions());
+//            System.out.println("Added: " + aAccessions);
+//            System.out.println("Removed: " + rAccessions);
+//            System.out.println("---");
+//            }
 
             // retrieve cached evaluation
             NearestEntryEvaluation eval = cache.getEntryToNearestEntry();
